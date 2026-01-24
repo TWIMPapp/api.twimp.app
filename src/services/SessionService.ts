@@ -28,13 +28,9 @@ export interface UniversalSession {
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { supabase, isSupabaseConfigured } from '../config/supabase';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const SESSIONS_DIR = path.join(__dirname, '../data/sessions');
+const SESSIONS_DIR = path.join(process.cwd(), 'src/data/sessions');
 
 export class SessionService {
     // ===== File-based helpers (fallback for local dev) =====

@@ -15,8 +15,8 @@ export const MeanGreenEggstravaganza: Trail = {
     steps: [
         {
             location: {
-                type: 'Point',
-                coordinates: [50.7249475, -1.8761684]
+                lat: 50.7249475,
+                lng: -1.8761684
             },
             type: 'TRAIL_NODE',
             name: 'Start',
@@ -84,8 +84,8 @@ What can be hard on the outside but contains
         // No, I have the full content in the artifact check. I will copy it all.
         {
             location: {
-                type: 'Point',
-                coordinates: [50.7265142, -1.8780528]
+                lat: 50.7265142,
+                lng: -1.8780528
             },
             type: 'TRAIL_NODE',
             name: "Annie's House",
@@ -148,8 +148,8 @@ Ginger nuts!?  That is a bit odd, she's normally a bit of a health freak.  Sorry
         },
         {
             location: {
-                type: 'Point',
-                coordinates: [50.7271073, -1.8823479]
+                lat: 50.7271073,
+                lng: -1.8823479
             },
             type: 'TRAIL_NODE',
             name: 'Meyrick Park Cafe',
@@ -199,8 +199,8 @@ Umm... well no!  But Maggie gets in just before 9am, she can tell you.`,
         },
         {
             location: {
-                type: 'Point',
-                coordinates: [50.7208604, -1.8841118]
+                lat: 50.7208604,
+                lng: -1.8841118
             },
             type: 'TRAIL_NODE',
             name: 'Pure Gym',

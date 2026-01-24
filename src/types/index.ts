@@ -28,6 +28,7 @@ export interface TrailTask {
     markers?: any[] | string[];
     options?: any[];
     on_arrival?: string[];
+    on_answer?: string[];
     theme?: string;
     options_randomised?: boolean;
 }
