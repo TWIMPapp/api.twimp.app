@@ -1,4 +1,8 @@
-<!DOCTYPE html>
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+export default function handler(req: VercelRequest, res: VercelResponse) {
+    res.setHeader('Content-Type', 'text/html');
+    res.send(`<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -15,10 +19,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
-        .container {
-            text-align: center;
-            padding: 2rem;
-        }
+        .container { text-align: center; padding: 2rem; }
         h1 { font-size: 3rem; margin-bottom: 0.5rem; }
         p { opacity: 0.9; font-size: 1.2rem; }
         .status {
@@ -28,16 +29,14 @@
             margin-top: 2rem;
             font-family: monospace;
         }
-        a { color: #fff; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>api.twimp.app</h1>
         <p>Easter Event API Server</p>
-        <div class="status">
-            <a href="/api/health">/api/health</a> - Check API status
-        </div>
+        <div class="status">Status: Online</div>
     </div>
 </body>
-</html>
+</html>`);
+}
