@@ -1,0 +1,476 @@
+{
+  "userId": "ross.coombes@gmail.com",
+  "gameType": "EGG_HUNT",
+  "startTime": 1768844092702,
+  "startPosition": {
+    "lat": 50.980380253320426,
+    "lng": -1.4423236622394229
+  },
+  "lastPosition": {
+    "lat": 50.97988240830329,
+    "lng": -1.4420457134312605
+  },
+  "currentLevel": 28,
+  "score": 170,
+  "history": [
+    {
+      "level": 1,
+      "egg": {
+        "level": 1,
+        "lat": 50.980057168335826,
+        "lng": -1.4451075896158225,
+        "spawnTime": 1768844092702,
+        "expireTime": 1768845892702,
+        "subject": "MATH"
+      },
+      "answer": "42",
+      "success": true,
+      "timestamp": 1768844319951
+    },
+    {
+      "level": 2,
+      "egg": {
+        "level": 2,
+        "lat": 50.98277243835497,
+        "lng": -1.4371293540425976,
+        "spawnTime": 1768844319951,
+        "expireTime": 1768846119951,
+        "subject": "ENGLISH"
+      },
+      "answer": "children",
+      "success": true,
+      "timestamp": 1768844419177
+    },
+    {
+      "level": 3,
+      "egg": {
+        "level": 3,
+        "lat": 50.97407914865521,
+        "lng": -1.449331697938349,
+        "spawnTime": 1768844419177,
+        "expireTime": 1768846219177,
+        "subject": "SCIENCE"
+      },
+      "answer": "Mars",
+      "success": true,
+      "timestamp": 1768844796609
+    },
+    {
+      "level": 4,
+      "egg": {
+        "level": 4,
+        "lat": 50.98202691214226,
+        "lng": -1.4448282733255406,
+        "spawnTime": 1768868665482,
+        "expireTime": 1768870465482,
+        "subject": "MATH"
+      },
+      "answer": "96",
+      "success": true,
+      "timestamp": 1768868695771
+    },
+    {
+      "level": 5,
+      "egg": {
+        "level": 5,
+        "lat": 50.98079219987404,
+        "lng": -1.447304184319937,
+        "spawnTime": 1768868695772,
+        "expireTime": 1768870495772,
+        "subject": "ENGLISH"
+      },
+      "answer": "jumps",
+      "success": true,
+      "timestamp": 1768868720907
+    },
+    {
+      "level": 6,
+      "egg": {
+        "level": 6,
+        "lat": 50.978046095923055,
+        "lng": -1.4428894157111336,
+        "spawnTime": 1768868720908,
+        "expireTime": 1768870520908,
+        "subject": "SCIENCE"
+      },
+      "answer": "co2",
+      "success": false,
+      "timestamp": 1768868838895
+    },
+    {
+      "level": 7,
+      "egg": {
+        "level": 7,
+        "lat": 50.98274094092041,
+        "lng": -1.440757267163903,
+        "spawnTime": 1768868838896,
+        "expireTime": 1768870638896,
+        "subject": "SCIENCE"
+      },
+      "answer": "au",
+      "success": true,
+      "timestamp": 1768868926595
+    },
+    {
+      "level": 8,
+      "egg": {
+        "level": 8,
+        "lat": 50.980682718000125,
+        "lng": -1.438564606586329,
+        "spawnTime": 1768868926596,
+        "expireTime": 1768870726596,
+        "subject": "ENGLISH"
+      },
+      "answer": "a word",
+      "success": false,
+      "timestamp": 1768868947178
+    },
+    {
+      "level": 9,
+      "egg": {
+        "level": 9,
+        "lat": 50.97969301959088,
+        "lng": -1.4445317230991097,
+        "spawnTime": 1768868947179,
+        "expireTime": 1768870747179,
+        "subject": "ENGLISH"
+      },
+      "answer": "latin",
+      "success": true,
+      "timestamp": 1768868975768
+    },
+    {
+      "level": 10,
+      "egg": {
+        "level": 10,
+        "lat": 50.981357146550295,
+        "lng": -1.4452757089558053,
+        "spawnTime": 1768868975769,
+        "expireTime": 1768870775769,
+        "subject": "MATH"
+      },
+      "answer": "8",
+      "success": false,
+      "timestamp": 1768868990121
+    },
+    {
+      "level": 11,
+      "egg": {
+        "level": 11,
+        "lat": 50.97909842682269,
+        "lng": -1.4436608245551035,
+        "spawnTime": 1768868990122,
+        "expireTime": 1768870790122,
+        "subject": "ENGLISH"
+      },
+      "answer": "Pars",
+      "success": false,
+      "timestamp": 1768869271835
+    },
+    {
+      "level": 12,
+      "egg": {
+        "level": 12,
+        "lat": 50.97932589759779,
+        "lng": -1.4446291038939907,
+        "spawnTime": 1768869271836,
+        "expireTime": 1768871071836,
+        "subject": "ENGLISH"
+      },
+      "answer": "geese",
+      "success": true,
+      "timestamp": 1768869285084
+    },
+    {
+      "level": 13,
+      "egg": {
+        "level": 13,
+        "lat": 50.97769063706565,
+        "lng": -1.445585049894474,
+        "spawnTime": 1768869285085,
+        "expireTime": 1768871085085,
+        "subject": "SCIENCE"
+      },
+      "answer": "jupiter",
+      "success": true,
+      "timestamp": 1768869346371
+    },
+    {
+      "level": 14,
+      "egg": {
+        "level": 14,
+        "lat": 50.97751952241898,
+        "lng": -1.4465689525045782,
+        "spawnTime": 1768869346372,
+        "expireTime": 1768871146372,
+        "subject": "MATH"
+      },
+      "answer": "20",
+      "success": true,
+      "timestamp": 1768869359060
+    },
+    {
+      "level": 15,
+      "egg": {
+        "level": 15,
+        "lat": 50.97682279421325,
+        "lng": -1.4432110897727322,
+        "spawnTime": 1768869359061,
+        "expireTime": 1768871159061,
+        "subject": "MATH"
+      },
+      "answer": "24",
+      "success": true,
+      "timestamp": 1768869374497
+    },
+    {
+      "level": 16,
+      "egg": {
+        "level": 16,
+        "lat": 50.97666002278843,
+        "lng": -1.4399941052153604,
+        "spawnTime": 1768869374498,
+        "expireTime": 1768871174498,
+        "subject": "ENGLISH"
+      },
+      "answer": "Van Goph",
+      "success": false,
+      "timestamp": 1768869394862
+    },
+    {
+      "level": 17,
+      "egg": {
+        "level": 17,
+        "lat": 50.976577784728924,
+        "lng": -1.4421402288894045,
+        "spawnTime": 1768869394863,
+        "expireTime": 1768871194863,
+        "subject": "ENGLISH"
+      },
+      "answer": "you",
+      "success": false,
+      "timestamp": 1768869415718
+    },
+    {
+      "level": 18,
+      "egg": {
+        "level": 18,
+        "lat": 50.9762330253663,
+        "lng": -1.439726519976979,
+        "spawnTime": 1768869415719,
+        "expireTime": 1768871215719,
+        "subject": "SCIENCE"
+      },
+      "answer": "Hydrogen",
+      "success": true,
+      "timestamp": 1768869434318
+    },
+    {
+      "level": 19,
+      "egg": {
+        "level": 19,
+        "lat": 50.98040380299059,
+        "lng": -1.436632973365828,
+        "spawnTime": 1768869434319,
+        "expireTime": 1768871234319,
+        "subject": "MATH"
+      },
+      "answer": "3.14",
+      "success": true,
+      "timestamp": 1768869465539
+    },
+    {
+      "level": 20,
+      "egg": {
+        "level": 20,
+        "lat": 50.97884746439052,
+        "lng": -1.4469666803282664,
+        "spawnTime": 1768869465540,
+        "expireTime": 1768871265540,
+        "subject": "SCIENCE"
+      },
+      "answer": "E=mc2",
+      "success": false,
+      "timestamp": 1768869483345
+    },
+    {
+      "level": 21,
+      "egg": {
+        "level": 21,
+        "lat": 50.979639046274954,
+        "lng": -1.443582927235858,
+        "spawnTime": 1768869483345,
+        "expireTime": 1768871283345,
+        "subject": "SCIENCE"
+      },
+      "answer": "12",
+      "success": false,
+      "timestamp": 1768869505114
+    },
+    {
+      "level": 22,
+      "egg": {
+        "level": 22,
+        "lat": 50.976882138597496,
+        "lng": -1.440901985399041,
+        "spawnTime": 1768869505115,
+        "expireTime": 1768871305115,
+        "subject": "SCIENCE"
+      },
+      "answer": "mycoticin",
+      "success": false,
+      "timestamp": 1768869532484
+    },
+    {
+      "level": 23,
+      "egg": {
+        "level": 23,
+        "lat": 50.97758228245261,
+        "lng": -1.4457134771569773,
+        "spawnTime": 1768869532485,
+        "expireTime": 1768871332485,
+        "subject": "ENGLISH"
+      },
+      "answer": "Thatcher",
+      "success": true,
+      "timestamp": 1768869547754
+    },
+    {
+      "level": 24,
+      "egg": {
+        "level": 24,
+        "lat": 50.979075910880056,
+        "lng": -1.4489297885650279,
+        "spawnTime": 1768869547755,
+        "expireTime": 1768871347755,
+        "subject": "MATH"
+      },
+      "answer": "0.5",
+      "success": true,
+      "timestamp": 1768869565834
+    },
+    {
+      "level": 25,
+      "egg": {
+        "level": 25,
+        "lat": 50.979763446265444,
+        "lng": -1.4473072503856947,
+        "spawnTime": 1768869565834,
+        "expireTime": 1768871365834,
+        "subject": "MATH"
+      },
+      "answer": "360",
+      "success": false,
+      "timestamp": 1768869586793
+    },
+    {
+      "level": 26,
+      "egg": {
+        "level": 26,
+        "lat": 50.97669749774152,
+        "lng": -1.4443799111736857,
+        "spawnTime": 1768869586793,
+        "expireTime": 1768871386793,
+        "subject": "SCIENCE"
+      },
+      "answer": "32",
+      "success": true,
+      "timestamp": 1768869603475
+    },
+    {
+      "level": 27,
+      "egg": {
+        "level": 27,
+        "lat": 50.981598965403585,
+        "lng": -1.4389415864969013,
+        "spawnTime": 1768869603476,
+        "expireTime": 1768871403476,
+        "subject": "SPECIAL",
+        "w3w": "violin.igloo.dog"
+      },
+      "answer": "DOG",
+      "success": true,
+      "timestamp": 1768870121087
+    },
+    {
+      "level": 28,
+      "egg": {
+        "level": 28,
+        "lat": 50.98365151623642,
+        "lng": -1.4377615489693358,
+        "spawnTime": 1768870121088,
+        "expireTime": 1768871921088,
+        "subject": "SPECIAL"
+      },
+      "answer": "jkbkj",
+      "success": false,
+      "timestamp": 1768870224145
+    }
+  ],
+  "codexMapping": {
+    "⚡": "E",
+    "⭐": "I",
+    "🌙": "H",
+    "☀️": "W",
+    "🌈": "M",
+    "❤️": "K",
+    "🔥": "R",
+    "💧": "Z",
+    "🌸": "Q",
+    "🍀": "L",
+    "🦋": "N",
+    "🐝": "X",
+    "🎵": "A",
+    "🎨": "J",
+    "⚽": "U",
+    "🎯": "Y",
+    "🔔": "G",
+    "⚓": "O",
+    "🎪": "P",
+    "🎭": "B",
+    "🎸": "V",
+    "🎮": "C",
+    "🚀": "D",
+    "🏆": "S",
+    "💎": "F",
+    "👑": "T"
+  },
+  "symbolUnlocks": {
+    "A": "🎵",
+    "B": "🎭",
+    "C": "🎮",
+    "D": "🚀",
+    "E": "⚡",
+    "F": "❌",
+    "G": "🔔",
+    "H": "❌",
+    "I": "⭐",
+    "J": "❌",
+    "K": "❌",
+    "L": "🍀",
+    "M": "🌈",
+    "N": "🦋",
+    "O": "⚓",
+    "P": "❌",
+    "Q": "❌",
+    "R": "🔥",
+    "S": "🏆",
+    "T": "❌",
+    "U": "❌",
+    "V": "❌",
+    "W": "☀️",
+    "X": "🐝",
+    "Y": "❌",
+    "Z": "💧"
+  },
+  "currentEggs": null,
+  "currentEgg": {
+    "level": 28,
+    "lat": 50.98160249114825,
+    "lng": -1.4355452616490787,
+    "spawnTime": 1769186274949,
+    "expireTime": 1769188074949,
+    "subject": "SPECIAL"
+  },
+  "currentQuestionAnswer": "dog"
+}

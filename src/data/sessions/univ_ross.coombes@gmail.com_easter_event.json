@@ -1,0 +1,125 @@
+{
+  "userId": "ross.coombes@gmail.com",
+  "gameType": "EASTER_EVENT",
+  "startTime": 1769187556697,
+  "startPosition": {
+    "lat": 50.979898250000005,
+    "lng": -1.44297075
+  },
+  "lastPosition": {
+    "lat": 50.9799,
+    "lng": -1.442964
+  },
+  "safetyVerified": true,
+  "currentLevel": 1,
+  "score": 0,
+  "history": [],
+  "dailyEggs": {
+    "2026-01-23": [
+      {
+        "letter": "K",
+        "collectedAt": 1769187579766,
+        "isDuplicate": false,
+        "lat": 50.9814193781873,
+        "lng": -1.438919630427849
+      },
+      {
+        "letter": "I",
+        "collectedAt": 1769187667120,
+        "isDuplicate": false,
+        "lat": 50.97916126947602,
+        "lng": -1.4456533510534297
+      },
+      {
+        "letter": "E",
+        "collectedAt": 1769188273112,
+        "isDuplicate": false,
+        "lat": 50.976120334595706,
+        "lng": -1.446477852483153
+      },
+      {
+        "letter": "T",
+        "collectedAt": 1769188422822,
+        "isDuplicate": false,
+        "lat": 50.98193555152841,
+        "lng": -1.4479274125254682
+      },
+      {
+        "letter": "M",
+        "collectedAt": 1769188463016,
+        "isDuplicate": false,
+        "lat": 50.979136164295944,
+        "lng": -1.4443428251016759
+      }
+    ]
+  },
+  "codexMapping": {
+    "⚡": "X",
+    "⭐": "G",
+    "🌙": "L",
+    "☀️": "E",
+    "🌈": "T",
+    "❤️": "W",
+    "🔥": "H",
+    "💧": "K",
+    "🌸": "D",
+    "🍀": "O",
+    "🦋": "C",
+    "🐝": "Q",
+    "🎵": "R",
+    "🎨": "B",
+    "⚽": "Z",
+    "🎯": "U",
+    "🔔": "Y",
+    "⚓": "F",
+    "🎪": "A",
+    "🎭": "S",
+    "🎸": "V",
+    "🎮": "I",
+    "🚀": "P",
+    "🏆": "J",
+    "💎": "M",
+    "👑": "N"
+  },
+  "unlockedLetters": {
+    "A": false,
+    "B": false,
+    "C": false,
+    "D": false,
+    "E": false,
+    "F": false,
+    "G": false,
+    "H": false,
+    "I": true,
+    "J": false,
+    "K": true,
+    "L": false,
+    "M": true,
+    "N": false,
+    "O": false,
+    "P": false,
+    "Q": false,
+    "R": false,
+    "S": false,
+    "T": true,
+    "U": false,
+    "V": false,
+    "W": false,
+    "X": false,
+    "Y": false,
+    "Z": false
+  },
+  "currentEgg": {
+    "lat": 50.981850386371,
+    "lng": -1.446776718459867,
+    "spawnTime": 1769254167696,
+    "expireTime": 1769255967696,
+    "assignedLetter": "T",
+    "subject": "ENGLISH",
+    "isGoldenEgg": false
+  },
+  "puzzlesSolved": [],
+  "totalEggsCollected": 5,
+  "uniqueLettersFound": 4,
+  "goldenEggCollected": false
+}

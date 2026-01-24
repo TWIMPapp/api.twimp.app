@@ -1,0 +1,213 @@
+{
+  "userId": "dev-user",
+  "gameType": "EGG_HUNT",
+  "startTime": 1769020450851,
+  "startPosition": {
+    "lat": 50.7712393225495,
+    "lng": -2.0174249125230515
+  },
+  "lastPosition": {
+    "lat": 50.9799,
+    "lng": -1.442964
+  },
+  "currentLevel": 9,
+  "score": 70,
+  "history": [
+    {
+      "level": 1,
+      "egg": {
+        "level": 1,
+        "lat": 50.77164265915706,
+        "lng": -2.012889382012665,
+        "spawnTime": 1769020450852,
+        "expireTime": 1769022250852,
+        "subject": "MATH"
+      },
+      "answer": "42",
+      "success": true,
+      "timestamp": 1769020606249
+    },
+    {
+      "level": 2,
+      "egg": {
+        "level": 2,
+        "lat": 50.77079291392203,
+        "lng": -2.0075035617854757,
+        "spawnTime": 1769020606249,
+        "expireTime": 1769022406249,
+        "subject": "ENGLISH"
+      },
+      "answer": "children",
+      "success": true,
+      "timestamp": 1769020658887
+    },
+    {
+      "level": 3,
+      "egg": {
+        "level": 3,
+        "lat": 50.77153346520931,
+        "lng": -2.01364671980746,
+        "spawnTime": 1769020658887,
+        "expireTime": 1769022458887,
+        "subject": "SCIENCE"
+      },
+      "answer": "mars",
+      "success": true,
+      "timestamp": 1769020903147
+    },
+    {
+      "level": 4,
+      "egg": {
+        "level": 4,
+        "lat": 50.767076734668066,
+        "lng": -2.0111523228101196,
+        "spawnTime": 1769020903147,
+        "expireTime": 1769022703147,
+        "subject": "MATH"
+      },
+      "answer": "96",
+      "success": true,
+      "timestamp": 1769020944702
+    },
+    {
+      "level": 5,
+      "egg": {
+        "level": 5,
+        "lat": 50.7701501413533,
+        "lng": -2.0141974366241677,
+        "spawnTime": 1769020944702,
+        "expireTime": 1769022744702,
+        "subject": "ENGLISH"
+      },
+      "answer": "jumps",
+      "success": true,
+      "timestamp": 1769020988246
+    },
+    {
+      "level": 6,
+      "egg": {
+        "level": 6,
+        "lat": 50.773705378208014,
+        "lng": -2.015074429131382,
+        "spawnTime": 1769020988246,
+        "expireTime": 1769022788246,
+        "subject": "SCIENCE"
+      },
+      "answer": "cavghvh",
+      "success": false,
+      "timestamp": 1769021025167
+    },
+    {
+      "level": 7,
+      "egg": {
+        "level": 7,
+        "lat": 50.7689138954993,
+        "lng": -2.008922627903712,
+        "spawnTime": 1769021025167,
+        "expireTime": 1769022825167,
+        "subject": "MATH"
+      },
+      "answer": "12",
+      "success": true,
+      "timestamp": 1769021098170
+    },
+    {
+      "level": 8,
+      "egg": {
+        "level": 8,
+        "lat": 50.771184243774734,
+        "lng": -2.01740001672776,
+        "spawnTime": 1769021098171,
+        "expireTime": 1769022898171,
+        "subject": "SCIENCE"
+      },
+      "answer": "photosynthesis",
+      "success": true,
+      "timestamp": 1769021193167
+    }
+  ],
+  "codexMapping": {
+    "⚡": "A",
+    "⭐": "I",
+    "🌙": "H",
+    "☀️": "F",
+    "🌈": "G",
+    "❤️": "B",
+    "🔥": "Y",
+    "💧": "E",
+    "🌸": "S",
+    "🍀": "V",
+    "🦋": "Z",
+    "🐝": "O",
+    "🎵": "X",
+    "🎨": "L",
+    "⚽": "U",
+    "🎯": "P",
+    "🔔": "T",
+    "⚓": "D",
+    "🎪": "C",
+    "🎭": "Q",
+    "🎸": "R",
+    "🎮": "M",
+    "🚀": "J",
+    "🏆": "W",
+    "💎": "K",
+    "👑": "N"
+  },
+  "symbolUnlocks": {
+    "A": "⚡",
+    "B": "❤️",
+    "C": "🎪",
+    "D": "⚓",
+    "E": "💧",
+    "F": "❌",
+    "G": "🌈",
+    "H": "🌙",
+    "I": "🔒",
+    "J": "🔒",
+    "K": "🔒",
+    "L": "🔒",
+    "M": "🔒",
+    "N": "🔒",
+    "O": "🔒",
+    "P": "🔒",
+    "Q": "🔒",
+    "R": "🔒",
+    "S": "🔒",
+    "T": "🔒",
+    "U": "🔒",
+    "V": "🔒",
+    "W": "🔒",
+    "X": "🔒",
+    "Y": "🔒",
+    "Z": "🔒"
+  },
+  "safetyVerified": true,
+  "currentEggs": [
+    {
+      "level": 9,
+      "lat": 50.77118598100254,
+      "lng": -2.0128267520977334,
+      "spawnTime": 1769256910517,
+      "expireTime": 1769258710517,
+      "subject": "MATH"
+    },
+    {
+      "level": 9,
+      "lat": 50.76989325793138,
+      "lng": -2.0117050372348575,
+      "spawnTime": 1769256910517,
+      "expireTime": 1769258710517,
+      "subject": "ENGLISH"
+    },
+    {
+      "level": 9,
+      "lat": 50.77296163101823,
+      "lng": -2.0111807646251734,
+      "spawnTime": 1769256910517,
+      "expireTime": 1769258710517,
+      "subject": "SCIENCE"
+    }
+  ],
+  "currentEgg": null
+}
