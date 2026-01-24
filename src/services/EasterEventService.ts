@@ -768,12 +768,18 @@ export class EasterEventService {
     // ===== Game Screen Data =====
 
     static async getGameScreenData(userId: string): Promise<any> {
-        const session = await SessionService.getUniversalSession(userId, 'EASTER_EVENT') as EasterEventSession;
+        // Auto-create session if none exists (gives user their unique codex)
+        let session = await SessionService.getUniversalSession(userId, 'EASTER_EVENT') as EasterEventSession;
+        if (!session) {
+            session = this.createNewSession(userId, 0, 0); // Location will be set when they start playing
+            await SessionService.saveUniversalSession(session);
+        }
+
         const puzzleStatus = await this.getPuzzleStatus(userId);
-        const clues = session ? await this.getClues(userId) : [];
+        const clues = await this.getClues(userId);
 
         return {
-            session: session || null,
+            session,
             chapters: STORY_CHAPTERS.map(ch => ({
                 id: ch.id,
                 title: ch.title,
@@ -785,12 +791,12 @@ export class EasterEventService {
             missionUpdates: this.getMissionUpdates(),
             clues,
             goldenEggAvailable: this.isGoldenEggAvailable(),
-            goldenEggCollected: session?.goldenEggCollected || false,
-            dailyProgress: session ? {
+            goldenEggCollected: session.goldenEggCollected || false,
+            dailyProgress: {
                 collected: this.getEggsCollectedToday(session),
                 max: EASTER_EVENT_CONFIG.DAILY_EGG_LIMIT
-            } : null,
-            codex: session ? this.getCodexDisplay(session) : null
+            },
+            codex: this.getCodexDisplay(session)
         };
     }
 
