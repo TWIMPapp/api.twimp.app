@@ -20,7 +20,7 @@ import { EggHuntQuestions } from '../data/universal/egg_hunt_questions';
 export class EasterEventService {
     // ===== Session Management =====
 
-    static async startOrResumeGame(userId: string, lat: number, lng: number): Promise<EasterEventSession> {
+    static async startOrResumeGame(userId: string, lat: number, lng: number): Promise<any> {
         let session = await SessionService.getUniversalSession(userId, 'EASTER_EVENT') as EasterEventSession;
 
         if (!session) {
@@ -28,15 +28,25 @@ export class EasterEventService {
             this.spawnNewEgg(session, lat, lng);
             await SessionService.saveUniversalSession(session);
         } else {
+            // Update start position if provided (allows changing spawn location)
+            if (lat !== 0 && lng !== 0) {
+                session.startPosition = { lat, lng };
+            }
             // Check egg expiration and respawn if needed
             if (session.currentEgg && session.currentEgg.expireTime < Date.now()) {
                 console.log(`[EasterEvent] Egg expired for user ${userId}, respawning.`);
                 this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
-                await SessionService.saveUniversalSession(session);
             }
+            await SessionService.saveUniversalSession(session);
         }
 
-        return session;
+        return {
+            ...session,
+            spawnRadius: {
+                center: session.startPosition,
+                radiusMeters: EASTER_EVENT_CONFIG.SPAWN_RADIUS_METERS
+            }
+        };
     }
 
     private static createNewSession(userId: string, lat: number, lng: number): EasterEventSession {
@@ -201,6 +211,10 @@ export class EasterEventService {
                 dailyProgress: {
                     collected: this.getEggsCollectedToday(session),
                     max: EASTER_EVENT_CONFIG.DAILY_EGG_LIMIT
+                },
+                spawnRadius: {
+                    center: session.startPosition,
+                    radiusMeters: EASTER_EVENT_CONFIG.SPAWN_RADIUS_METERS
                 }
             };
         }
@@ -216,7 +230,11 @@ export class EasterEventService {
                     ok: true,
                     arrived: true,
                     isGoldenEgg: true,
-                    session
+                    session,
+                    spawnRadius: {
+                        center: session.startPosition,
+                        radiusMeters: EASTER_EVENT_CONFIG.SPAWN_RADIUS_METERS
+                    }
                 };
             }
 
@@ -238,6 +256,10 @@ export class EasterEventService {
                     content: session.currentEgg.currentQuestion,
                     subject: session.currentEgg.subject,
                     answer: session.currentEgg.currentAnswer
+                },
+                spawnRadius: {
+                    center: session.startPosition,
+                    radiusMeters: EASTER_EVENT_CONFIG.SPAWN_RADIUS_METERS
                 }
             };
         }
@@ -262,6 +284,10 @@ export class EasterEventService {
             dailyProgress: {
                 collected: this.getEggsCollectedToday(session),
                 max: EASTER_EVENT_CONFIG.DAILY_EGG_LIMIT
+            },
+            spawnRadius: {
+                center: session.startPosition,
+                radiusMeters: EASTER_EVENT_CONFIG.SPAWN_RADIUS_METERS
             }
         };
     }
@@ -796,7 +822,11 @@ export class EasterEventService {
                 collected: this.getEggsCollectedToday(session),
                 max: EASTER_EVENT_CONFIG.DAILY_EGG_LIMIT
             },
-            codex: this.getCodexDisplay(session)
+            codex: this.getCodexDisplay(session),
+            spawnRadius: {
+                center: session.startPosition,
+                radiusMeters: EASTER_EVENT_CONFIG.SPAWN_RADIUS_METERS
+            }
         };
     }
 
