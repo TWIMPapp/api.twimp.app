@@ -1,11 +1,11 @@
 import { supabase, isSupabaseConfigured } from '../config/supabase';
 
+export type GameStatus = 'active' | 'featured' | 'pending' | 'inactive';
+
 export interface GameConfig {
     ref: string;
     gameType: 'trail' | 'universal';
-    active: boolean;
-    featured: boolean;
-    displayOrder: number;
+    status: GameStatus;
 }
 
 // In-memory cache with TTL
@@ -23,16 +23,14 @@ export class GameConfigService {
         if (!isSupabaseConfigured()) {
             // Fallback defaults when Supabase not configured
             return [
-                { ref: 'egg-hunt', gameType: 'universal', active: true, featured: true, displayOrder: 1 },
-                { ref: 'easter-event', gameType: 'universal', active: false, featured: false, displayOrder: 2 }
+                { ref: 'easter-event', gameType: 'universal', status: 'featured' }
             ];
         }
 
         try {
             const { data, error } = await supabase!
                 .from('game_config')
-                .select('*')
-                .order('display_order', { ascending: true });
+                .select('*');
 
             if (error) {
                 console.error('Supabase getGameConfig error:', error);
@@ -42,9 +40,7 @@ export class GameConfigService {
             configCache = (data || []).map((d: any) => ({
                 ref: d.ref,
                 gameType: d.game_type,
-                active: d.active,
-                featured: d.featured,
-                displayOrder: d.display_order
+                status: d.status as GameStatus
             }));
             cacheTime = Date.now();
 
@@ -57,20 +53,39 @@ export class GameConfigService {
 
     static async getFeatured(): Promise<GameConfig[]> {
         const all = await this.getAll();
-        return all.filter(c => c.active && c.featured);
+        return all.filter(c => c.status === 'featured');
     }
 
-    static async isActive(ref: string): Promise<boolean> {
+    static async getActive(): Promise<GameConfig[]> {
+        const all = await this.getAll();
+        return all.filter(c => c.status === 'active' || c.status === 'featured');
+    }
+
+    static async getPending(): Promise<GameConfig[]> {
+        const all = await this.getAll();
+        return all.filter(c => c.status === 'pending');
+    }
+
+    static async getStatus(ref: string): Promise<GameStatus> {
         const all = await this.getAll();
         const config = all.find(c => c.ref === ref);
         // If not in config, default to active (for trails not yet added)
-        return config ? config.active : true;
+        return config ? config.status : 'active';
+    }
+
+    static async isPlayable(ref: string): Promise<boolean> {
+        const status = await this.getStatus(ref);
+        return status === 'active' || status === 'featured';
     }
 
     static async isFeatured(ref: string): Promise<boolean> {
-        const all = await this.getAll();
-        const config = all.find(c => c.ref === ref);
-        return config ? config.featured : false;
+        const status = await this.getStatus(ref);
+        return status === 'featured';
+    }
+
+    static async isPending(ref: string): Promise<boolean> {
+        const status = await this.getStatus(ref);
+        return status === 'pending';
     }
 
     // Clear cache (useful after updates)
