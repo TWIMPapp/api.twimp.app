@@ -1,7 +1,7 @@
-import { UniversalGameSession, EggHuntQuestion } from '../types/UniversalGameTypes.js';
-import { SessionService } from './SessionService.js';
-import { GeoService } from './GeoService.js';
-import { EggHuntQuestions } from '../data/universal/egg_hunt_questions.js';
+import { UniversalGameSession, EggHuntQuestion } from '../types/UniversalGameTypes';
+import { SessionService } from './SessionService';
+import { GeoService } from './GeoService';
+import { EggHuntQuestions } from '../data/universal/egg_hunt_questions';
 
 export class EggHuntService {
     private static SYMBOLS = [

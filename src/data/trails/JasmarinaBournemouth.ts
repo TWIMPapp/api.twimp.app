@@ -1,4 +1,4 @@
-import { Trail } from '../../types/index.js';
+import { Trail } from '../../types/index';
 
 // Source: twimp_adalo/trails/json/jasmarina_bournemouth.js
 export const JasmarinaBournemouth: Trail = {

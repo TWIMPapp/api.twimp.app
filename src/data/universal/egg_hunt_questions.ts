@@ -1,4 +1,4 @@
-import { EggHuntQuestion } from '../../types/UniversalGameTypes.js';
+import { EggHuntQuestion } from '../../types/UniversalGameTypes';
 
 export const EggHuntQuestions: EggHuntQuestion[] = [
     // Phase 1: Levels 1-6 (KS2)

@@ -1,7 +1,7 @@
-import { GeoService } from './GeoService.js';
-import { SessionService } from './SessionService.js';
-import { TrailService } from './TrailService.js';
-import { GameSession } from './SessionService.js';
+import { GeoService } from './GeoService';
+import { SessionService } from './SessionService';
+import { TrailService } from './TrailService';
+import { GameSession } from './SessionService';
 
 export class GameEngineService {
     static async handleAWTY(userId: string, trailRef: string, lat: number, lng: number, accuracy: number = 10, currentTaskId?: number) {

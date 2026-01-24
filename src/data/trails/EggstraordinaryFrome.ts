@@ -1,4 +1,4 @@
-﻿import { Trail } from '../../types/index.js';
+﻿import { Trail } from '../../types/index';
 
 export const EggstraordinaryFrome: Trail = {
 	"type": "WALK",

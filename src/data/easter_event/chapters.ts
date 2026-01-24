@@ -1,4 +1,4 @@
-import { StoryChapter } from '../../types/EasterEventTypes.js';
+import { StoryChapter } from '../../types/EasterEventTypes';
 
 // Story chapters for the Easter Event
 // Adapted from "The Eggstraordinary Case of the Missing Eggs"

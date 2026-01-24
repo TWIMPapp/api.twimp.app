@@ -1,4 +1,4 @@
-import { ClueConfig } from '../../types/EasterEventTypes.js';
+import { ClueConfig } from '../../types/EasterEventTypes';
 
 export const EASTER_EVENT_CONFIG = {
     // Configurable limits

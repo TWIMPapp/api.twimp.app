@@ -1,4 +1,4 @@
-import { Trail, Step } from '../types/index.js';
+import { Trail, Step } from '../types/index';
 
 /**
  * Resolves a raw Trail (with separated locations array) into a fully hydrated Trail

@@ -1,15 +1,15 @@
-import { MeanGreenEggstravaganza } from './MeanGreenEggstravaganza.js';
-import { JasmarinaBournemouth } from './JasmarinaBournemouth.js';
-import { MatildasSpring } from './MatildasSpring.js';
-import { BryngarwMeadowSpring } from './BryngarwMeadowSpring.js';
-import { BryngarwMeadowSummer } from './BryngarwMeadowSummer.js';
-import { BryngarwRiverSpring } from './BryngarwRiverSpring.js';
-import { BryngarwRiverSummer } from './BryngarwRiverSummer.js';
-import { BryngarwWoodlandSummer } from './BryngarwWoodlandSummer.js';
-import { EggstraordinaryCardiff } from './EggstraordinaryCardiff.js';
-import { EggstraordinaryFrome } from './EggstraordinaryFrome.js';
-import { EggHunt } from './EggHunt.js';
-import { EasterEvent } from './EasterEvent.js';
+import { MeanGreenEggstravaganza } from './MeanGreenEggstravaganza';
+import { JasmarinaBournemouth } from './JasmarinaBournemouth';
+import { MatildasSpring } from './MatildasSpring';
+import { BryngarwMeadowSpring } from './BryngarwMeadowSpring';
+import { BryngarwMeadowSummer } from './BryngarwMeadowSummer';
+import { BryngarwRiverSpring } from './BryngarwRiverSpring';
+import { BryngarwRiverSummer } from './BryngarwRiverSummer';
+import { BryngarwWoodlandSummer } from './BryngarwWoodlandSummer';
+import { EggstraordinaryCardiff } from './EggstraordinaryCardiff';
+import { EggstraordinaryFrome } from './EggstraordinaryFrome';
+import { EggHunt } from './EggHunt';
+import { EasterEvent } from './EasterEvent';
 
 // Helper to get all trails (including EVENT type games)
 export const Trails = [

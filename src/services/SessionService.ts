@@ -29,7 +29,7 @@ export interface UniversalSession {
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { supabase, isSupabaseConfigured } from '../config/supabase.js';
+import { supabase, isSupabaseConfigured } from '../config/supabase';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

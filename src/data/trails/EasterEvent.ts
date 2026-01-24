@@ -1,4 +1,4 @@
-import { Trail } from '../../types/index.js';
+import { Trail } from '../../types/index';
 
 export const EasterEvent: Trail = {
     ref: 'easter-event',

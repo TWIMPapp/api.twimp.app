@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from '../config/supabase.js';
+import { supabase, isSupabaseConfigured } from '../config/supabase';
 
 export interface GameConfig {
     ref: string;

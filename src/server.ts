@@ -2,13 +2,13 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import { Logger } from './utils/logger.js';
-import { TrailService } from './services/TrailService.js';
-import { GameEngineService } from './services/GameEngineService.js';
-import { SessionService } from './services/SessionService.js';
-import { EggHuntService } from './services/EggHuntService.js';
-import { EasterEventService } from './services/EasterEventService.js';
-import { GameConfigService } from './services/GameConfigService.js';
+import { Logger } from './utils/logger';
+import { TrailService } from './services/TrailService';
+import { GameEngineService } from './services/GameEngineService';
+import { SessionService } from './services/SessionService';
+import { EggHuntService } from './services/EggHuntService';
+import { EasterEventService } from './services/EasterEventService';
+import { GameConfigService } from './services/GameConfigService';
 
 dotenv.config();
 

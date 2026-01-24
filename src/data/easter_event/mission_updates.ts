@@ -1,4 +1,4 @@
-import { MissionUpdate } from '../../types/EasterEventTypes.js';
+import { MissionUpdate } from '../../types/EasterEventTypes';
 
 // Mission updates for the Easter Event news feed
 // Filtered by date only (no puzzle/progress dependencies)

@@ -1,4 +1,4 @@
-import { Trail } from '../../types/index.js';
+import { Trail } from '../../types/index';
 
 export const BryngarwWoodlandSummer: Trail = {
     "ref": "bryngarw-woodland-summer-bridgend",

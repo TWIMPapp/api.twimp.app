@@ -1,9 +1,9 @@
-import { getStoredTrails } from '../data/trails/index.js';
-import { resolveTrail } from '../utils/resolveTrail.js';
-import { Trail } from '../types/index.js';
-import { GeoService } from './GeoService.js';
-import { SessionService } from './SessionService.js';
-import { GameConfigService } from './GameConfigService.js';
+import { getStoredTrails } from '../data/trails/index';
+import { resolveTrail } from '../utils/resolveTrail';
+import { Trail } from '../types/index';
+import { GeoService } from './GeoService';
+import { SessionService } from './SessionService';
+import { GameConfigService } from './GameConfigService';
 
 export class TrailService {
     static getAllTrails(): Trail[] {

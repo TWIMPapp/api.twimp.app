@@ -1,4 +1,4 @@
-import { Puzzle } from '../../types/EasterEventTypes.js';
+import { Puzzle } from '../../types/EasterEventTypes';
 
 // Daily puzzles for the Easter Event
 // Each puzzle is available for 48 hours

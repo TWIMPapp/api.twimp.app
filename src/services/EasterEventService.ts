@@ -7,15 +7,15 @@ import {
     MissionUpdate,
     EncodedClue,
     EncodedCharacter
-} from '../types/EasterEventTypes.js';
-import { EggHuntQuestion } from '../types/UniversalGameTypes.js';
-import { SessionService } from './SessionService.js';
-import { GeoService } from './GeoService.js';
-import { EASTER_EVENT_CONFIG } from '../data/easter_event/config.js';
-import { STORY_CHAPTERS } from '../data/easter_event/chapters.js';
-import { PUZZLES } from '../data/easter_event/puzzles.js';
-import { MISSION_UPDATES } from '../data/easter_event/mission_updates.js';
-import { EggHuntQuestions } from '../data/universal/egg_hunt_questions.js';
+} from '../types/EasterEventTypes';
+import { EggHuntQuestion } from '../types/UniversalGameTypes';
+import { SessionService } from './SessionService';
+import { GeoService } from './GeoService';
+import { EASTER_EVENT_CONFIG } from '../data/easter_event/config';
+import { STORY_CHAPTERS } from '../data/easter_event/chapters';
+import { PUZZLES } from '../data/easter_event/puzzles';
+import { MISSION_UPDATES } from '../data/easter_event/mission_updates';
+import { EggHuntQuestions } from '../data/universal/egg_hunt_questions';
 
 export class EasterEventService {
     // ===== Session Management =====
