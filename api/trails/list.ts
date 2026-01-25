@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { handleOptions, cors } from '../_utils';
 import { TrailService } from '../../src/services/TrailService';
+import { GameConfigService } from '../../src/services/GameConfigService';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (handleOptions(req, res)) return;
@@ -12,10 +13,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const { lat, lng, user_id } = req.query;
-    const trails = await TrailService.getTrailSummaries(
-        lat ? parseFloat(lat as string) : undefined,
-        lng ? parseFloat(lng as string) : undefined,
-        user_id as string
-    );
-    res.json(trails);
+
+    // Fetch trails and featured config in parallel
+    const [trails, featured] = await Promise.all([
+        TrailService.getTrailSummaries(
+            lat ? parseFloat(lat as string) : undefined,
+            lng ? parseFloat(lng as string) : undefined,
+            user_id as string
+        ),
+        GameConfigService.getFeatured()
+    ]);
+
+    res.json({ ...trails, featured });
 }
