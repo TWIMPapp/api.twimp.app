@@ -1,11 +1,5 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/**/*.ts",
-      "use": "@vercel/node"
-    }
-  ],
   "rewrites": [
     { "source": "/easter_event/:path*", "destination": "/api/easter_event/:path*" }
   ],
