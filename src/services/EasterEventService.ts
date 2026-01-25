@@ -243,8 +243,34 @@ export class EasterEventService {
                 const question = this.getRandomQuestion(session.currentEgg.subject);
                 session.currentEgg.currentQuestion = question.question;
                 session.currentEgg.currentAnswer = question.answer;
-                await SessionService.saveUniversalSession(session);
             }
+
+            // Record collection immediately (egg counts toward daily limit now)
+            const letter = session.currentEgg.assignedLetter;
+            const today = this.getTodayDateString();
+
+            if (!session.dailyEggs[today]) {
+                session.dailyEggs[today] = [];
+            }
+
+            // Only add if not already recorded (prevent duplicate entries on multiple AWTY calls)
+            const alreadyRecorded = session.dailyEggs[today].some(
+                egg => egg.lat === session.currentEgg!.lat && egg.lng === session.currentEgg!.lng
+            );
+
+            if (!alreadyRecorded) {
+                session.dailyEggs[today].push({
+                    letter,
+                    collectedAt: Date.now(),
+                    isDuplicate: session.unlockedLetters[letter] === true,
+                    lat: session.currentEgg.lat,
+                    lng: session.currentEgg.lng
+                });
+                session.totalEggsCollected++;
+                console.log(`[EasterEvent] User ${userId} arrived at egg, counted as collected.`);
+            }
+
+            await SessionService.saveUniversalSession(session);
 
             return {
                 ok: true,
@@ -256,6 +282,10 @@ export class EasterEventService {
                     content: session.currentEgg.currentQuestion,
                     subject: session.currentEgg.subject,
                     answer: session.currentEgg.currentAnswer
+                },
+                dailyProgress: {
+                    collected: this.getEggsCollectedToday(session),
+                    max: EASTER_EVENT_CONFIG.DAILY_EGG_LIMIT
                 },
                 spawnRadius: {
                     center: session.startPosition,
@@ -308,62 +338,6 @@ export class EasterEventService {
     }
 
     // ===== Egg Collection =====
-
-    // Called when user clicks "Collect" on the celebration popup (before question)
-    // This counts the egg toward daily limit
-    static async confirmArrival(userId: string): Promise<any> {
-        const session = await SessionService.getUniversalSession(userId, 'EASTER_EVENT') as EasterEventSession;
-        if (!session || !session.currentEgg) {
-            return { ok: false, message: "No egg to collect" };
-        }
-
-        // Golden egg doesn't count toward daily limit
-        if (session.currentEgg.isGoldenEgg) {
-            return {
-                ok: true,
-                isGoldenEgg: true,
-                message: "Golden egg confirmed!"
-            };
-        }
-
-        // Record the collection (egg counts toward daily limit now, before question)
-        const letter = session.currentEgg.assignedLetter;
-        const today = this.getTodayDateString();
-
-        if (!session.dailyEggs[today]) {
-            session.dailyEggs[today] = [];
-        }
-
-        // Add placeholder entry - will be updated with result after question
-        session.dailyEggs[today].push({
-            letter,
-            collectedAt: Date.now(),
-            isDuplicate: session.unlockedLetters[letter] === true,
-            lat: session.currentEgg.lat,
-            lng: session.currentEgg.lng
-        });
-
-        session.totalEggsCollected++;
-        await SessionService.saveUniversalSession(session);
-
-        console.log(`[EasterEvent] User ${userId} confirmed arrival at egg, counted as collected.`);
-
-        return {
-            ok: true,
-            isGoldenEgg: false,
-            message: "Egg collected! Now answer the question.",
-            task: {
-                type: 'question_single',
-                content: session.currentEgg.currentQuestion,
-                subject: session.currentEgg.subject,
-                answer: session.currentEgg.currentAnswer
-            },
-            dailyProgress: {
-                collected: this.getEggsCollectedToday(session),
-                max: EASTER_EVENT_CONFIG.DAILY_EGG_LIMIT
-            }
-        };
-    }
 
     static async collectEgg(userId: string, answer: string): Promise<any> {
         const session = await SessionService.getUniversalSession(userId, 'EASTER_EVENT') as EasterEventSession;
@@ -719,6 +693,29 @@ export class EasterEventService {
         }).reverse(); // Most recent first
     }
 
+    // Get mission updates with timing info for relative time display
+    static getMissionUpdatesWithTiming(): any[] {
+        const daysSinceStart = this.getDaysSinceEventStart();
+        const hoursSinceStart = this.getHoursSinceEventStart();
+
+        return MISSION_UPDATES.filter(update => {
+            if (update.dayOffset > daysSinceStart) return false;
+            if (update.dayOffset === daysSinceStart && update.hourOffset) {
+                const hoursIntoDay = hoursSinceStart - (daysSinceStart * 24);
+                if (hoursIntoDay < update.hourOffset) return false;
+            }
+            return true;
+        }).map(update => {
+            // Calculate hours ago this update was posted
+            const updateHoursSinceStart = (update.dayOffset * 24) + (update.hourOffset || 0);
+            const hoursAgo = Math.max(0, Math.floor(hoursSinceStart - updateHoursSinceStart));
+            return {
+                ...update,
+                hoursAgo
+            };
+        }).reverse(); // Most recent first
+    }
+
     // ===== Clues =====
 
     static async getClues(userId: string): Promise<EncodedClue[]> {
@@ -806,6 +803,7 @@ export class EasterEventService {
 
         return {
             session,
+            eventDay: this.getDaysSinceEventStart() + 1, // Day 1, Day 2, etc. (1-indexed for display)
             chapters: STORY_CHAPTERS.map(ch => ({
                 id: ch.id,
                 title: ch.title,
@@ -814,7 +812,7 @@ export class EasterEventService {
             })),
             availableChapters: this.getAvailableChapters().map(ch => ch.id),
             puzzleStatus,
-            missionUpdates: this.getMissionUpdates(),
+            missionUpdates: this.getMissionUpdatesWithTiming(),
             clues,
             goldenEggAvailable: this.isGoldenEggAvailable(),
             goldenEggCollected: session.goldenEggCollected || false,
