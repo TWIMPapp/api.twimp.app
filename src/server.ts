@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import { Logger } from './utils/logger';
 
 // Route modules
-//import trailsRoutes from './routes/trails';
+import trailsRoutes from './routes/trails';
 // import universalRoutes from './routes/universal';  // Disabled - Easter Event supersedes this
 import easterRoutes from './routes/easter';
 
@@ -25,9 +25,9 @@ app.get('/health', (req, res) => {
 });
 
 // Mount route modules
-// app.use(trailsRoutes);      // Trails + Config (9 endpoints)
+app.use(trailsRoutes);      // Unified API + Trails + Config
 // app.use(universalRoutes);   // Disabled - Easter Event supersedes this
-app.use(easterRoutes);      // Easter Event (9 endpoints)
+app.use(easterRoutes);      // Easter Event legacy routes
 
 app.listen(PORT, () => {
     Logger.info(`Twimp Backend (api.twimp.app) running on port ${PORT}`, 'SERVER');
