@@ -32,7 +32,7 @@ export class TrailService {
         // Filter to only active games (games not in config default to active)
         const activeTrails = trails.filter(t => {
             const config = configMap.get(t.ref);
-            return config ? config.active : true;
+            return config ? config.status === 'active' : true;
         });
 
         const summaries = activeTrails.map(t => {
