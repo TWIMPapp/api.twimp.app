@@ -3,6 +3,10 @@
   "buildCommand": "",
   "outputDirectory": "",
   "rewrites": [
+    { "source": "/play", "destination": "/api/play" },
+    { "source": "/awty", "destination": "/api/awty" },
+    { "source": "/next", "destination": "/api/next" },
+    { "source": "/trails/:path*", "destination": "/api/trails/:path*" },
     { "source": "/easter_event/:path*", "destination": "/api/easter_event/:path*" }
   ],
   "headers": [
