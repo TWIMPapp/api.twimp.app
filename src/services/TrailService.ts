@@ -1,4 +1,4 @@
-import { getStoredTrails } from '../data/trails/index';
+import { getStoredTrails } from '../data/games/index';
 import { resolveTrail } from '../utils/resolveTrail';
 import { Trail } from '../types/index';
 import { GeoService } from './GeoService';
@@ -29,13 +29,14 @@ export class TrailService {
         const gameConfig = await GameConfigService.getAll();
         const configMap = new Map(gameConfig.map(c => [c.ref, c]));
 
-        // Filter to only active games (games not in config default to active)
+        // Only include trails that exist in game_config (default is inactive/hidden)
         const activeTrails = trails.filter(t => {
             const config = configMap.get(t.ref);
-            return config ? config.status === 'active' : true;
+            return config && config.status !== 'inactive';
         });
 
         const summaries = activeTrails.map(t => {
+            const config = configMap.get(t.ref)!;
             // EVENT games (content_pack) work anywhere, no location needed
             const isEvent = t.type === 'EVENT' || t.content_pack;
 
@@ -65,11 +66,15 @@ export class TrailService {
                 hasSession: sessionTrailRefs.has(t.ref),
                 type: t.type,
                 gradient: t.gradient,
-                content_pack: t.content_pack
+                content_pack: t.content_pack,
+                status: config.status
             };
         });
 
-        // Filter and Categorize
+        // Featured = promoted games shown in a banner/carousel
+        const featured = summaries.filter(s => s.status === 'featured');
+
+        // Categorize remaining by session existence
         const playAgain = summaries.filter(s => s.hasSession);
         const discoverable = summaries.filter(s => !s.hasSession);
 
@@ -82,9 +87,10 @@ export class TrailService {
         }
 
         return {
+            featured,
             playAgain,
             nearYou,
-            all: discoverable // Exclude playAgain from exploration/search
+            all: discoverable
         };
     }
 }

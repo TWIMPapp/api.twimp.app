@@ -1,7 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 export function cors(res: VercelResponse) {
     res.setHeader('Access-Control-Allow-Credentials', 'true');

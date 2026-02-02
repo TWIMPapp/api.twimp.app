@@ -7,8 +7,10 @@
     { "source": "/play", "destination": "/api/play" },
     { "source": "/awty", "destination": "/api/awty" },
     { "source": "/next", "destination": "/api/next" },
-    { "source": "/trails/:path*", "destination": "/api/trails/:path*" },
-    { "source": "/easter_event/:path*", "destination": "/api/easter_event/:path*" }
+    { "source": "/list", "destination": "/api/list" },
+    { "source": "/easter_event/:path*", "destination": "/api/easter_event/:path*" },
+    { "source": "/custom-trail/create", "destination": "/api/custom-trail/create" },
+{ "source": "/custom-trail/:id", "destination": "/api/custom-trail/[id]" }
   ],
   "headers": [
     {

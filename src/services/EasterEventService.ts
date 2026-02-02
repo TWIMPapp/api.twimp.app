@@ -11,11 +11,11 @@ import {
 import { EggHuntQuestion } from '../types/UniversalGameTypes';
 import { SessionService } from './SessionService';
 import { GeoService } from './GeoService';
-import { EASTER_EVENT_CONFIG } from '../data/easter_event/config';
+import { EASTER_EVENT_CONFIG, getDayConfig } from '../data/easter_event/config';
 import { STORY_CHAPTERS } from '../data/easter_event/chapters';
 import { PUZZLES } from '../data/easter_event/puzzles';
 import { MISSION_UPDATES } from '../data/easter_event/mission_updates';
-import { EggHuntQuestions } from '../data/universal/egg_hunt_questions';
+import { EggHuntQuestions } from '../data/easter_event/egg_hunt_questions';
 
 export class EasterEventService {
     // ===== Session Management =====
@@ -40,11 +40,16 @@ export class EasterEventService {
             await SessionService.saveUniversalSession(session);
         }
 
+        const dayConfig = this.getCurrentDayConfig();
         return {
             ...session,
+            dailyProgress: {
+                collected: this.getEggsCollectedToday(session),
+                max: dayConfig.max
+            },
             spawnRadius: {
                 center: session.startPosition,
-                radiusMeters: EASTER_EVENT_CONFIG.SPAWN_RADIUS_METERS
+                radiusMeters: dayConfig.radius
             }
         };
     }
@@ -91,16 +96,12 @@ export class EasterEventService {
     // ===== Daily Egg Management =====
 
     static getEggsCollectedToday(session: EasterEventSession): number {
-        const today = this.getTodayDateString();
-        return session.dailyEggs[today]?.length || 0;
+        const dayKey = String(this.getDaysSinceEventStart());
+        return session.dailyEggs[dayKey]?.length || 0;
     }
 
     static canCollectMoreEggsToday(session: EasterEventSession): boolean {
-        return this.getEggsCollectedToday(session) < EASTER_EVENT_CONFIG.DAILY_EGG_LIMIT;
-    }
-
-    private static getTodayDateString(): string {
-        return new Date().toISOString().split('T')[0];
+        return this.getEggsCollectedToday(session) < this.getCurrentDayConfig().max;
     }
 
     // ===== Weighted Random Letter Selection =====
@@ -127,16 +128,22 @@ export class EasterEventService {
             return;
         }
 
-        // Check daily limit
-        if (!this.canCollectMoreEggsToday(session)) {
-            session.currentEgg = null;
+        const dayConfig = this.getCurrentDayConfig();
+        const eggsCollectedToday = this.getEggsCollectedToday(session);
+        const isBonusEgg = !this.canCollectMoreEggsToday(session);
+
+        // Check if using custom trail - custom trails can have more eggs than daily limit
+        if (session.customTrail && eggsCollectedToday < session.customTrail.locations.length) {
+            const nextLocation = session.customTrail.locations[eggsCollectedToday];
+            this.spawnCustomTrailEgg(session, nextLocation.lat, nextLocation.lng, isBonusEgg);
             return;
         }
 
+        // Normal random spawn
         const assignedLetter = this.selectRandomLetter();
         const pos = this.getRandomPointNearby(
             lat, lng,
-            EASTER_EVENT_CONFIG.SPAWN_RADIUS_METERS / 1000,
+            dayConfig.radius / 1000,
             EASTER_EVENT_CONFIG.MIN_SPAWN_DISTANCE_METERS / 1000
         );
 
@@ -148,17 +155,37 @@ export class EasterEventService {
             lat: pos.lat,
             lng: pos.lng,
             spawnTime: Date.now(),
-            expireTime: Date.now() + (EASTER_EVENT_CONFIG.EGG_EXPIRE_MINUTES * 60 * 1000),
+            expireTime: Date.now() + (dayConfig.expire * 60 * 1000),
             assignedLetter,
             subject,
-            isGoldenEgg: false
+            isGoldenEgg: false,
+            isBonusEgg
+        };
+    }
+
+    private static spawnCustomTrailEgg(session: EasterEventSession, lat: number, lng: number, isBonusEgg: boolean = false): void {
+        const assignedLetter = this.selectRandomLetter();
+        const subjects: Array<'MATH' | 'ENGLISH' | 'SCIENCE'> = ['MATH', 'ENGLISH', 'SCIENCE'];
+        const subject = subjects[Math.floor(Math.random() * subjects.length)];
+
+        session.currentEgg = {
+            lat,
+            lng,
+            spawnTime: Date.now(),
+            expireTime: Date.now() + (24 * 60 * 60 * 1000), // 24 hours - effectively no expiry for today
+            assignedLetter,
+            subject,
+            isGoldenEgg: false,
+            isCustomTrail: true,
+            isBonusEgg
         };
     }
 
     private static spawnGoldenEgg(session: EasterEventSession, lat: number, lng: number): void {
+        const dayConfig = this.getCurrentDayConfig();
         const pos = this.getRandomPointNearby(
             lat, lng,
-            EASTER_EVENT_CONFIG.SPAWN_RADIUS_METERS / 1000,
+            dayConfig.radius / 1000,
             EASTER_EVENT_CONFIG.MIN_SPAWN_DISTANCE_METERS / 1000
         );
 
@@ -166,10 +193,82 @@ export class EasterEventService {
             lat: pos.lat,
             lng: pos.lng,
             spawnTime: Date.now(),
-            expireTime: Date.now() + (EASTER_EVENT_CONFIG.EGG_EXPIRE_MINUTES * 60 * 1000),
+            expireTime: Date.now() + (dayConfig.expire * 60 * 1000),
             assignedLetter: '', // Golden egg doesn't have a letter
             subject: 'MATH', // Not used for golden egg
             isGoldenEgg: true
+        };
+    }
+
+    // ===== Custom Trail Management =====
+
+    static async setCustomTrail(userId: string, locations: Array<{ lat: number; lng: number }>): Promise<any> {
+        const session = await SessionService.getUniversalSession(userId, 'EASTER_EVENT') as EasterEventSession;
+        if (!session) return { ok: false, message: "No active session" };
+
+        const dayConfig = this.getCurrentDayConfig();
+        const eggsCollectedToday = this.getEggsCollectedToday(session);
+        const eggsRemaining = dayConfig.max - eggsCollectedToday;
+
+        // Allow any number of locations - eggs beyond daily limit become bonus eggs
+        if (locations.length === 0) {
+            return { ok: false, message: "At least one location is required." };
+        }
+
+        const bonusEggCount = Math.max(0, locations.length - eggsRemaining);
+
+        // Validate 200m spacing between all eggs
+        const MIN_SPACING_METERS = 200;
+        for (let i = 0; i < locations.length; i++) {
+            for (let j = i + 1; j < locations.length; j++) {
+                const distance = GeoService.getDistanceFromLatLonInMeters(
+                    locations[i].lat, locations[i].lng,
+                    locations[j].lat, locations[j].lng
+                );
+                if (distance < MIN_SPACING_METERS) {
+                    return {
+                        ok: false,
+                        message: `Eggs ${i + 1} and ${j + 1} are too close (${Math.round(distance)}m). Minimum spacing is ${MIN_SPACING_METERS}m.`
+                    };
+                }
+            }
+        }
+
+        // Save custom trail and spawn first egg
+        session.customTrail = { locations };
+        session.currentEgg = null; // Clear any existing egg
+        this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
+
+        await SessionService.saveUniversalSession(session);
+
+        const message = bonusEggCount > 0
+            ? `Custom trail set with ${locations.length} eggs (${bonusEggCount} bonus).`
+            : `Custom trail set with ${locations.length} eggs.`;
+
+        return {
+            ok: true,
+            message,
+            bonusEggCount,
+            session,
+            dailyProgress: {
+                collected: eggsCollectedToday,
+                max: dayConfig.max
+            }
+        };
+    }
+
+    static async clearCustomTrail(userId: string): Promise<any> {
+        const session = await SessionService.getUniversalSession(userId, 'EASTER_EVENT') as EasterEventSession;
+        if (!session) return { ok: false, message: "No active session" };
+
+        session.customTrail = null;
+        session.currentEgg = null; // Clear current egg, will respawn randomly on next AWTY
+
+        await SessionService.saveUniversalSession(session);
+
+        return {
+            ok: true,
+            message: "Custom trail cleared. Eggs will now spawn randomly."
         };
     }
 
@@ -179,42 +278,41 @@ export class EasterEventService {
         const session = await SessionService.getUniversalSession(userId, 'EASTER_EVENT') as EasterEventSession;
         if (!session) return { ok: false, message: "No active session" };
 
+        const dayConfig = this.getCurrentDayConfig();
         session.lastPosition = { lat, lng };
 
-        // Check egg expiration and respawn if needed
-        if (session.currentEgg && session.currentEgg.expireTime < Date.now()) {
+        // Check egg expiration and respawn if needed (skip for custom trail eggs - they don't expire)
+        if (session.currentEgg && !session.currentEgg.isCustomTrail && session.currentEgg.expireTime < Date.now()) {
             console.log(`[EasterEvent] Egg expired during AWTY for ${userId}, respawning.`);
             this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
         }
 
-        // If no egg and can collect more, spawn one
-        if (!session.currentEgg && this.canCollectMoreEggsToday(session)) {
-            this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
-        }
-
-        // Also check golden egg availability
-        if (!session.currentEgg && this.isGoldenEggAvailable() && !session.goldenEggCollected) {
-            this.spawnGoldenEgg(session, session.startPosition.lat, session.startPosition.lng);
+        // If no egg, spawn one (bonus eggs allowed after daily limit)
+        if (!session.currentEgg) {
+            // Check golden egg first
+            if (this.isGoldenEggAvailable() && !session.goldenEggCollected) {
+                this.spawnGoldenEgg(session, session.startPosition.lat, session.startPosition.lng);
+            } else {
+                this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
+            }
         }
 
         await SessionService.saveUniversalSession(session);
 
         if (!session.currentEgg) {
-            const canCollectMore = this.canCollectMoreEggsToday(session);
+            // This should rarely happen now since we always spawn eggs
             return {
                 ok: true,
                 arrived: false,
-                message: canCollectMore
-                    ? "Searching for eggs..."
-                    : "You've collected all your eggs for today! Come back tomorrow!",
+                message: "Searching for eggs...",
                 session,
                 dailyProgress: {
                     collected: this.getEggsCollectedToday(session),
-                    max: EASTER_EVENT_CONFIG.DAILY_EGG_LIMIT
+                    max: dayConfig.max
                 },
                 spawnRadius: {
                     center: session.startPosition,
-                    radiusMeters: EASTER_EVENT_CONFIG.SPAWN_RADIUS_METERS
+                    radiusMeters: dayConfig.radius
                 }
             };
         }
@@ -233,7 +331,7 @@ export class EasterEventService {
                     session,
                     spawnRadius: {
                         center: session.startPosition,
-                        radiusMeters: EASTER_EVENT_CONFIG.SPAWN_RADIUS_METERS
+                        radiusMeters: dayConfig.radius
                     }
                 };
             }
@@ -245,29 +343,35 @@ export class EasterEventService {
                 session.currentEgg.currentAnswer = question.answer;
             }
 
-            // Record collection immediately (egg counts toward daily limit now)
-            const letter = session.currentEgg.assignedLetter;
-            const today = this.getTodayDateString();
+            const isBonusEgg = session.currentEgg.isBonusEgg === true;
 
-            if (!session.dailyEggs[today]) {
-                session.dailyEggs[today] = [];
-            }
+            // Record collection immediately (but NOT for bonus eggs - they don't count toward daily limit)
+            if (!isBonusEgg) {
+                const letter = session.currentEgg.assignedLetter;
+                const dayKey = String(this.getDaysSinceEventStart());
 
-            // Only add if not already recorded (prevent duplicate entries on multiple AWTY calls)
-            const alreadyRecorded = session.dailyEggs[today].some(
-                egg => egg.lat === session.currentEgg!.lat && egg.lng === session.currentEgg!.lng
-            );
+                if (!session.dailyEggs[dayKey]) {
+                    session.dailyEggs[dayKey] = [];
+                }
 
-            if (!alreadyRecorded) {
-                session.dailyEggs[today].push({
-                    letter,
-                    collectedAt: Date.now(),
-                    isDuplicate: session.unlockedLetters[letter] === true,
-                    lat: session.currentEgg.lat,
-                    lng: session.currentEgg.lng
-                });
-                session.totalEggsCollected++;
-                console.log(`[EasterEvent] User ${userId} arrived at egg, counted as collected.`);
+                // Only add if not already recorded (prevent duplicate entries on multiple AWTY calls)
+                const alreadyRecorded = session.dailyEggs[dayKey].some(
+                    egg => egg.lat === session.currentEgg!.lat && egg.lng === session.currentEgg!.lng
+                );
+
+                if (!alreadyRecorded) {
+                    session.dailyEggs[dayKey].push({
+                        letter,
+                        collectedAt: Date.now(),
+                        isDuplicate: session.unlockedLetters[letter] === true,
+                        lat: session.currentEgg.lat,
+                        lng: session.currentEgg.lng
+                    });
+                    session.totalEggsCollected++;
+                    console.log(`[EasterEvent] User ${userId} arrived at egg, counted as collected.`);
+                }
+            } else {
+                console.log(`[EasterEvent] User ${userId} arrived at bonus egg (not counted toward daily limit).`);
             }
 
             await SessionService.saveUniversalSession(session);
@@ -276,6 +380,7 @@ export class EasterEventService {
                 ok: true,
                 arrived: true,
                 isGoldenEgg: false,
+                isBonusEgg,
                 session,
                 task: {
                     type: 'question_single',
@@ -285,11 +390,11 @@ export class EasterEventService {
                 },
                 dailyProgress: {
                     collected: this.getEggsCollectedToday(session),
-                    max: EASTER_EVENT_CONFIG.DAILY_EGG_LIMIT
+                    max: dayConfig.max
                 },
                 spawnRadius: {
                     center: session.startPosition,
-                    radiusMeters: EASTER_EVENT_CONFIG.SPAWN_RADIUS_METERS
+                    radiusMeters: dayConfig.radius
                 }
             };
         }
@@ -297,10 +402,12 @@ export class EasterEventService {
         // Not arrived yet - show distance and direction
         const bearing = GeoService.bearing(lat, lng, session.currentEgg.lat, session.currentEgg.lng);
         const direction = GeoService.degToCompass(bearing);
+        const isBonusEgg = session.currentEgg.isBonusEgg === true;
 
         return {
             ok: true,
             arrived: false,
+            isBonusEgg,
             message: `Egg is ${Math.floor(dist)}m to the ${direction}`,
             distance: dist,
             direction,
@@ -308,16 +415,16 @@ export class EasterEventService {
             markers: [{
                 lat: session.currentEgg.lat,
                 lng: session.currentEgg.lng,
-                title: session.currentEgg.isGoldenEgg ? "Golden Egg!" : "Easter Egg",
-                colour: session.currentEgg.isGoldenEgg ? "gold" : this.getEggColour(session.currentEgg.subject)
+                title: session.currentEgg.isGoldenEgg ? "Golden Egg!" : (isBonusEgg ? "Bonus Egg" : "Easter Egg"),
+                colour: session.currentEgg.isGoldenEgg ? "gold" : (isBonusEgg ? "orange" : this.getEggColour(session.currentEgg.subject))
             }],
             dailyProgress: {
                 collected: this.getEggsCollectedToday(session),
-                max: EASTER_EVENT_CONFIG.DAILY_EGG_LIMIT
+                max: dayConfig.max
             },
             spawnRadius: {
                 center: session.startPosition,
-                radiusMeters: EASTER_EVENT_CONFIG.SPAWN_RADIUS_METERS
+                radiusMeters: dayConfig.radius
             }
         };
     }
@@ -345,6 +452,9 @@ export class EasterEventService {
             return { ok: false, message: "No egg to collect" };
         }
 
+        const dayConfig = this.getCurrentDayConfig();
+        const isBonusEgg = session.currentEgg.isBonusEgg === true;
+
         // Golden egg has special handling (no question)
         if (session.currentEgg.isGoldenEgg) {
             return this.collectGoldenEgg(userId);
@@ -367,9 +477,8 @@ export class EasterEventService {
             // Egg is already counted (from confirmArrival), just clear and respawn
             console.log(`[EasterEvent] Wrong answer from ${userId}, respawning egg.`);
             session.currentEgg = null;
-            if (this.canCollectMoreEggsToday(session)) {
-                this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
-            }
+            // Always spawn next egg (bonus eggs allowed)
+            this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
             await SessionService.saveUniversalSession(session);
 
             return {
@@ -379,27 +488,41 @@ export class EasterEventService {
                 session,
                 dailyProgress: {
                     collected: this.getEggsCollectedToday(session),
-                    max: EASTER_EVENT_CONFIG.DAILY_EGG_LIMIT
-                }
+                    max: dayConfig.max
+                },
+                isBonusEgg
             };
         }
 
-        // Correct answer - reveal letter
-        if (!isDuplicate) {
+        // Correct answer - reveal letter (but NOT for bonus eggs)
+        if (!isBonusEgg && !isDuplicate) {
             session.unlockedLetters[letter] = true;
             session.uniqueLettersFound++;
         }
 
-        // Clear current egg and spawn next if possible
+        // Clear current egg and spawn next (bonus eggs allowed)
         session.currentEgg = null;
-        if (this.canCollectMoreEggsToday(session)) {
-            this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
-        }
+        this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
 
         await SessionService.saveUniversalSession(session);
 
         // Get the symbol for this letter
         const symbol = this.getSymbolForLetter(letter, session.codexMapping);
+
+        // Different messaging for bonus eggs
+        if (isBonusEgg) {
+            return {
+                ok: true,
+                correct: true,
+                isBonusEgg: true,
+                message: "Great job! Keep playing for fun!",
+                session,
+                dailyProgress: {
+                    collected: this.getEggsCollectedToday(session),
+                    max: dayConfig.max
+                }
+            };
+        }
 
         return {
             ok: true,
@@ -407,13 +530,14 @@ export class EasterEventService {
             letter,
             symbol,
             isDuplicate,
+            isBonusEgg: false,
             message: isDuplicate
                 ? `Oh no! We already have ${letter}!`
                 : `New letter unlocked: ${letter}!`,
             session,
             dailyProgress: {
                 collected: this.getEggsCollectedToday(session),
-                max: EASTER_EVENT_CONFIG.DAILY_EGG_LIMIT
+                max: dayConfig.max
             }
         };
     }
@@ -798,6 +922,7 @@ export class EasterEventService {
             await SessionService.saveUniversalSession(session);
         }
 
+        const dayConfig = this.getCurrentDayConfig();
         const puzzleStatus = await this.getPuzzleStatus(userId);
         const clues = await this.getClues(userId);
 
@@ -818,12 +943,12 @@ export class EasterEventService {
             goldenEggCollected: session.goldenEggCollected || false,
             dailyProgress: {
                 collected: this.getEggsCollectedToday(session),
-                max: EASTER_EVENT_CONFIG.DAILY_EGG_LIMIT
+                max: dayConfig.max
             },
             codex: this.getCodexDisplay(session),
             spawnRadius: {
                 center: session.startPosition,
-                radiusMeters: EASTER_EVENT_CONFIG.SPAWN_RADIUS_METERS
+                radiusMeters: dayConfig.radius
             }
         };
     }
@@ -871,7 +996,7 @@ export class EasterEventService {
         return {
             ok: true,
             center: session.startPosition,
-            radiusMeters: EASTER_EVENT_CONFIG.SPAWN_RADIUS_METERS
+            radiusMeters: this.getCurrentDayConfig().radius
         };
     }
 
@@ -918,6 +1043,11 @@ export class EasterEventService {
         return Math.floor((now.getTime() - eventStart.getTime()) / (1000 * 60 * 60));
     }
 
+    // Get day-specific config (max eggs, expire time, spawn radius)
+    private static getCurrentDayConfig() {
+        return getDayConfig(this.getDaysSinceEventStart());
+    }
+
     private static getRandomPointNearby(
         lat: number,
         lng: number,
@@ -926,29 +1056,35 @@ export class EasterEventService {
     ): { lat: number; lng: number } {
         let attempts = 0;
         let point;
+        const minDistanceM = minDistanceKm * 1000;
+        const maxDistanceM = radiusKm * 1000;
 
         do {
-            const r = radiusKm / 111.32; // rough lat conversion
-            const u = Math.random();
-            const v = Math.random();
-            const w = r * Math.sqrt(u);
-            const t = 2 * Math.PI * v;
-            const dx = w * Math.cos(t);
-            const dy = w * Math.sin(t);
+            // Generate random angle and distance
+            const angle = Math.random() * 2 * Math.PI;
+            // Uniform distribution within annulus (between min and max radius)
+            const minR = minDistanceKm;
+            const maxR = radiusKm;
+            const distance = Math.sqrt(Math.random() * (maxR * maxR - minR * minR) + minR * minR);
+
+            // Convert to lat/lng offset
+            const latOffset = (distance * Math.cos(angle)) / 111.32;
+            const lngOffset = (distance * Math.sin(angle)) / (111.32 * Math.cos(lat * Math.PI / 180));
 
             point = {
-                lat: lat + dy,
-                lng: lng + dx / Math.cos(lat * Math.PI / 180)
+                lat: lat + latOffset,
+                lng: lng + lngOffset
             };
 
-            const distance = GeoService.getDistanceFromLatLonInMeters(lat, lng, point.lat, point.lng);
+            // Verify the actual distance is within bounds
+            const actualDistance = GeoService.getDistanceFromLatLonInMeters(lat, lng, point.lat, point.lng);
 
-            if (distance >= minDistanceKm * 1000) {
+            if (actualDistance >= minDistanceM && actualDistance <= maxDistanceM) {
                 break;
             }
 
             attempts++;
-        } while (attempts < 10);
+        } while (attempts < 20);
 
         return point!;
     }

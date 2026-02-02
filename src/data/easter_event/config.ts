@@ -1,18 +1,42 @@
 import { ClueConfig } from '../../types/EasterEventTypes';
 
+// Day-based configuration
+// Keys are event day numbers (0 = event start)
+// Values cascade forward until the next defined day
+// Day 0 must be defined with all values as the baseline
+interface DayConfig {
+    max: number;      // Daily egg limit
+    expire: number;   // Egg expire time in minutes
+    radius: number;   // Spawn radius in meters
+}
+
+const DAY_CONFIG: Record<number, DayConfig> = {
+    0: { max: 5, expire: 30, radius: 200 },   // Days 0-6: Default settings
+    4: { max: 6, expire: 25, radius: 200 },   // Day 4: Slightly harder (shorter timer, smaller radius)
+    7: { max: 5, expire: 25, radius: 400 },   // Day 7+: Slightly harder (shorter timer, smaller radius)
+};
+
+// Get effective config for a specific event day
+export function getDayConfig(eventDay: number): DayConfig {
+    // Find the highest day key that's <= eventDay
+    const applicableDay = Object.keys(DAY_CONFIG)
+        .map(Number)
+        .filter(day => day <= eventDay)
+        .sort((a, b) => b - a)[0] ?? 0;
+
+    return DAY_CONFIG[applicableDay] || DAY_CONFIG[0];
+}
+
 export const EASTER_EVENT_CONFIG = {
-    // Configurable limits
-    DAILY_EGG_LIMIT: 5,
+    // Collection and spawn settings
+    COLLECTION_RADIUS_METERS: 20,
+    MIN_SPAWN_DISTANCE_METERS: 100,
     PUZZLE_DURATION_HOURS: 48,
     PUZZLE_START_HOUR: 17,  // 5pm - puzzles start at this hour each day
-    EGG_EXPIRE_MINUTES: 30,
-    COLLECTION_RADIUS_METERS: 20,
-    SPAWN_RADIUS_METERS: 500,
-    MIN_SPAWN_DISTANCE_METERS: 100,
 
     // TEST MODE: Set to 0-7 to override day, or null for real date
     // Day 0 = event start, Day 7 = Easter Sunday
-    TEST_DAY_OVERRIDE: 3 as number | null,
+    TEST_DAY_OVERRIDE: 6 as number | null,
 
     // Event dates (update each year)
     // For 2026: Easter Sunday is April 5, event starts Friday March 27 (9 days before)

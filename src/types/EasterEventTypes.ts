@@ -30,6 +30,11 @@ export interface EasterEventSession {
     totalEggsCollected: number;
     uniqueLettersFound: number;
     goldenEggCollected: boolean;
+
+    // Custom trail mode - user-defined egg locations
+    customTrail?: {
+        locations: Array<{ lat: number; lng: number }>;
+    } | null;
 }
 
 export interface CollectedEgg {
@@ -38,6 +43,7 @@ export interface CollectedEgg {
     isDuplicate: boolean;
     lat: number;
     lng: number;
+    isBonusEgg?: boolean;       // Bonus egg - played for fun, no codex reward
 }
 
 export interface EasterEgg {
@@ -48,6 +54,8 @@ export interface EasterEgg {
     assignedLetter: string;     // Pre-assigned on spawn
     subject: 'MATH' | 'ENGLISH' | 'SCIENCE';
     isGoldenEgg?: boolean;      // Easter Sunday special egg
+    isCustomTrail?: boolean;    // From user-defined trail (no expiry)
+    isBonusEgg?: boolean;       // Bonus egg - played for fun, no codex reward
     // Question assigned when user arrives (so answer check uses same question)
     currentQuestion?: string;
     currentAnswer?: string;

@@ -8,7 +8,6 @@ import { BryngarwRiverSummer } from './BryngarwRiverSummer';
 import { BryngarwWoodlandSummer } from './BryngarwWoodlandSummer';
 import { EggstraordinaryCardiff } from './EggstraordinaryCardiff';
 import { EggstraordinaryFrome } from './EggstraordinaryFrome';
-import { EggHunt } from './EggHunt';
 import { EasterEvent } from './EasterEvent';
 
 // Helper to get all trails (including EVENT type games)
@@ -23,7 +22,6 @@ export const Trails = [
     BryngarwWoodlandSummer,
     EggstraordinaryCardiff,
     EggstraordinaryFrome,
-    EggHunt,
     EasterEvent
 ];
 

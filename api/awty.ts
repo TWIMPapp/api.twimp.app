@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { handleOptions, cors } from './_utils';
 import { EasterEventService } from '../src/services/EasterEventService';
+import { CustomTrailService } from '../src/services/CustomTrailService';
 import { GameEngineService } from '../src/services/GameEngineService';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -21,6 +22,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Easter Event uses dedicated service
     if (ref === 'easter-event') {
         const result = await EasterEventService.handleAWTY(user_id, parseFloat(lat), parseFloat(lng));
+        return res.json({ body: result });
+    }
+
+    // Custom Trail games
+    if (ref.startsWith('custom-trail-')) {
+        const trailId = ref.replace('custom-trail-', '');
+        const result = await CustomTrailService.handleAWTY(user_id, trailId, parseFloat(lat), parseFloat(lng));
         return res.json({ body: result });
     }
 

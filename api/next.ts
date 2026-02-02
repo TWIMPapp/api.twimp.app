@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { handleOptions, cors } from './_utils';
 import { EasterEventService } from '../src/services/EasterEventService';
+import { CustomTrailService } from '../src/services/CustomTrailService';
 import { GameEngineService } from '../src/services/GameEngineService';
 import { SessionService } from '../src/services/SessionService';
 
@@ -44,6 +45,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 }
                 return res.json({ body: await EasterEventService.resetSpawnLocation(user_id, parseFloat(lat), parseFloat(lng)) });
 
+            default:
+                return res.status(400).json({ ok: false, message: `Unknown action: ${action}` });
+        }
+    }
+
+    // Custom Trail games
+    if (ref.startsWith('custom-trail-')) {
+        const trailId = ref.replace('custom-trail-', '');
+        const { pin_index } = req.body;
+        switch (action) {
+            case 'collect':
+                const collectResult = await CustomTrailService.collectPin(user_id, trailId, answer, pin_index);
+                return res.json({ body: collectResult });
+            case 'restart':
+                const gameType = `CUSTOM_TRAIL_${trailId}`;
+                await SessionService.clearUniversalSession(user_id, gameType);
+                return res.json({ body: { ok: true, message: 'Trail restarted' } });
             default:
                 return res.status(400).json({ ok: false, message: `Unknown action: ${action}` });
         }

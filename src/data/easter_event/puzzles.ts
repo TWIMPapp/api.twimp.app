@@ -1,6 +1,6 @@
 import { Puzzle } from '../../types/EasterEventTypes';
 
-// Daily puzzles for the Easter Event
+// Cryptic puzzles for the Easter Event
 // Each puzzle is available for 48 hours
 // Correct answer awards 2 rare codex letters
 
@@ -33,7 +33,7 @@ export const PUZZLES: Puzzle[] = [
         image: "puzzle3.png",
         hint: "Look at the first letter of each word...",
         answer: "spring",
-        rewardLetters: ['X', 'U']
+        rewardLetters: ['J', 'F']
     },
     {
         id: 4,
@@ -43,7 +43,7 @@ export const PUZZLES: Puzzle[] = [
         image: "puzzle4.png",
         hint: "What comes once in a year, twice in a week, but never in a day?",
         answer: "e",
-        rewardLetters: ['J', 'F']
+        rewardLetters: ['X', 'U']
     },
     {
         id: 5,

@@ -23,7 +23,8 @@ export class GameConfigService {
         if (!isSupabaseConfigured()) {
             // Fallback defaults when Supabase not configured
             return [
-                { ref: 'easter-event', gameType: 'universal', status: 'featured' }
+                { ref: 'easter-event', gameType: 'universal', status: 'featured' },
+                { ref: 'the-eggstraordinary-case-of-the-missing-eggs-frome', gameType: 'trail', status: 'pending' }
             ];
         }
 
@@ -69,8 +70,8 @@ export class GameConfigService {
     static async getStatus(ref: string): Promise<GameStatus> {
         const all = await this.getAll();
         const config = all.find(c => c.ref === ref);
-        // If not in config, default to active (for trails not yet added)
-        return config ? config.status : 'active';
+        // Temporarily default to inactive until all trails are added to game_config
+        return config ? config.status : 'inactive';
     }
 
     static async isPlayable(ref: string): Promise<boolean> {

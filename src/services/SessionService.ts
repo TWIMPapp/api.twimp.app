@@ -20,7 +20,6 @@ export interface UniversalSession {
     lastPosition: { lat: number; lng: number };
     currentLevel: number;
     score: number;
-    history: any[];
     codexMapping?: Record<string, string>;
     currentEgg?: any;
     currentEggs?: any[]; // For multi-choice
@@ -246,6 +245,42 @@ export class SessionService {
         return null;
     }
 
+    static async getSessionsByGameType(gameType: string): Promise<UniversalSession[]> {
+        if (isSupabaseConfigured()) {
+            try {
+                const { data, error } = await supabase!
+                    .from('universal_sessions')
+                    .select('*')
+                    .eq('game_type', gameType);
+
+                if (error) {
+                    console.error('Supabase getSessionsByGameType error:', error);
+                    return [];
+                }
+                return (data || []).map((d: any) => this.dbToUniversalSession(d));
+            } catch (e) {
+                console.error('Failed to get sessions by game type:', e);
+                return [];
+            }
+        }
+
+        // File-based fallback - scan directory
+        this.ensureDirectory();
+        const sessions: UniversalSession[] = [];
+        const files = fs.readdirSync(SESSIONS_DIR).filter(f => f.startsWith('univ_') && f.endsWith('.json'));
+        for (const file of files) {
+            try {
+                const session: UniversalSession = JSON.parse(
+                    fs.readFileSync(path.join(SESSIONS_DIR, file), 'utf8')
+                );
+                if (session.gameType === gameType) {
+                    sessions.push(session);
+                }
+            } catch (e) { /* skip */ }
+        }
+        return sessions;
+    }
+
     // Sync version for backward compatibility - returns cached/file data only
     static getUniversalSessionSync(userId: string, gameType: string): UniversalSession | null {
         if (!isSupabaseConfigured()) {
@@ -382,14 +417,13 @@ export class SessionService {
             lastPosition: data.last_position || { lat: 0, lng: 0 },
             currentLevel: data.current_level,
             score: data.score,
-            history: data.history || [],
             ...sessionData  // Spread any additional fields from session_data
         };
     }
 
     private static universalSessionToDb(session: UniversalSession): any {
         // Extract known fields, put the rest in session_data
-        const { userId, gameType, startTime, lastPosition, currentLevel, score, history, ...extraFields } = session;
+        const { userId, gameType, startTime, lastPosition, currentLevel, score, ...extraFields } = session;
         return {
             user_id: userId,
             game_type: gameType,
@@ -397,7 +431,6 @@ export class SessionService {
             last_position: lastPosition,
             current_level: currentLevel,
             score: score,
-            history: history,
             session_data: extraFields  // Store Easter Event specific fields here
         };
     }
