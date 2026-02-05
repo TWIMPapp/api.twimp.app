@@ -5,7 +5,7 @@ export type CustomTrailTheme = 'easter' | 'valentine' | 'general';
 export interface CustomPin {
     lat: number;
     lng: number;
-    icon: string;           // e.g. 'egg_red', 'heart_pink', 'treasure_chest'
+    icon: string;           // e.g. 'egg', 'medal', 'heart_pink', 'treasure_chest'
     visible: boolean;       // shown on map or hidden (clue-based)
     question?: string;      // optional question on arrival (max 200 chars)
     answer?: string;        // answer to validate (max 200 chars)
@@ -18,7 +18,7 @@ export interface CustomTrail {
     creatorId: string;
     theme: CustomTrailTheme;
     name?: string;
-    startLocation: { lat: number; lng: number };
+    startLocation: { lat: number; lng: number } | null; // null = generate pins on first play
     pins: CustomPin[];
     mode: 'random' | 'custom';
     competitive: boolean;           // true = shared pins, free-roam, first-come-first-served
@@ -28,6 +28,12 @@ export interface CustomTrail {
     expiresAt: number;
     playCount: number;
     isActive: boolean;
+    // For dynamic trails (startLocation null) - config stored until first play
+    dynamicConfig?: {
+        count: number;
+        icon?: string;
+        successMessage?: string;
+    };
 }
 
 export interface CustomTrailPlaySession {

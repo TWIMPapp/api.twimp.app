@@ -46,4 +46,35 @@ export class GeoService {
         const arr = ["North", "North East", "East", "South East", "South", "South West", "West", "North West"];
         return arr[(val % 8)];
     }
+
+    /**
+     * Returns a random point at approximately the given distance from the origin.
+     */
+    static getRandomPointAtDistance(
+        lat: number,
+        lng: number,
+        distanceMeters: number
+    ): { lat: number; lng: number } {
+        const earthRadius = 6371000; // meters
+        const randomBearing = Math.random() * 2 * Math.PI; // random direction
+
+        const latRad = this.toRadians(lat);
+        const lngRad = this.toRadians(lng);
+        const angularDistance = distanceMeters / earthRadius;
+
+        const newLatRad = Math.asin(
+            Math.sin(latRad) * Math.cos(angularDistance) +
+            Math.cos(latRad) * Math.sin(angularDistance) * Math.cos(randomBearing)
+        );
+
+        const newLngRad = lngRad + Math.atan2(
+            Math.sin(randomBearing) * Math.sin(angularDistance) * Math.cos(latRad),
+            Math.cos(angularDistance) - Math.sin(latRad) * Math.sin(newLatRad)
+        );
+
+        return {
+            lat: this.toDegrees(newLatRad),
+            lng: this.toDegrees(newLngRad)
+        };
+    }
 }

@@ -44,6 +44,66 @@ export class CustomTrailService {
 
     // ===== CRUD =====
 
+    /**
+     * Create a dynamic trail where pins are generated on first play
+     * Used for Secret Valentine where the recipient's location determines pin placement
+     */
+    static async createDynamicTrail(
+        creatorId: string,
+        theme: CustomTrailTheme,
+        name: string | undefined,
+        count: number,
+        icon?: string,
+        successMessage?: string,
+        competitive: boolean = false
+    ): Promise<{ ok: boolean; trail?: CustomTrail; message?: string }> {
+        if (count < 1 || count > MAX_PINS) {
+            return { ok: false, message: `Count must be between 1 and ${MAX_PINS}` };
+        }
+
+        // Check 1 active trail limit per creator
+        const existingActive = await this.getActiveTrailByCreator(creatorId);
+        if (existingActive) {
+            return { ok: false, message: 'You already have an active trail. Delete it first to create a new one.' };
+        }
+
+        // Generate unique ID
+        let id = generateShortId();
+        let attempts = 0;
+        while (await this.getTrail(id) !== null && attempts < 10) {
+            id = generateShortId();
+            attempts++;
+        }
+        if (attempts >= 10) {
+            return { ok: false, message: 'Failed to generate unique ID. Please try again.' };
+        }
+
+        const trail: CustomTrail = {
+            id,
+            creatorId,
+            theme,
+            name: name ? truncate(name, MAX_TEXT_LENGTH) : undefined,
+            startLocation: null, // Will be set on first play
+            pins: [], // Will be generated on first play
+            mode: 'random',
+            competitive,
+            globalCollectedPins: [],
+            globalCollectedBy: {},
+            createdAt: Date.now(),
+            expiresAt: Date.now() + NINETY_DAYS_MS,
+            playCount: 0,
+            isActive: true,
+            dynamicConfig: {
+                count,
+                icon: icon ? truncate(icon, 50) : undefined,
+                successMessage: successMessage ? truncate(successMessage, MAX_TEXT_LENGTH) : undefined
+            }
+        };
+
+        await this.saveTrail(trail);
+        return { ok: true, trail };
+    }
+
     static async createTrail(
         creatorId: string,
         theme: CustomTrailTheme,
@@ -288,9 +348,26 @@ export class CustomTrailService {
         lat: number,
         lng: number
     ): Promise<any> {
-        const trail = await this.getActiveTrail(trailId);
+        let trail = await this.getActiveTrail(trailId);
         if (!trail) {
             return { ok: false, message: 'Trail not found or has expired' };
+        }
+
+        // Dynamic trail: generate pins on first play using player's location
+        if (trail.startLocation === null && trail.pins.length === 0 && trail.dynamicConfig) {
+            const { count, icon, successMessage } = trail.dynamicConfig;
+            const pins = this.generateRandomPins({ lat, lng }, count, false, trail.theme);
+
+            // Apply custom icon and message if specified
+            pins.forEach(pin => {
+                if (icon) pin.icon = icon;
+                if (successMessage) pin.successMessage = successMessage;
+            });
+
+            trail.pins = pins;
+            trail.startLocation = { lat, lng };
+            delete trail.dynamicConfig; // No longer needed
+            await this.saveTrail(trail);
         }
 
         const gameType = this.getGameType(trailId);
