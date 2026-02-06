@@ -617,7 +617,8 @@ export class CustomTrailService {
                 };
             }
 
-            return this.collectPin(userId, trailId, undefined);
+            const collectionResult = await this.collectPin(userId, trailId, undefined);
+            return { ...collectionResult, arrived: true };
         }
 
         const bearing = GeoService.bearing(lat, lng, currentPin.lat, currentPin.lng);

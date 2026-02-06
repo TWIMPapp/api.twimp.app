@@ -10,7 +10,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(405).json({ ok: false, message: 'Method not allowed' });
     }
 
-    const { creator_id, theme, name, start_location, pins, mode, competitive, count, has_questions } = req.body;
+    const { creator_id, theme, name, start_location, pins, mode, competitive, count, has_questions, spawn_radius } = req.body;
 
     if (!creator_id) {
         return res.status(400).json({ ok: false, message: 'creator_id is required' });
@@ -22,14 +22,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let finalPins = pins;
 
     if (mode === 'random') {
-        if (!count || count < 3 || count > 20) {
-            return res.status(400).json({ ok: false, message: 'count must be between 3 and 20 for random mode' });
+        if (!count || count < 1 || count > 20) {
+            return res.status(400).json({ ok: false, message: 'count must be between 1 and 20 for random mode' });
         }
+        const radius = (spawn_radius && spawn_radius >= 100 && spawn_radius <= 500)
+            ? spawn_radius
+            : 500;
         finalPins = CustomTrailService.generateRandomPins(
             start_location,
             count,
             !!has_questions,
-            theme || 'general'
+            theme || 'general',
+            radius
         );
     } else if (!pins || !Array.isArray(pins) || pins.length === 0) {
         return res.status(400).json({ ok: false, message: 'pins array is required for custom mode' });
