@@ -519,6 +519,69 @@ export class CustomTrailService {
             };
         }
 
+        // ===== Non-competitive Random: personal collection, any order =====
+        if (trail.mode === 'random' && !trail.competitive) {
+            // Check if user has collected all pins
+            if (session.collectedPins.length >= trail.pins.length) {
+                session.completed = true;
+                await SessionService.saveUniversalSession(session as any);
+                return { ok: true, completed: true, message: 'You found all the eggs!' };
+            }
+
+            // Find the nearest uncollected pin within range
+            let nearestPin: CustomPin | null = null;
+            let nearestIdx = -1;
+            let nearestDist = Infinity;
+
+            for (let i = 0; i < trail.pins.length; i++) {
+                if (session.collectedPins.includes(i)) continue; // already collected by this user
+                const pin = trail.pins[i];
+                const dist = GeoService.getDistanceFromLatLonInMeters(lat, lng, pin.lat, pin.lng);
+                if (dist < nearestDist) {
+                    nearestDist = dist;
+                    nearestPin = pin;
+                    nearestIdx = i;
+                }
+            }
+
+            await SessionService.saveUniversalSession(session as any);
+
+            if (nearestPin && nearestDist < COLLECTION_RADIUS_METERS) {
+                if (nearestPin.question && nearestPin.answer) {
+                    return {
+                        ok: true,
+                        arrived: true,
+                        task: {
+                            type: 'question',
+                            content: nearestPin.question,
+                            pinIndex: nearestIdx,
+                            icon: nearestPin.icon
+                        },
+                        session: {
+                            collectedPins: session.collectedPins,
+                            totalPins: trail.pins.length,
+                            completed: false
+                        }
+                    };
+                }
+                // No question - auto-collect
+                return this.collectPin(userId, trailId, undefined, nearestIdx);
+            }
+
+            // Return status with distance to nearest pin
+            return {
+                ok: true,
+                arrived: false,
+                nearestDistance: nearestDist < Infinity ? Math.round(nearestDist) : null,
+                session: {
+                    collectedPins: session.collectedPins,
+                    totalPins: trail.pins.length,
+                    completed: false
+                },
+                trail: this.getTrailForPlayer(trail, session)
+            };
+        }
+
         // ===== Sequential mode =====
         if (session.completed) {
             return { ok: true, completed: true, message: 'Trail already completed!' };
@@ -637,6 +700,56 @@ export class CustomTrailService {
                 completed: allCollected,
                 trail: allCollected ? undefined : this.getTrailForPlayer(trail, session),
                 session: this.buildCompetitiveSessionResponse(trail, session)
+            };
+        }
+
+        // ===== Non-competitive Random: personal collection =====
+        if (trail.mode === 'random' && !trail.competitive) {
+            const pinIdx = targetPinIndex ?? 0;
+            const pin = trail.pins[pinIdx];
+            if (!pin) {
+                return { ok: false, message: 'Invalid pin' };
+            }
+
+            // Check if already collected by this user
+            if (session.collectedPins.includes(pinIdx)) {
+                return { ok: false, message: 'You already found this one!' };
+            }
+
+            // Validate answer if question pin
+            if (pin.question && pin.answer) {
+                if (!answer) {
+                    return { ok: false, message: 'Answer required' };
+                }
+                const correct = answer.trim().toLowerCase() === pin.answer.trim().toLowerCase();
+                if (!correct) {
+                    return { ok: true, correct: false, message: 'Incorrect! Try again.' };
+                }
+            }
+
+            // Collect for this user
+            session.collectedPins.push(pinIdx);
+            session.score++;
+
+            const allCollected = session.collectedPins.length >= trail.pins.length;
+            if (allCollected) {
+                session.completed = true;
+            }
+
+            await SessionService.saveUniversalSession(session as any);
+
+            return {
+                ok: true,
+                correct: true,
+                collected: true,
+                successMessage: pin.successMessage || 'Found it! 🥚',
+                completed: allCollected,
+                session: {
+                    collectedPins: session.collectedPins,
+                    totalPins: trail.pins.length,
+                    completed: allCollected
+                },
+                trail: allCollected ? undefined : this.getTrailForPlayer(trail, session)
             };
         }
 
