@@ -7,7 +7,7 @@ import path from 'path';
 
 const CUSTOM_TRAILS_DIR = path.join(process.cwd(), 'src/data/custom_trails');
 const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
-const MIN_SPACING_METERS = 200;
+const MIN_SPACING_METERS = 50;
 const MAX_PINS = 50;
 const MAX_TEXT_LENGTH = 200;
 const COLLECTION_RADIUS_METERS = 20;
