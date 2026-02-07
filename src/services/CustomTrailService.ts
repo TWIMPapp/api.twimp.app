@@ -507,7 +507,8 @@ export class CustomTrailService {
                     };
                 }
                 // No question - auto-collect
-                return this.collectPin(userId, trailId, undefined, nearestIdx);
+                const collectResult = await this.collectPin(userId, trailId, undefined, nearestIdx);
+                return { ...collectResult, arrived: true };
             }
 
             return {
@@ -565,7 +566,8 @@ export class CustomTrailService {
                     };
                 }
                 // No question - auto-collect
-                return this.collectPin(userId, trailId, undefined, nearestIdx);
+                const collectResult = await this.collectPin(userId, trailId, undefined, nearestIdx);
+                return { ...collectResult, arrived: true };
             }
 
             // Return status with distance to nearest pin
