@@ -2,6 +2,7 @@ import { supabase, isSupabaseConfigured } from '../config/supabase';
 import { SessionService } from './SessionService';
 import { GeoService } from './GeoService';
 import { CustomTrail, CustomPin, CustomTrailTheme, CustomTrailPlaySession } from '../types/CustomTrailTypes';
+import { THEMES } from '../data/themes';
 import fs from 'fs';
 import path from 'path';
 
@@ -12,6 +13,7 @@ const MAX_PINS = 50;
 const MAX_TEXT_LENGTH = 200;
 const COLLECTION_RADIUS_METERS = 30;
 const RANDOM_SPAWN_RADIUS_METERS = 500;
+const MAX_TRAILS_PER_CREATOR = 5;
 const ID_ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789';
 const ID_LENGTH = 4;
 
@@ -64,7 +66,13 @@ export class CustomTrailService {
         // Check 1 active trail limit per creator
         const existingActive = await this.getActiveTrailByCreator(creatorId);
         if (existingActive) {
-            return { ok: false, message: 'You already have an active trail. Delete it first to create a new one.' };
+            return { ok: false, message: 'You already have an active trail. Stop it first to create a new one.' };
+        }
+
+        // Check total trail limit per creator
+        const allTrails = await this.getTrailsByCreator(creatorId);
+        if (allTrails.length >= MAX_TRAILS_PER_CREATOR) {
+            return { ok: false, message: `You can only create up to ${MAX_TRAILS_PER_CREATOR} games.` };
         }
 
         // Generate unique ID
@@ -100,7 +108,11 @@ export class CustomTrailService {
             }
         };
 
-        await this.saveTrail(trail);
+        try {
+            await this.saveTrail(trail);
+        } catch (e: any) {
+            return { ok: false, message: e.message || 'Failed to save trail' };
+        }
         return { ok: true, trail };
     }
 
@@ -137,14 +149,21 @@ export class CustomTrailService {
         // Check 1 active trail limit per creator
         const existingActive = await this.getActiveTrailByCreator(creatorId);
         if (existingActive) {
-            return { ok: false, message: 'You already have an active trail. Delete it first to create a new one.' };
+            return { ok: false, message: 'You already have an active trail. Stop it first to create a new one.' };
+        }
+
+        // Check total trail limit per creator
+        const allTrails = await this.getTrailsByCreator(creatorId);
+        if (allTrails.length >= MAX_TRAILS_PER_CREATOR) {
+            return { ok: false, message: `You can only create up to ${MAX_TRAILS_PER_CREATOR} games.` };
         }
 
         // Sanitise text fields
         const sanitisedPins: CustomPin[] = pins.map((pin, idx) => ({
             lat: pin.lat,
             lng: pin.lng,
-            icon: pin.icon || '📍',
+            icon: pin.icon || 'pin',
+            colour: pin.colour || 'red',
             visible: pin.visible !== false,
             question: truncate(pin.question, MAX_TEXT_LENGTH),
             answer: truncate(pin.answer, MAX_TEXT_LENGTH),
@@ -181,7 +200,11 @@ export class CustomTrailService {
             isActive: true
         };
 
-        await this.saveTrail(trail);
+        try {
+            await this.saveTrail(trail);
+        } catch (e: any) {
+            return { ok: false, message: e.message || 'Failed to save trail' };
+        }
         return { ok: true, trail };
     }
 
@@ -279,8 +302,91 @@ export class CustomTrailService {
         }
 
         trail.isActive = false;
-        await this.saveTrail(trail);
-        return { ok: true, message: 'Trail deleted' };
+        try {
+            await this.saveTrail(trail);
+        } catch (e: any) {
+            return { ok: false, message: e.message || 'Failed to save trail' };
+        }
+        return { ok: true, message: 'Trail stopped' };
+    }
+
+    static async getTrailsByCreator(creatorId: string): Promise<CustomTrail[]> {
+        if (isSupabaseConfigured()) {
+            try {
+                const { data, error } = await supabase!
+                    .from('custom_trails')
+                    .select('*')
+                    .eq('creator_id', creatorId)
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Supabase getTrailsByCreator error:', error);
+                    return [];
+                }
+                if (data && data.length > 0) {
+                    return data.map(row => {
+                        const trail = this.dbToTrail(row);
+                        if (trail.isActive && Date.now() > trail.expiresAt) {
+                            trail.isActive = false;
+                        }
+                        return trail;
+                    });
+                }
+                return [];
+            } catch (e) {
+                console.error('Failed to get trails by creator:', e);
+                return [];
+            }
+        }
+
+        // File-based fallback
+        this.ensureDirectory();
+        const files = fs.readdirSync(CUSTOM_TRAILS_DIR).filter(f => f.endsWith('.json'));
+        const trails: CustomTrail[] = [];
+        for (const file of files) {
+            try {
+                const trail: CustomTrail = JSON.parse(
+                    fs.readFileSync(path.join(CUSTOM_TRAILS_DIR, file), 'utf8')
+                );
+                if (trail.creatorId === creatorId) {
+                    if (trail.isActive && Date.now() > trail.expiresAt) {
+                        trail.isActive = false;
+                    }
+                    trails.push(trail);
+                }
+            } catch (e) { /* skip corrupt files */ }
+        }
+        return trails.sort((a, b) => b.createdAt - a.createdAt);
+    }
+
+    static async reactivateTrail(creatorId: string, trailId: string): Promise<{ ok: boolean; message?: string }> {
+        const trail = await this.getTrail(trailId);
+        if (!trail) {
+            return { ok: false, message: 'Trail not found' };
+        }
+        if (trail.creatorId !== creatorId) {
+            return { ok: false, message: 'You can only start your own trails' };
+        }
+        if (trail.isActive) {
+            return { ok: false, message: 'Trail is already active' };
+        }
+        if (Date.now() > trail.expiresAt) {
+            return { ok: false, message: 'Trail has expired and cannot be restarted' };
+        }
+
+        // Check no other active trail
+        const existingActive = await this.getActiveTrailByCreator(creatorId);
+        if (existingActive) {
+            return { ok: false, message: 'You already have an active trail. Stop it first.' };
+        }
+
+        trail.isActive = true;
+        try {
+            await this.saveTrail(trail);
+        } catch (e: any) {
+            return { ok: false, message: e.message || 'Failed to save trail' };
+        }
+        return { ok: true };
     }
 
     // ===== Random pin generation =====
@@ -289,10 +395,12 @@ export class CustomTrailService {
         startLocation: { lat: number; lng: number },
         count: number,
         _hasQuestions: boolean,
-        theme: CustomTrailTheme
+        theme: CustomTrailTheme,
+        spawnRadius: number = RANDOM_SPAWN_RADIUS_METERS
     ): CustomPin[] {
         const pins: CustomPin[] = [];
-        const defaultIcon = '📍';
+        const themeConfig = THEMES[theme];
+        const themeIcons = themeConfig?.icons ?? [{ name: 'pin', colour: 'red' }];
 
         for (let i = 0; i < count; i++) {
             let lat: number, lng: number;
@@ -302,7 +410,7 @@ export class CustomTrailService {
             // Find a location that's at least MIN_SPACING_METERS from all existing pins
             do {
                 const angle = Math.random() * 2 * Math.PI;
-                const distance = MIN_SPACING_METERS + Math.random() * (RANDOM_SPAWN_RADIUS_METERS - MIN_SPACING_METERS);
+                const distance = MIN_SPACING_METERS + Math.random() * (spawnRadius - MIN_SPACING_METERS);
 
                 // Offset in meters to lat/lng
                 const dLat = (distance * Math.cos(angle)) / 111320;
@@ -324,10 +432,12 @@ export class CustomTrailService {
 
             if (!valid) continue; // Skip if couldn't find valid position after retries
 
+            const themeIcon = themeIcons[i % themeIcons.length];
             pins.push({
                 lat,
                 lng,
-                icon: defaultIcon,
+                icon: themeIcon.name,
+                colour: themeIcon.colour,
                 visible: true,
                 order: i
             });
@@ -830,6 +940,7 @@ export class CustomTrailService {
                     lat: pin.lat,
                     lng: pin.lng,
                     icon: pin.icon,
+                    colour: pin.colour,
                     order: pin.order,
                     collected: trail.globalCollectedPins.includes(pin.order),
                     collectedByYou: session.collectedPins.includes(pin.order),
@@ -859,6 +970,7 @@ export class CustomTrailService {
                 lat: pin.lat,
                 lng: pin.lng,
                 icon: pin.icon,
+                colour: pin.colour,
                 order: pin.order,
                 collected: session.collectedPins.includes(pin.order)
             }));
@@ -922,6 +1034,7 @@ export class CustomTrailService {
                     lat: pin.lat,
                     lng: pin.lng,
                     icon: pin.icon,
+                    colour: pin.colour,
                     order: pin.order,
                     visible: pin.visible,
                     question: pin.question,
@@ -951,18 +1064,15 @@ export class CustomTrailService {
 
     private static async saveTrail(trail: CustomTrail): Promise<void> {
         if (isSupabaseConfigured()) {
-            try {
-                const { error } = await supabase!
-                    .from('custom_trails')
-                    .upsert(this.trailToDb(trail), { onConflict: 'id' });
+            const { error } = await supabase!
+                .from('custom_trails')
+                .upsert(this.trailToDb(trail), { onConflict: 'id' });
 
-                if (error) {
-                    console.error('Supabase saveTrail error:', error);
-                }
-                return;
-            } catch (e) {
-                console.error('Failed to save trail to Supabase:', e);
+            if (error) {
+                console.error('Supabase saveTrail error:', error);
+                throw new Error(`Failed to save trail: ${error.message}`);
             }
+            return;
         }
 
         // File-based fallback
@@ -987,7 +1097,8 @@ export class CustomTrailService {
             createdAt: data.created_at,
             expiresAt: data.expires_at,
             playCount: data.play_count,
-            isActive: data.is_active
+            isActive: data.is_active,
+            ...(data.dynamic_config ? { dynamicConfig: data.dynamic_config } : {})
         };
     }
 
@@ -1006,7 +1117,8 @@ export class CustomTrailService {
             created_at: trail.createdAt,
             expires_at: trail.expiresAt,
             play_count: trail.playCount,
-            is_active: trail.isActive
+            is_active: trail.isActive,
+            dynamic_config: trail.dynamicConfig || null
         };
     }
 }

@@ -51,5 +51,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
     }
 
+    // Stop trail (soft-delete)
+    if (req.method === 'DELETE') {
+        const { creator_id } = req.body || {};
+        if (!creator_id) {
+            return res.status(400).json({ ok: false, message: 'creator_id is required' });
+        }
+        const result = await CustomTrailService.deleteTrail(creator_id, trailId);
+        return res.status(result.ok ? 200 : 403).json({ body: result });
+    }
+
+    // Reactivate trail
+    if (req.method === 'PATCH') {
+        const { creator_id } = req.body || {};
+        if (!creator_id) {
+            return res.status(400).json({ ok: false, message: 'creator_id is required' });
+        }
+        const result = await CustomTrailService.reactivateTrail(creator_id, trailId);
+        return res.status(result.ok ? 200 : 400).json({ body: result });
+    }
+
     return res.status(405).json({ ok: false, message: 'Method not allowed' });
 }

@@ -10,12 +10,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(405).json({ success: false, message: 'Method not allowed' });
     }
 
-    const { trailId, recipientEmail } = req.body;
+    const { recipientName, message } = req.body;
 
-    if (!trailId || !recipientEmail) {
+    if (!recipientName || !message) {
         return res.status(400).json({
             success: false,
-            message: 'trailId and recipientEmail are required'
+            message: 'recipientName and message are required'
         });
     }
 
@@ -23,9 +23,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         || req.socket?.remoteAddress
         || 'unknown';
 
-    const result = await ValentineService.sendValentineEmail(
-        trailId,
-        recipientEmail,
+    const result = await ValentineService.createValentine(
+        recipientName,
+        message,
         clientIp
     );
 

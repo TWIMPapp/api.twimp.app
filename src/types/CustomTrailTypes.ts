@@ -5,7 +5,8 @@ export type CustomTrailTheme = 'easter' | 'valentine' | 'general';
 export interface CustomPin {
     lat: number;
     lng: number;
-    icon: string;           // e.g. 'egg', 'medal', 'heart_pink', 'treasure_chest'
+    icon: string;           // e.g. 'egg_red', 'heart_pink', 'treasure_chest'
+    colour: string;         // indicator colour e.g. 'red', 'blue', 'gold'
     visible: boolean;       // shown on map or hidden (clue-based)
     question?: string;      // optional question on arrival (max 200 chars)
     answer?: string;        // answer to validate (max 200 chars)

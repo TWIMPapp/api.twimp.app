@@ -11,7 +11,9 @@
     { "source": "/trails/list", "destination": "/api/list" },
     { "source": "/easter_event/:path*", "destination": "/api/easter_event/:path*" },
     { "source": "/custom-trail/create", "destination": "/api/custom-trail/create" },
+    { "source": "/custom-trail/by-creator", "destination": "/api/custom-trail/by-creator" },
     { "source": "/custom-trail/:id", "destination": "/api/custom-trail/[id]" },
+    { "source": "/valentine/create", "destination": "/api/valentine/create" },
     { "source": "/valentine/send", "destination": "/api/valentine/send" }
   ],
   "headers": [

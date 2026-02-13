@@ -92,6 +92,69 @@ INSERT INTO game_config (ref, game_type, active, featured, display_order) VALUES
     ('easter-event', 'universal', false, false, 2)
 ON CONFLICT (ref) DO NOTHING;
 
+-- =====================================================
+-- Authentication & User Management Tables
+-- =====================================================
+
+-- Users table for OAuth authentication
+CREATE TABLE IF NOT EXISTS users (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    name TEXT,
+    google_id TEXT UNIQUE,
+    facebook_id TEXT UNIQUE,
+    provider TEXT NOT NULL,  -- 'google' or 'facebook'
+    avatar_url TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Index for faster lookups
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id);
+CREATE INDEX IF NOT EXISTS idx_users_facebook_id ON users(facebook_id);
+
+-- Trigger for users updated_at
+DROP TRIGGER IF EXISTS update_users_updated_at ON users;
+CREATE TRIGGER update_users_updated_at
+    BEFORE UPDATE ON users
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- User-created games/trails
+CREATE TABLE IF NOT EXISTS user_games (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    creator_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    description TEXT,
+    ref TEXT UNIQUE NOT NULL,  -- URL-friendly slug
+    game_type TEXT NOT NULL DEFAULT 'trail',  -- 'trail', 'custom', etc.
+    image_url TEXT,
+    is_published BOOLEAN DEFAULT false,  -- Not visible until published
+    is_public BOOLEAN DEFAULT false,     -- Can be shared with others
+    latitude DECIMAL(9,6),
+    longitude DECIMAL(9,6),
+    config JSONB DEFAULT '{}'::jsonb,   -- Game-specific configuration
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for user games
+CREATE INDEX IF NOT EXISTS idx_user_games_creator_id ON user_games(creator_id);
+CREATE INDEX IF NOT EXISTS idx_user_games_ref ON user_games(ref);
+CREATE INDEX IF NOT EXISTS idx_user_games_is_published ON user_games(is_published);
+
+-- Trigger for user_games updated_at
+DROP TRIGGER IF EXISTS update_user_games_updated_at ON user_games;
+CREATE TRIGGER update_user_games_updated_at
+    BEFORE UPDATE ON user_games
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- =====================================================
+-- Default universe games (you can edit these)
+-- =====================================================
+
 -- Row Level Security (RLS) - Enable for production
 -- ALTER TABLE game_sessions ENABLE ROW LEVEL SECURITY;
 -- ALTER TABLE universal_sessions ENABLE ROW LEVEL SECURITY;
