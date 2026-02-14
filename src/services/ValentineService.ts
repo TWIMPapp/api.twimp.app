@@ -117,7 +117,8 @@ export class ValentineService {
         const collectUrl = `https://game.twimp.app/v/${trailId}`;
 
         try {
-            const { error } = await getResend().emails.send({
+            console.log(`[EMAIL] Sending to ${recipientEmail} for trail ${trailId}, key=${process.env.RESEND_API_KEY ? 'SET(' + process.env.RESEND_API_KEY.substring(0, 6) + '...)' : 'MISSING'}`);
+            const { data, error } = await getResend().emails.send({
                 from: 'Twimp <hello@twimp.app>',
                 to: recipientEmail,
                 subject: 'Someone sent you a Secret Valentine! 💌',
@@ -145,12 +146,13 @@ export class ValentineService {
             });
 
             if (error) {
-                console.error('Resend error:', error);
-                return { success: false, message: 'Failed to send email. Please try again.' };
+                console.error('[EMAIL] Resend error:', JSON.stringify(error));
+                return { success: false, message: `Failed to send email: ${error.message || JSON.stringify(error)}` };
             }
+            console.log(`[EMAIL] Sent successfully, id=${data?.id}`);
         } catch (e: any) {
-            console.error('Email send error:', e);
-            return { success: false, message: 'Failed to send email. Please try again.' };
+            console.error('[EMAIL] Exception:', e?.message, e?.statusCode, JSON.stringify(e));
+            return { success: false, message: `Failed to send email: ${e?.message || 'Unknown error'}` };
         }
 
         incrementCount(emailCounts, clientIp);
