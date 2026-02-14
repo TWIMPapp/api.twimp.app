@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { handleOptions, cors } from './_utils';
 import { EasterEventService } from '../src/services/EasterEventService';
+import { DinoHuntService } from '../src/services/DinoHuntService';
 import { CustomTrailService } from '../src/services/CustomTrailService';
 import { GameEngineService } from '../src/services/GameEngineService';
 import { SessionService } from '../src/services/SessionService';
@@ -47,6 +48,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
             default:
                 return res.status(400).json({ ok: false, message: `Unknown action: ${action}` });
+        }
+    }
+
+    // Dino Egg Hunt
+    if (ref === 'dino-hunt') {
+        const { answer_index, nickname, dino_id, dino_data, option_rarities } = req.body;
+        switch (action) {
+            case 'choose-dino':
+                return res.json({ body: await DinoHuntService.chooseFavoriteDino(user_id, dino_id) });
+            case 'answer-question':
+                return res.json({ body: await DinoHuntService.answerQuestion(user_id, parseInt(answer_index), option_rarities) });
+            case 'name-dino':
+                return res.json({ body: await DinoHuntService.nameDino(user_id, nickname, dino_data) });
+            case 'collect-golden-egg':
+                return res.json({ body: await DinoHuntService.collectGoldenEgg(user_id) });
+            case 'restart':
+                await SessionService.clearUniversalSession(user_id, 'DINO_HUNT');
+                return res.json({ body: { ok: true, message: 'Dino Hunt restarted' } });
+            default:
+                return res.status(400).json({ ok: false, message: `Unknown dino-hunt action: ${action}` });
         }
     }
 

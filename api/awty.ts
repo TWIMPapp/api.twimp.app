@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { handleOptions, cors } from './_utils';
 import { EasterEventService } from '../src/services/EasterEventService';
+import { DinoHuntService } from '../src/services/DinoHuntService';
 import { CustomTrailService } from '../src/services/CustomTrailService';
 import { GameEngineService } from '../src/services/GameEngineService';
 
@@ -22,6 +23,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Easter Event uses dedicated service
     if (ref === 'easter-event') {
         const result = await EasterEventService.handleAWTY(user_id, parseFloat(lat), parseFloat(lng));
+        return res.json({ body: result });
+    }
+
+    // Dino Egg Hunt
+    if (ref === 'dino-hunt') {
+        const result = await DinoHuntService.handleAWTY(user_id, parseFloat(lat), parseFloat(lng));
         return res.json({ body: result });
     }
 
