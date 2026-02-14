@@ -574,6 +574,8 @@ export class CustomTrailService {
         // Update position
         session.lastPosition = { lat, lng };
 
+        console.log(`[AWTY] trail=${trailId} mode=${trail.mode} competitive=${trail.competitive} pins=${trail.pins.length} user=${userId}`);
+
         // ===== Competitive + Random: shared pins, first-come-first-served =====
         if (trail.competitive && trail.mode === 'random') {
             // Check if all pins globally collected
@@ -695,6 +697,8 @@ export class CustomTrailService {
         }
 
         // ===== Sequential mode =====
+        console.log(`[AWTY-SEQ] trail=${trailId} mode=${trail.mode} user=${userId} pinIndex=${session.currentPinIndex}/${trail.pins.length} collected=[${session.collectedPins}]`);
+
         if (session.completed) {
             return { ok: true, completed: true, message: 'Trail already completed!' };
         }
@@ -706,6 +710,10 @@ export class CustomTrailService {
 
         const distance = GeoService.getDistanceFromLatLonInMeters(lat, lng, currentPin.lat, currentPin.lng);
         const arrived = distance < COLLECTION_RADIUS_METERS;
+
+        if (arrived) {
+            console.log(`[AWTY-SEQ] ARRIVED at pin ${session.currentPinIndex} (order=${currentPin.order}) dist=${Math.round(distance)}m`);
+        }
 
         await SessionService.saveUniversalSession(session as any);
 
@@ -740,7 +748,13 @@ export class CustomTrailService {
             ok: true,
             arrived: false,
             hint: `Head ${direction} for ${Math.round(distance)} metres`,
-            distance: Math.round(distance)
+            distance: Math.round(distance),
+            session: {
+                currentPinIndex: session.currentPinIndex,
+                collectedPins: session.collectedPins,
+                completed: false,
+                totalPins: trail.pins.length
+            }
         };
     }
 
