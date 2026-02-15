@@ -1143,6 +1143,52 @@ export class CustomTrailService {
         };
     }
 
+    /**
+     * Creator reports a pin as unreachable from the status page.
+     * Validates creator ownership instead of player session.
+     * Uses trail.startLocation as "player position" so respawned pin is >100m from start.
+     */
+    static async creatorReportPin(
+        creatorId: string, trailId: string, pinIndex: number, category: string
+    ): Promise<any> {
+        const trail = await this.getTrail(trailId);
+        if (!trail) return { ok: false, message: 'Trail not found' };
+        if (trail.creatorId !== creatorId) return { ok: false, message: 'Not the creator of this trail' };
+        if (trail.mode !== 'random') return { ok: false, message: 'Reporting is only available for random trails.' };
+
+        const pin = trail.pins[pinIndex];
+        if (!pin) return { ok: false, message: 'Invalid pin index.' };
+        if (trail.globalCollectedPins.includes(pinIndex)) {
+            return { ok: false, message: 'Pin already collected.' };
+        }
+
+        const otherPins = trail.pins
+            .filter((_, i) => i !== pinIndex)
+            .map(p => ({ lat: p.lat, lng: p.lng }));
+
+        const result = await HazardService.handleReport({
+            userId: creatorId,
+            category,
+            reportedLocation: { lat: pin.lat, lng: pin.lng },
+            playerPosition: trail.startLocation!,
+            exclusionZones: [],
+            gameCenter: trail.startLocation!,
+            spawnRadius: RANDOM_SPAWN_RADIUS_METERS,
+            otherPins,
+            minSpacing: MIN_SPACING_METERS,
+        });
+
+        if (!result.ok) {
+            return { ok: false, message: result.message };
+        }
+
+        pin.lat = result.newLocation!.lat;
+        pin.lng = result.newLocation!.lng;
+        await this.saveTrail(trail);
+
+        return await this.getCreatorView(trailId, creatorId);
+    }
+
     // ===== Storage =====
 
     private static async saveTrail(trail: CustomTrail): Promise<void> {

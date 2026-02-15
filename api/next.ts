@@ -97,6 +97,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     user_id, trailId, parseInt(hazardPinIndex), hazard_category, parseFloat(lat), parseFloat(lng)
                 )});
             }
+            case 'creator-report-hazard': {
+                const { creator_id, pin_index: creatorPinIndex, hazard_category: creatorCategory } = req.body;
+                if (!creator_id || creatorPinIndex === undefined || !creatorCategory) {
+                    return res.status(400).json({ ok: false, message: 'creator_id, pin_index, hazard_category required' });
+                }
+                return res.json({ body: await CustomTrailService.creatorReportPin(
+                    creator_id, trailId, parseInt(creatorPinIndex), creatorCategory
+                )});
+            }
             case 'restart':
                 const gameType = `CUSTOM_TRAIL_${trailId}`;
                 await SessionService.clearUniversalSession(user_id, gameType);
