@@ -363,6 +363,7 @@ export class DinoHuntService {
             rarity: dinoData.rarity,
             stats: dinoData.stats,
             total: dinoData.total,
+            attributes: dinoData.attributes || '',
             categoryId: dinoData.categoryId,
             categoryName: dinoData.categoryName,
             eggIndex,
@@ -423,14 +424,24 @@ export class DinoHuntService {
 
     private static async generateBattleStory(session: DinoHuntSession): Promise<string> {
         const armyDescription = session.collectedDinos.map(d =>
-            `- ${d.nickname} (${d.name}, ${d.rarity.toUpperCase()}) — Speed:${d.stats.speed} Size:${d.stats.size} Strength:${d.stats.strength} Intelligence:${d.stats.intelligence} Defence:${d.stats.defence} Aggression:${d.stats.aggression} (Total: ${d.total})`
+            `- ${d.nickname} (${d.name}, ${d.rarity.toUpperCase()}) — Speed:${d.stats.speed} Size:${d.stats.size} Strength:${d.stats.strength} Intelligence:${d.stats.intelligence} Defence:${d.stats.defence} Aggression:${d.stats.aggression} (Total: ${d.total})  Unique attributes: ${d.attributes}`
         ).join('\n');
 
         const systemPrompt = `You are a storyteller for a children's dinosaur adventure game. Write exciting, fun, age-appropriate stories. Keep language playful and avoid anything scary or violent. The player always wins but make it dramatic and fun.`;
 
         const userPrompt = `Generate a fun, exciting battle story (200-300 words) where this dinosaur army defeats the evil Dr. Fossilus and rescues a baby ${session.favoriteDino}.
 
-Use each dinosaur's NICKNAME throughout the story (not their species name). Consider their stats and rarity — Epics should do something impressive, Rares should have strong moments, and even Common dinosaurs should shine in unexpected ways. Be creative with how their abilities combine.
+Use each dinosaur's NICKNAME throughout the story, occasionally alongside their species name (e.g Danny the Diplodocus).
+First consider what makes the player's team unique.
+
+For example,
+1) Does the player have Epic dinosaurs in their team?  Make them the star
+2) Does the player have two Velociraptors?  They are known for working well together.
+3) Does one of their dinosaurs have a unique quality useful in a battle, an armoured head, a really long tail etc
+4) Does one of their dinousaurs get a 100% score in a particular stat?  Make that stat is their superpower in the story
+5) Do they have a common dinosaur that could do something funny and unexpected?
+
+Next, decide how the team is ultimately going to win and then write the story.
 
 The player's dinosaur army:
 ${armyDescription}

@@ -20,6 +20,7 @@ export interface Dinosaur {
     rarity: DinoRarity;
     stats: DinoStats;
     total: number;        // Sum of all stats
+    attributes: string;   // Comma-separated physical/behavioral traits for story generation
 }
 
 export interface DinoQuestionOption {
@@ -59,6 +60,7 @@ export interface CollectedDino {
     rarity: DinoRarity;
     stats: DinoStats;
     total: number;
+    attributes: string;
     categoryId: DinoCategoryId;
     categoryName: string;
     eggIndex: number;

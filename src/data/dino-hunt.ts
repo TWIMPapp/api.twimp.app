@@ -36,9 +36,9 @@ export const DINO_CATEGORIES: DinoCategory[] = [
             ],
         },
         dinosaurs: {
-            epic:   { name: 'Velociraptor',    rarity: 'epic',   stats: { speed: 10, size: 2, strength: 3, intelligence: 8, defence: 3, aggression: 9 }, total: 35 },
-            rare:   { name: 'Gallimimus',      rarity: 'rare',   stats: { speed: 8,  size: 4, strength: 1, intelligence: 3, defence: 1, aggression: 1 }, total: 18 },
-            common: { name: 'Dromiceiomimus',  rarity: 'common', stats: { speed: 5,  size: 1, strength: 1, intelligence: 2, defence: 1, aggression: 1 }, total: 11 },
+            epic:   { name: 'Velociraptor',    rarity: 'epic',   stats: { speed: 10, size: 2, strength: 3, intelligence: 8, defence: 3, aggression: 9 }, total: 35, attributes: 'razor-sharp sickle claw on each foot, feathered body, hunts in packs, lightning-fast reflexes' },
+            rare:   { name: 'Gallimimus',      rarity: 'rare',   stats: { speed: 8,  size: 4, strength: 1, intelligence: 3, defence: 1, aggression: 1 }, total: 18, attributes: 'ostrich-like build, long legs built for sprinting, toothless beak, large eyes for spotting danger' },
+            common: { name: 'Dromiceiomimus',  rarity: 'common', stats: { speed: 5,  size: 1, strength: 1, intelligence: 2, defence: 1, aggression: 1 }, total: 11, attributes: 'lightweight runner, bird-like frame, large brain for its size, nimble and agile' },
         },
     },
     {
@@ -55,9 +55,9 @@ export const DINO_CATEGORIES: DinoCategory[] = [
             ],
         },
         dinosaurs: {
-            epic:   { name: 'Majungasaurus',     rarity: 'epic',   stats: { speed: 5, size: 5, strength: 8, intelligence: 3, defence: 3, aggression: 10 }, total: 34 },
-            rare:   { name: 'Allosaurus',        rarity: 'rare',   stats: { speed: 6, size: 6, strength: 6, intelligence: 5, defence: 2, aggression: 8 },  total: 33 },
-            common: { name: 'Proceratosaurus',   rarity: 'common', stats: { speed: 5, size: 3, strength: 3, intelligence: 2, defence: 2, aggression: 5 },  total: 20 },
+            epic:   { name: 'Majungasaurus',     rarity: 'epic',   stats: { speed: 5, size: 5, strength: 8, intelligence: 3, defence: 3, aggression: 10 }, total: 34, attributes: 'thick skull dome, short powerful snout, serrated teeth, known cannibal, stocky muscular build' },
+            rare:   { name: 'Allosaurus',        rarity: 'rare',   stats: { speed: 6, size: 6, strength: 6, intelligence: 5, defence: 2, aggression: 8 },  total: 33, attributes: 'large crested head, powerful jaws that open extra wide, strong three-fingered claws, ambush predator' },
+            common: { name: 'Proceratosaurus',   rarity: 'common', stats: { speed: 5, size: 3, strength: 3, intelligence: 2, defence: 2, aggression: 5 },  total: 20, attributes: 'small nasal crest, sharp teeth, lightweight build, early ancestor of the T-Rex' },
         },
     },
     {
@@ -74,9 +74,9 @@ export const DINO_CATEGORIES: DinoCategory[] = [
             ],
         },
         dinosaurs: {
-            epic:   { name: 'T-Rex',           rarity: 'epic',   stats: { speed: 6, size: 9,  strength: 10, intelligence: 6, defence: 3, aggression: 9 }, total: 43 },
-            rare:   { name: 'Giganotosaurus',  rarity: 'rare',   stats: { speed: 5, size: 8,  strength: 10, intelligence: 3, defence: 2, aggression: 9 }, total: 37 },
-            common: { name: 'Spinosaurus',     rarity: 'common', stats: { speed: 7, size: 9,  strength: 8,  intelligence: 3, defence: 2, aggression: 5 }, total: 34 },
+            epic:   { name: 'T-Rex',           rarity: 'epic',   stats: { speed: 6, size: 9,  strength: 10, intelligence: 6, defence: 3, aggression: 9 }, total: 43, attributes: 'bone-crushing bite force, tiny but strong arms, keen sense of smell, massive skull, king of the dinosaurs' },
+            rare:   { name: 'Giganotosaurus',  rarity: 'rare',   stats: { speed: 5, size: 8,  strength: 10, intelligence: 3, defence: 2, aggression: 9 }, total: 37, attributes: 'longer skull than T-Rex, blade-like teeth for slashing, powerful legs, hunted giant sauropods' },
+            common: { name: 'Spinosaurus',     rarity: 'common', stats: { speed: 7, size: 9,  strength: 8,  intelligence: 3, defence: 2, aggression: 5 }, total: 34, attributes: 'enormous sail on its back, crocodile-like snout, semi-aquatic hunter, longest carnivorous dinosaur, could swim' },
         },
     },
     {
@@ -93,9 +93,9 @@ export const DINO_CATEGORIES: DinoCategory[] = [
             ],
         },
         dinosaurs: {
-            epic:   { name: 'Therizinosaurus',    rarity: 'epic',   stats: { speed: 2, size: 6, strength: 6, intelligence: 2, defence: 6, aggression: 2 }, total: 24 },
-            rare:   { name: 'Amargasaurus',       rarity: 'rare',   stats: { speed: 2, size: 6, strength: 3, intelligence: 2, defence: 4, aggression: 1 }, total: 18 },
-            common: { name: 'Pachycephalosaurus',  rarity: 'common', stats: { speed: 4, size: 2, strength: 3, intelligence: 2, defence: 3, aggression: 2 }, total: 16 },
+            epic:   { name: 'Therizinosaurus',    rarity: 'epic',   stats: { speed: 2, size: 6, strength: 6, intelligence: 2, defence: 6, aggression: 2 }, total: 24, attributes: 'enormous 90cm claws like scythes, pot-bellied body, feathered, herbivore despite terrifying appearance' },
+            rare:   { name: 'Amargasaurus',       rarity: 'rare',   stats: { speed: 2, size: 6, strength: 3, intelligence: 2, defence: 4, aggression: 1 }, total: 18, attributes: 'twin rows of tall spines along its neck, sail-like display, long neck, peaceful plant-eater' },
+            common: { name: 'Pachycephalosaurus',  rarity: 'common', stats: { speed: 4, size: 2, strength: 3, intelligence: 2, defence: 3, aggression: 2 }, total: 16, attributes: 'thick dome-shaped skull used for headbutting, bony bumps around head, ran on two legs' },
         },
     },
     {
@@ -112,9 +112,9 @@ export const DINO_CATEGORIES: DinoCategory[] = [
             ],
         },
         dinosaurs: {
-            epic:   { name: 'Pliosaur',      rarity: 'epic',   stats: { speed: 7, size: 8, strength: 9, intelligence: 4, defence: 4, aggression: 9 }, total: 41 },
-            rare:   { name: 'Nothosaurus',   rarity: 'rare',   stats: { speed: 6, size: 4, strength: 5, intelligence: 3, defence: 3, aggression: 6 }, total: 27 },
-            common: { name: 'Ichthyosaur',   rarity: 'common', stats: { speed: 8, size: 3, strength: 3, intelligence: 3, defence: 2, aggression: 3 }, total: 22 },
+            epic:   { name: 'Pliosaur',      rarity: 'epic',   stats: { speed: 7, size: 8, strength: 9, intelligence: 4, defence: 4, aggression: 9 }, total: 41, attributes: 'massive jaws with crushing bite, four powerful flippers, short thick neck, apex ocean predator' },
+            rare:   { name: 'Nothosaurus',   rarity: 'rare',   stats: { speed: 6, size: 4, strength: 5, intelligence: 3, defence: 3, aggression: 6 }, total: 27, attributes: 'webbed feet, needle-like teeth for catching fish, could walk on land and swim, long flexible neck' },
+            common: { name: 'Ichthyosaur',   rarity: 'common', stats: { speed: 8, size: 3, strength: 3, intelligence: 3, defence: 2, aggression: 3 }, total: 22, attributes: 'dolphin-shaped body, enormous eyes for deep-sea vision, incredibly fast swimmer, gave live birth' },
         },
     },
     {
@@ -131,9 +131,9 @@ export const DINO_CATEGORIES: DinoCategory[] = [
             ],
         },
         dinosaurs: {
-            epic:   { name: 'Quetzalcoatlus', rarity: 'epic',   stats: { speed: 7, size: 7, strength: 5, intelligence: 4, defence: 2, aggression: 5 }, total: 30 },
-            rare:   { name: 'Pteranodon',     rarity: 'rare',   stats: { speed: 8, size: 4, strength: 3, intelligence: 3, defence: 1, aggression: 4 }, total: 23 },
-            common: { name: 'Dimorphodon',    rarity: 'common', stats: { speed: 6, size: 1, strength: 2, intelligence: 2, defence: 1, aggression: 4 }, total: 16 },
+            epic:   { name: 'Quetzalcoatlus', rarity: 'epic',   stats: { speed: 7, size: 7, strength: 5, intelligence: 4, defence: 2, aggression: 5 }, total: 30, attributes: '11-metre wingspan, tall as a giraffe on the ground, could launch itself into the air, toothless beak' },
+            rare:   { name: 'Pteranodon',     rarity: 'rare',   stats: { speed: 8, size: 4, strength: 3, intelligence: 3, defence: 1, aggression: 4 }, total: 23, attributes: 'long bony crest on its head, wingspan of 6 metres, soared over oceans, scooped fish from the water' },
+            common: { name: 'Dimorphodon',    rarity: 'common', stats: { speed: 6, size: 1, strength: 2, intelligence: 2, defence: 1, aggression: 4 }, total: 16, attributes: 'large head with two types of teeth, short wings for quick flapping flight, long stiff tail for balance' },
         },
     },
     {
@@ -150,9 +150,9 @@ export const DINO_CATEGORIES: DinoCategory[] = [
             ],
         },
         dinosaurs: {
-            epic:   { name: 'Velociraptor',   rarity: 'epic',   stats: { speed: 10, size: 2, strength: 3, intelligence: 8, defence: 3, aggression: 9 }, total: 35 },
-            rare:   { name: 'Dilophosaurus',  rarity: 'rare',   stats: { speed: 6,  size: 5, strength: 5, intelligence: 5, defence: 2, aggression: 4 }, total: 27 },
-            common: { name: 'Diplodocus',     rarity: 'common', stats: { speed: 2,  size: 9, strength: 4, intelligence: 2, defence: 2, aggression: 1 }, total: 20 },
+            epic:   { name: 'Velociraptor',   rarity: 'epic',   stats: { speed: 10, size: 2, strength: 3, intelligence: 8, defence: 3, aggression: 9 }, total: 35, attributes: 'razor-sharp sickle claw on each foot, feathered body, hunts in packs, lightning-fast reflexes' },
+            rare:   { name: 'Dilophosaurus',  rarity: 'rare',   stats: { speed: 6,  size: 5, strength: 5, intelligence: 5, defence: 2, aggression: 4 }, total: 27, attributes: 'twin crests on its head, slender build, one of the earliest large predators, quick and cunning' },
+            common: { name: 'Diplodocus',     rarity: 'common', stats: { speed: 2,  size: 9, strength: 4, intelligence: 2, defence: 2, aggression: 1 }, total: 20, attributes: 'extremely long whip-like tail, pencil-shaped teeth, one of the longest dinosaurs ever, gentle giant' },
         },
     },
     {
@@ -169,9 +169,9 @@ export const DINO_CATEGORIES: DinoCategory[] = [
             ],
         },
         dinosaurs: {
-            epic:   { name: 'Argentinosaurus', rarity: 'epic',   stats: { speed: 1, size: 10, strength: 7, intelligence: 2, defence: 4, aggression: 2 }, total: 26 },
-            rare:   { name: 'Brachiosaurus',   rarity: 'rare',   stats: { speed: 2, size: 9,  strength: 5, intelligence: 2, defence: 3, aggression: 1 }, total: 22 },
-            common: { name: 'Apatosaurus',     rarity: 'common', stats: { speed: 2, size: 8,  strength: 4, intelligence: 2, defence: 3, aggression: 1 }, total: 20 },
+            epic:   { name: 'Argentinosaurus', rarity: 'epic',   stats: { speed: 1, size: 10, strength: 7, intelligence: 2, defence: 4, aggression: 2 }, total: 26, attributes: 'one of the heaviest dinosaurs ever at 70 tonnes, earth-shaking footsteps, towering neck, massive pillar-like legs' },
+            rare:   { name: 'Brachiosaurus',   rarity: 'rare',   stats: { speed: 2, size: 9,  strength: 5, intelligence: 2, defence: 3, aggression: 1 }, total: 22, attributes: 'giraffe-like posture with front legs longer than back, could reach treetops, nostril crest on its head' },
+            common: { name: 'Apatosaurus',     rarity: 'common', stats: { speed: 2, size: 8,  strength: 4, intelligence: 2, defence: 3, aggression: 1 }, total: 20, attributes: 'long muscular tail used like a whip, massive bulky body, travelled in herds, thundering footsteps' },
         },
     },
     {
@@ -188,9 +188,9 @@ export const DINO_CATEGORIES: DinoCategory[] = [
             ],
         },
         dinosaurs: {
-            epic:   { name: 'Ankylosaurus',  rarity: 'epic',   stats: { speed: 2, size: 5, strength: 7, intelligence: 2, defence: 10, aggression: 5 }, total: 31 },
-            rare:   { name: 'Borealopelta',  rarity: 'rare',   stats: { speed: 2, size: 4, strength: 4, intelligence: 2, defence: 8,  aggression: 3 }, total: 23 },
-            common: { name: 'Nodosaurus',    rarity: 'common', stats: { speed: 2, size: 4, strength: 3, intelligence: 2, defence: 6,  aggression: 2 }, total: 19 },
+            epic:   { name: 'Ankylosaurus',  rarity: 'epic',   stats: { speed: 2, size: 5, strength: 7, intelligence: 2, defence: 10, aggression: 5 }, total: 31, attributes: 'massive bony club tail, body covered in thick armour plates, could withstand T-Rex bites, built like a living tank' },
+            rare:   { name: 'Borealopelta',  rarity: 'rare',   stats: { speed: 2, size: 4, strength: 4, intelligence: 2, defence: 8,  aggression: 3 }, total: 23, attributes: 'best-preserved armoured dinosaur ever found, spiky shoulder horns, reddish-brown camouflage colouring' },
+            common: { name: 'Nodosaurus',    rarity: 'common', stats: { speed: 2, size: 4, strength: 3, intelligence: 2, defence: 6,  aggression: 2 }, total: 19, attributes: 'rows of bony nodules across its back, no tail club but heavily armoured, low to the ground' },
         },
     },
     {
@@ -207,9 +207,9 @@ export const DINO_CATEGORIES: DinoCategory[] = [
             ],
         },
         dinosaurs: {
-            epic:   { name: 'Styracosaurus',  rarity: 'epic',   stats: { speed: 4, size: 5, strength: 7, intelligence: 3, defence: 9, aggression: 7 }, total: 35 },
-            rare:   { name: 'Triceratops',    rarity: 'rare',   stats: { speed: 4, size: 6, strength: 7, intelligence: 3, defence: 7, aggression: 5 }, total: 32 },
-            common: { name: 'Protoceratops',  rarity: 'common', stats: { speed: 4, size: 2, strength: 3, intelligence: 3, defence: 4, aggression: 4 }, total: 20 },
+            epic:   { name: 'Styracosaurus',  rarity: 'epic',   stats: { speed: 4, size: 5, strength: 7, intelligence: 3, defence: 9, aggression: 7 }, total: 35, attributes: 'spectacular frill with six long spikes, large nose horn, could charge like a rhino, intimidating display' },
+            rare:   { name: 'Triceratops',    rarity: 'rare',   stats: { speed: 4, size: 6, strength: 7, intelligence: 3, defence: 7, aggression: 5 }, total: 32, attributes: 'three facial horns, massive bony frill, powerful charging attack, one of the last dinosaurs to exist' },
+            common: { name: 'Protoceratops',  rarity: 'common', stats: { speed: 4, size: 2, strength: 3, intelligence: 3, defence: 4, aggression: 4 }, total: 20, attributes: 'small but feisty, beak-like mouth, bony neck frill, sheep-sized, known for fighting Velociraptors' },
         },
     },
 ];
