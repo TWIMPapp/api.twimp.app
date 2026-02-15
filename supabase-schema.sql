@@ -152,6 +152,21 @@ CREATE TRIGGER update_user_games_updated_at
     EXECUTE FUNCTION update_updated_at_column();
 
 -- =====================================================
+-- Hazard Reports (crowdsourced unreachable location data)
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS hazard_reports (
+    id          BIGSERIAL PRIMARY KEY,
+    user_id     TEXT NOT NULL,
+    category    TEXT NOT NULL,
+    lat         DOUBLE PRECISION NOT NULL,
+    lng         DOUBLE PRECISION NOT NULL,
+    reported_at BIGINT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_hazard_reports_location ON hazard_reports (lat, lng);
+
+-- =====================================================
 -- Default universe games (you can edit these)
 -- =====================================================
 
