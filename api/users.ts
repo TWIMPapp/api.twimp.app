@@ -16,7 +16,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method === 'POST') {
     try {
-      const { email, name, avatar_url, provider, provider_id } = req.body;
+      const { email, name, avatar_url, provider, provider_id, twimp_user_id } = req.body;
 
       if (!email || !provider) {
         return res.status(400).json({ error: 'Email and provider are required' });
@@ -34,7 +34,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .single();
 
       if (existingUser) {
-        // User already exists, just return their data
+        // Update twimp_user_id if provided (links localStorage ID to this user)
+        if (twimp_user_id) {
+          await supabase
+            .from('users')
+            .update({ twimp_user_id })
+            .eq('email', email);
+        }
         return res.status(200).json(existingUser);
       }
 
@@ -44,6 +50,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         name: name || email.split('@')[0], // Default to email prefix if no name
         avatar_url: avatar_url || null,
         provider, // Explicitly set the provider field
+        ...(twimp_user_id && { twimp_user_id }),
       };
 
       // Set the appropriate OAuth ID column

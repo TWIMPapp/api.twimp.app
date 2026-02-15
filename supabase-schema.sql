@@ -105,6 +105,7 @@ CREATE TABLE IF NOT EXISTS users (
     facebook_id TEXT UNIQUE,
     provider TEXT NOT NULL,  -- 'google' or 'facebook'
     avatar_url TEXT,
+    twimp_user_id TEXT,      -- links to localStorage twimp_user_id used in game sessions
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -113,6 +114,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id);
 CREATE INDEX IF NOT EXISTS idx_users_facebook_id ON users(facebook_id);
+CREATE INDEX IF NOT EXISTS idx_users_twimp_user_id ON users(twimp_user_id);
 
 -- Trigger for users updated_at
 DROP TRIGGER IF EXISTS update_users_updated_at ON users;
