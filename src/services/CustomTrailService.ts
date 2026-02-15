@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from '../config/supabase';
 import { SessionService } from './SessionService';
 import { GeoService } from './GeoService';
+import { HazardService } from './HazardService';
 import { CustomTrail, CustomPin, CustomTrailTheme, CustomTrailPlaySession } from '../types/CustomTrailTypes';
 import { THEMES } from '../data/themes';
 import fs from 'fs';
@@ -1010,6 +1011,74 @@ export class CustomTrailService {
             globalCollectedBy: trail.globalCollectedBy,
             remainingPins: trail.pins.length - trail.globalCollectedPins.length,
             yourScore: session.collectedPins.length
+        };
+    }
+
+    // ===== Report unreachable pin =====
+
+    static async reportUnreachablePin(
+        userId: string, trailId: string, pinIndex: number, category: string, lat: number, lng: number
+    ): Promise<any> {
+        const trail = await this.getActiveTrail(trailId);
+        if (!trail) return { ok: false, message: 'Trail not found or has expired' };
+        if (trail.mode !== 'random') return { ok: false, message: 'Reporting is only available for random trails.' };
+
+        const gameType = this.getGameType(trailId);
+        const existing = await SessionService.getUniversalSession(userId, gameType);
+        if (!existing) return { ok: false, message: 'No active session.' };
+
+        const session = existing as any as CustomTrailPlaySession;
+        const pin = trail.pins[pinIndex];
+        if (!pin) return { ok: false, message: 'Invalid pin index.' };
+
+        if (session.collectedPins.includes(pinIndex)) {
+            return { ok: false, message: 'Pin already collected.' };
+        }
+        if (trail.competitive && trail.globalCollectedPins.includes(pinIndex)) {
+            return { ok: false, message: 'Pin already collected.' };
+        }
+
+        const otherPins = trail.pins
+            .filter((_, i) => i !== pinIndex)
+            .map(p => ({ lat: p.lat, lng: p.lng }));
+
+        const result = await HazardService.handleReport({
+            userId,
+            category,
+            reportedLocation: { lat: pin.lat, lng: pin.lng },
+            playerPosition: { lat, lng },
+            exclusionZones: session.exclusionZones || [],
+            gameCenter: trail.startLocation!,
+            spawnRadius: RANDOM_SPAWN_RADIUS_METERS,
+            otherPins,
+            minSpacing: MIN_SPACING_METERS,
+        });
+
+        if (!result.ok) {
+            return { ok: false, message: result.message };
+        }
+
+        pin.lat = result.newLocation!.lat;
+        pin.lng = result.newLocation!.lng;
+        session.exclusionZones = result.updatedExclusions;
+
+        await this.saveTrail(trail);
+        await SessionService.saveUniversalSession(session as any);
+
+        return {
+            ok: true,
+            message: 'Pin moved to a new location!',
+            trail: this.getTrailForPlayer(trail, session),
+            session: {
+                collectedPins: session.collectedPins,
+                totalPins: trail.pins.length,
+                completed: session.completed,
+                ...(trail.competitive && {
+                    globalCollectedPins: trail.globalCollectedPins,
+                    globalCollectedBy: trail.globalCollectedBy,
+                    remainingPins: trail.pins.length - trail.globalCollectedPins.length,
+                })
+            },
         };
     }
 

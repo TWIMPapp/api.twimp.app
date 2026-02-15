@@ -63,6 +63,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 return res.json({ body: await DinoHuntService.nameDino(user_id, nickname, dino_data) });
             case 'collect-golden-egg':
                 return res.json({ body: await DinoHuntService.collectGoldenEgg(user_id) });
+            case 'report-hazard': {
+                const { egg_index, hazard_category } = req.body;
+                if (egg_index === undefined || !hazard_category || !lat || !lng) {
+                    return res.status(400).json({ ok: false, message: 'egg_index, hazard_category, lat, lng required' });
+                }
+                return res.json({ body: await DinoHuntService.reportUnreachableEgg(
+                    user_id, parseInt(egg_index), hazard_category, parseFloat(lat), parseFloat(lng)
+                )});
+            }
             case 'restart':
                 await SessionService.clearUniversalSession(user_id, 'DINO_HUNT');
                 return res.json({ body: { ok: true, message: 'Dino Hunt restarted' } });
@@ -79,6 +88,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             case 'collect':
                 const collectResult = await CustomTrailService.collectPin(user_id, trailId, answer, pin_index);
                 return res.json({ body: collectResult });
+            case 'report-hazard': {
+                const { pin_index: hazardPinIndex, hazard_category } = req.body;
+                if (hazardPinIndex === undefined || !hazard_category || !lat || !lng) {
+                    return res.status(400).json({ ok: false, message: 'pin_index, hazard_category, lat, lng required' });
+                }
+                return res.json({ body: await CustomTrailService.reportUnreachablePin(
+                    user_id, trailId, parseInt(hazardPinIndex), hazard_category, parseFloat(lat), parseFloat(lng)
+                )});
+            }
             case 'restart':
                 const gameType = `CUSTOM_TRAIL_${trailId}`;
                 await SessionService.clearUniversalSession(user_id, gameType);

@@ -50,4 +50,7 @@ export interface CustomTrailPlaySession {
     currentLevel: number;
     score: number;
     history: any[];
+
+    // Reported hazard locations — exclusion zones for respawning
+    exclusionZones?: Array<{ lat: number; lng: number }>;
 }

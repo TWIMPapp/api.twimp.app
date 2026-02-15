@@ -7,6 +7,7 @@ import {
 import { SessionService } from './SessionService';
 import { GeoService } from './GeoService';
 import { AIService } from './AIService';
+import { HazardService } from './HazardService';
 import {
     DINO_HUNT_CONFIG, DINO_CATEGORIES, getCategoryById,
     FAVORITE_DINO_OPTIONS, RARITY_MESSAGES, INTRO_STORY
@@ -464,6 +465,51 @@ The baby ${session.favoriteDino} was free at last! It ran happily towards its re
 "Nooooo!" screamed Dr. Fossilus as he ran away, defeated.
 
 The army of ${session.collectedDinos.length} brave dinosaurs celebrated their victory. They had saved the day — together!`;
+    }
+
+    // ===== Report unreachable egg =====
+
+    static async reportUnreachableEgg(
+        userId: string, eggIndex: number, category: string, lat: number, lng: number
+    ): Promise<any> {
+        const session = await this.getSession(userId);
+        if (!session) return { ok: false, message: 'No active game.' };
+        if (session.phase !== 'hunting') return { ok: false, message: 'Not in hunting phase.' };
+
+        const egg = session.eggs[eggIndex];
+        if (!egg) return { ok: false, message: 'Invalid egg index.' };
+        if (egg.collected) return { ok: false, message: 'Egg already collected.' };
+
+        const otherEggs = session.eggs
+            .filter((e, i) => i !== eggIndex && !e.collected)
+            .map(e => ({ lat: e.lat, lng: e.lng }));
+
+        const result = await HazardService.handleReport({
+            userId,
+            category,
+            reportedLocation: { lat: egg.lat, lng: egg.lng },
+            playerPosition: { lat, lng },
+            exclusionZones: session.exclusionZones || [],
+            gameCenter: session.startPosition,
+            spawnRadius: session.spawnRadiusMeters,
+            otherPins: otherEggs,
+            minSpacing: DINO_HUNT_CONFIG.MIN_SPAWN_DISTANCE_METERS,
+        });
+
+        if (!result.ok) {
+            return { ok: false, message: result.message };
+        }
+
+        egg.lat = result.newLocation!.lat;
+        egg.lng = result.newLocation!.lng;
+        session.exclusionZones = result.updatedExclusions;
+        await SessionService.saveUniversalSession(session);
+
+        return {
+            ok: true,
+            message: 'Egg moved to a new location!',
+            session: this.sanitizeSession(session),
+        };
     }
 
     // ===== Helpers =====

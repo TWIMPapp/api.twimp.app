@@ -87,4 +87,7 @@ export interface DinoHuntSession {
 
     // Tracks which egg the player is currently answering (set on arrival)
     pendingEggIndex: number | null;
+
+    // Reported hazard locations — exclusion zones for respawning
+    exclusionZones?: Array<{ lat: number; lng: number }>;
 }
