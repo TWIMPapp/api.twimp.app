@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { handleOptions, cors } from '../_utils';
+import { handleOptions, cors, resolveCreatorFromApiKey } from '../_utils';
 import { CustomTrailService } from '../../src/services/CustomTrailService';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -10,8 +10,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(405).json({ ok: false, message: 'Method not allowed' });
     }
 
-    const { creator_id } = req.query;
-    const creatorId = Array.isArray(creator_id) ? creator_id[0] : creator_id;
+    // Resolve creator_id: API key takes priority, then query param
+    const authResult = await resolveCreatorFromApiKey(req);
+    if (authResult && 'error' in authResult) {
+        return res.status(401).json({ ok: false, message: authResult.error });
+    }
+
+    const { creator_id: query_creator_id } = req.query;
+    const creatorId = authResult?.creator_id || (Array.isArray(query_creator_id) ? query_creator_id[0] : query_creator_id);
 
     if (!creatorId) {
         return res.status(400).json({ ok: false, message: 'creator_id query parameter is required' });

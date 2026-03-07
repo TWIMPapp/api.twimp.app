@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { handleOptions, cors } from '../_utils';
+import { handleOptions, cors, resolveCreatorFromApiKey } from '../_utils';
 import { CustomTrailService } from '../../src/services/CustomTrailService';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -10,7 +10,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(405).json({ ok: false, message: 'Method not allowed' });
     }
 
-    const { creator_id, theme, name, start_location, pins, mode, competitive, count, has_questions, spawn_radius } = req.body;
+    const { creator_id: body_creator_id, theme, name, start_location, pins, mode, competitive, count, has_questions, spawn_radius } = req.body;
+
+    // Resolve creator_id: API key takes priority, then body
+    const authResult = await resolveCreatorFromApiKey(req);
+    if (authResult && 'error' in authResult) {
+        return res.status(401).json({ ok: false, message: authResult.error });
+    }
+    const creator_id = authResult?.creator_id || body_creator_id;
 
     if (!creator_id) {
         return res.status(400).json({ ok: false, message: 'creator_id is required' });
