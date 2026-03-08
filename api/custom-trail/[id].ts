@@ -57,14 +57,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
     }
 
-    // Stop trail (soft-delete)
+    // Stop trail (soft-delete), ?expire=true to mark for immediate cleanup
     if (req.method === 'DELETE') {
         const { creator_id: body_creator_id } = req.body || {};
         const creator_id = authResult?.creator_id || body_creator_id;
         if (!creator_id) {
             return res.status(400).json({ ok: false, message: 'creator_id is required' });
         }
-        const result = await CustomTrailService.deleteTrail(creator_id, trailId);
+        const expire = req.query.expire === 'true';
+        const result = await CustomTrailService.deleteTrail(creator_id, trailId, expire);
         return res.status(result.ok ? 200 : 403).json({ body: result });
     }
 

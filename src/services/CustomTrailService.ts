@@ -293,7 +293,7 @@ export class CustomTrailService {
         return null;
     }
 
-    static async deleteTrail(creatorId: string, trailId: string): Promise<{ ok: boolean; message: string }> {
+    static async deleteTrail(creatorId: string, trailId: string, expire = false): Promise<{ ok: boolean; message: string }> {
         const trail = await this.getTrail(trailId);
         if (!trail) {
             return { ok: false, message: 'Trail not found' };
@@ -303,12 +303,15 @@ export class CustomTrailService {
         }
 
         trail.isActive = false;
+        if (expire) {
+            trail.expiresAt = Date.now();
+        }
         try {
             await this.saveTrail(trail);
         } catch (e: any) {
             return { ok: false, message: e.message || 'Failed to save trail' };
         }
-        return { ok: true, message: 'Trail stopped' };
+        return { ok: true, message: expire ? 'Trail stopped and marked for cleanup' : 'Trail stopped' };
     }
 
     static async getTrailsByCreator(creatorId: string): Promise<CustomTrail[]> {
