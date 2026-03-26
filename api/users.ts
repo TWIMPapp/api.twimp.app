@@ -29,17 +29,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Check if user already exists
       const { data: existingUser } = await supabase
         .from('users')
-        .select('id')
+        .select('*')
         .eq('email', email)
         .single();
 
       if (existingUser) {
-        // Update twimp_user_id if provided (links localStorage ID to this user)
-        if (twimp_user_id) {
+        // Only set twimp_user_id if the user doesn't already have one
+        if (twimp_user_id && !existingUser.twimp_user_id) {
           await supabase
             .from('users')
             .update({ twimp_user_id })
             .eq('email', email);
+          existingUser.twimp_user_id = twimp_user_id;
         }
         return res.status(200).json(existingUser);
       }
