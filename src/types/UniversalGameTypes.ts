@@ -26,9 +26,7 @@ export interface EggEvent {
 
 export interface EggHuntQuestion {
     id: string;
-    phase: 1 | 2 | 3 | 4;
     subject: 'MATH' | 'ENGLISH' | 'SCIENCE' | 'SPECIAL';
-    level: number;
     question: string;
     options?: string[];
     answer: string;

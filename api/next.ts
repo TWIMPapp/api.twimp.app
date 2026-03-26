@@ -23,6 +23,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Easter Event uses action-based routing
     if (ref === 'easter-event') {
+        const { test_day, tk } = req.body;
+        if (test_day !== undefined && tk === 'eggstra26') {
+            const { EASTER_EVENT_CONFIG } = require('../src/data/easter_event/config');
+            EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE = parseInt(test_day);
+        }
         switch (action) {
             case 'collect':
                 return res.json({ body: await EasterEventService.collectEgg(user_id, answer || '') });

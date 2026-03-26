@@ -324,11 +324,28 @@ export class EasterEventService {
         if (dist < EASTER_EVENT_CONFIG.COLLECTION_RADIUS_METERS) {
             // User arrived at egg
             if (session.currentEgg.isGoldenEgg) {
+                // Assign golden egg question if not already set
+                if (!session.currentEgg.currentQuestion) {
+                    const goldenQ = EggHuntQuestions.find(q => q.id === 'q30');
+                    if (goldenQ) {
+                        session.currentEgg.currentQuestion = goldenQ.question;
+                        session.currentEgg.currentAnswer = goldenQ.answer;
+                        session.currentEgg.currentOptions = goldenQ.options;
+                    }
+                    await SessionService.saveUniversalSession(session);
+                }
+
                 return {
                     ok: true,
                     arrived: true,
                     isGoldenEgg: true,
                     session,
+                    task: {
+                        type: 'question_multiple_choice',
+                        content: session.currentEgg.currentQuestion,
+                        options: session.currentEgg.currentOptions,
+                        subject: 'SPECIAL'
+                    },
                     spawnRadius: {
                         center: session.startPosition,
                         radiusMeters: dayConfig.radius
@@ -341,6 +358,7 @@ export class EasterEventService {
                 const question = this.getRandomQuestion(session.currentEgg.subject);
                 session.currentEgg.currentQuestion = question.question;
                 session.currentEgg.currentAnswer = question.answer;
+                session.currentEgg.currentOptions = question.options;
             }
 
             const isBonusEgg = session.currentEgg.isBonusEgg === true;
@@ -383,8 +401,9 @@ export class EasterEventService {
                 isBonusEgg,
                 session,
                 task: {
-                    type: 'question_single',
+                    type: session.currentEgg.currentOptions ? 'question_multiple_choice' : 'question_single',
                     content: session.currentEgg.currentQuestion,
+                    options: session.currentEgg.currentOptions,
                     subject: session.currentEgg.subject,
                     answer: session.currentEgg.currentAnswer
                 },
@@ -437,10 +456,7 @@ export class EasterEventService {
     }
 
     private static getRandomQuestion(subject: 'MATH' | 'ENGLISH' | 'SCIENCE'): EggHuntQuestion {
-        // Get all questions for this subject from levels 1-26 (not special)
-        const subjectQuestions = EggHuntQuestions.filter(
-            q => q.subject === subject && q.level <= 26
-        );
+        const subjectQuestions = EggHuntQuestions.filter(q => q.subject === subject);
         return subjectQuestions[Math.floor(Math.random() * subjectQuestions.length)];
     }
 
@@ -455,8 +471,19 @@ export class EasterEventService {
         const dayConfig = this.getCurrentDayConfig();
         const isBonusEgg = session.currentEgg.isBonusEgg === true;
 
-        // Golden egg has special handling (no question)
+        // Golden egg - validate answer then reveal GERARDIA
         if (session.currentEgg.isGoldenEgg) {
+            const expectedAnswer = session.currentEgg.currentAnswer || 'Simnel Cake';
+            const correct = answer.trim().toLowerCase() === expectedAnswer.toLowerCase();
+
+            if (!correct) {
+                return {
+                    ok: true,
+                    correct: false,
+                    message: 'Not quite... try again!'
+                };
+            }
+
             return this.collectGoldenEgg(userId);
         }
 
@@ -546,9 +573,10 @@ export class EasterEventService {
 
     static isGoldenEggAvailable(): boolean {
         const eventStart = new Date(EASTER_EVENT_CONFIG.EVENT_START_DATE + 'T00:00:00Z');
-        const goldenEggDay = eventStart.getTime() +
-            EASTER_EVENT_CONFIG.GOLDEN_EGG.dayOffset * 24 * 60 * 60 * 1000;
-        return Date.now() >= goldenEggDay;
+        const goldenEggTime = eventStart.getTime() +
+            EASTER_EVENT_CONFIG.GOLDEN_EGG.dayOffset * 24 * 60 * 60 * 1000 +
+            10 * 60 * 60 * 1000;  // Golden egg appears at 10am
+        return Date.now() >= goldenEggTime;
     }
 
     static async collectGoldenEgg(userId: string): Promise<any> {
@@ -772,7 +800,17 @@ export class EasterEventService {
 
     static getAvailableChapters(): StoryChapter[] {
         const daysSinceStart = this.getDaysSinceEventStart();
-        return STORY_CHAPTERS.filter(ch => ch.dayOffset <= daysSinceStart);
+        const hoursSinceStart = this.getHoursSinceEventStart();
+
+        return STORY_CHAPTERS.filter(ch => {
+            // Past days: always available
+            if (ch.dayOffset < daysSinceStart) return true;
+            // Future days: not yet
+            if (ch.dayOffset > daysSinceStart) return false;
+            // Current day: available from 8am onwards
+            const hoursIntoDay = hoursSinceStart - (daysSinceStart * 24);
+            return hoursIntoDay >= 8;
+        });
     }
 
     static getChapterContent(chapterId: number): any {
@@ -785,7 +823,8 @@ export class EasterEventService {
         if (!isUnlocked) {
             const eventStart = new Date(EASTER_EVENT_CONFIG.EVENT_START_DATE + 'T00:00:00Z');
             const unlockDate = new Date(eventStart.getTime() +
-                chapter.dayOffset * 24 * 60 * 60 * 1000);
+                chapter.dayOffset * 24 * 60 * 60 * 1000 +
+                8 * 60 * 60 * 1000);  // Chapters unlock at 8am
 
             return {
                 locked: true,
@@ -932,7 +971,7 @@ export class EasterEventService {
             chapters: STORY_CHAPTERS.map(ch => ({
                 id: ch.id,
                 title: ch.title,
-                locked: ch.dayOffset > this.getDaysSinceEventStart(),
+                locked: !this.getAvailableChapters().some(a => a.id === ch.id),
                 dayOffset: ch.dayOffset
             })),
             availableChapters: this.getAvailableChapters().map(ch => ch.id),

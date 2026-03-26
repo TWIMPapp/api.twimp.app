@@ -327,6 +327,7 @@ export class DinoHuntService {
                 rarity: dinosaur.rarity,
                 stats: dinosaur.stats,
                 total: dinosaur.total,
+                attributes: dinosaur.attributes,
                 categoryId: category.id,
                 categoryName: category.name,
             },
@@ -404,7 +405,10 @@ export class DinoHuntService {
         }
 
         // Generate battle story
+        console.log('[DinoHunt] Generating battle story for', session.userId, '— dinos:', session.collectedDinos.length);
+        console.log('[DinoHunt] ANTHROPIC_API_KEY present:', !!process.env.ANTHROPIC_API_KEY);
         const story = await this.generateBattleStory(session);
+        console.log('[DinoHunt] Story result:', story ? `AI (${story.length} chars)` : 'FALLBACK');
         session.battleStory = story;
         session.phase = 'victory';
         await SessionService.saveUniversalSession(session);

@@ -59,6 +59,7 @@ export interface EasterEgg {
     // Question assigned when user arrives (so answer check uses same question)
     currentQuestion?: string;
     currentAnswer?: string;
+    currentOptions?: string[];
 }
 
 export interface PuzzleSolveRecord {

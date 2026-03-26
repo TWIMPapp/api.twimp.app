@@ -30,7 +30,7 @@ Easter Egg hunts are about to start all over the country and I have nothing to g
 
 That means I can place them anywhere and they won't melt until the timer goes off. It's how I set up Easter Egg hunts the night before without the chocolate going bad.
 
-But now someone has stolen them all, and if I don't get them back before the timers expire, they'll turn into chocolate and be gone forever!`
+But now someone has stolen them all, and if I don't get them back before the timers expire, they'll turn into chocolate and I don't where!  They could end up being found by doggies and it will make them very sick!`
             },
             {
                 id: "ch1_s3",
@@ -59,7 +59,7 @@ Go out with a grown-up, stay safe, and collect as many eggs as you can! I'll be 
     {
         id: 2,
         title: "The Purple Glove",
-        dayOffset: 3,  // Day 4
+        dayOffset: 2,  // Day 3
         scenes: [
             {
                 id: "ch2_s1",
@@ -146,9 +146,56 @@ So if he can't cook, why would he need recipe ingredients? Something doesn't add
                 emotion: "determined",
                 narration: `Keep collecting eggs and solving puzzles! The more of the Codex we unlock, the more of the clues we can read.
 
-I have a feeling we're getting close to discovering who's REALLY behind all this...
-
 Easter is almost here. We need to solve this mystery!`
+            }
+        ]
+    },
+    {
+        id: 4,
+        title: "The Golden Egg",
+        dayOffset: 9,  // Day 10
+        scenes: [
+            {
+                id: "ch4_s1",
+                character: "easter_bunny",
+                characterImage: "easterbunnyhappy.png",
+                emotion: "happy",
+                narration: `I can't believe it... you actually did it!
+
+Children all over the country have helped collect the eggs, and Easter Egg hunts are SAVED! I could cry. Actually, I think I am crying. These are happy tears!
+
+Thank you, thank you, THANK YOU!`
+            },
+            {
+                id: "ch4_s2",
+                character: "easter_bunny",
+                characterImage: "easterbunnyhappy.png",
+                emotion: "happy",
+                narration: `I've been getting messages from children everywhere telling me how many eggs they've found. You've all been absolutely incredible.
+
+I honestly didn't know if we'd pull it off, but you proved that when everyone works together, anything is possible!`
+            },
+            {
+                id: "ch4_s3",
+                character: "easter_bunny",
+                characterImage: "easterbunny.png",
+                emotion: "default",
+                narration: `Now, there IS one more thing...
+
+I've been getting reports from some of you about a strange egg that's appeared. A GOLDEN one. It's not one of mine - my eggs are all accounted for now.
+
+I don't know where it came from or who left it.`
+            },
+            {
+                id: "ch4_s4",
+                character: "easter_bunny",
+                characterImage: "easterbunnydetermined.png",
+                emotion: "determined",
+                narration: `I don't need you to collect it - you've done more than enough already. But... I'd be lying if I said I wasn't curious.
+
+Whoever is behind all of this went to a LOT of effort. The symbols, the questions, the ingredients... there has to be a reason.
+
+If you want to go and find that Golden Egg, I think it might finally tell us what this whole thing has been about. But only if you want to - you've already saved Easter!`
             }
         ]
     }

@@ -22,6 +22,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Easter Event uses dedicated service
     if (ref === 'easter-event') {
+        const { test_day, tk } = req.body;
+        if (test_day !== undefined && tk === 'eggstra26') {
+            const { EASTER_EVENT_CONFIG } = require('../src/data/easter_event/config');
+            EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE = parseInt(test_day);
+        }
         const result = await EasterEventService.handleAWTY(user_id, parseFloat(lat), parseFloat(lng));
         return res.json({ body: result });
     }

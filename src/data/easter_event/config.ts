@@ -11,8 +11,8 @@ interface DayConfig {
 }
 
 const DAY_CONFIG: Record<number, DayConfig> = {
-    0: { max: 5, expire: 30, radius: 200 },   // Days 0-6: Default settings
-    4: { max: 6, expire: 25, radius: 200 },   // Day 4: Slightly harder (shorter timer, smaller radius)
+    0: { max: 5, expire: 30, radius: 50 },   // Days 0-6: Default settings
+    4: { max: 5, expire: 25, radius: 200 },   // Day 4: Slightly harder (shorter timer, smaller radius)
     7: { max: 5, expire: 25, radius: 400 },   // Day 7+: Slightly harder (shorter timer, smaller radius)
 };
 
@@ -30,13 +30,13 @@ export function getDayConfig(eventDay: number): DayConfig {
 export const EASTER_EVENT_CONFIG = {
     // Collection and spawn settings
     COLLECTION_RADIUS_METERS: 20,
-    MIN_SPAWN_DISTANCE_METERS: 100,
+    MIN_SPAWN_DISTANCE_METERS: 20,
     PUZZLE_DURATION_HOURS: 48,
     PUZZLE_START_HOUR: 17,  // 5pm - puzzles start at this hour each day
 
     // TEST MODE: Set to 0-7 to override day, or null for real date
     // Day 0 = event start, Day 7 = Easter Sunday
-    TEST_DAY_OVERRIDE: 6 as number | null,
+    TEST_DAY_OVERRIDE: null as number | null,
 
     // Event dates (update each year)
     // For 2026: Easter Sunday is April 5, event starts Friday March 27 (9 days before)
