@@ -54,13 +54,9 @@ export const EASTER_EVENT_CONFIG = {
     } as Record<string, number>,
 
     // Puzzle rewards (rare letters from puzzles)
-    // Last 2 puzzles give very rare letters
+    // Daily puzzles, 1 letter each
     PUZZLE_REWARD_LETTERS: {
-        1: ['Q', 'K'],      // Puzzle 1 - rare (Fri Mar 27)
-        2: ['V', 'W'],      // Puzzle 2 (Sun Mar 29)
-        3: ['X', 'U'],      // Puzzle 3 - very rare (Tue Mar 31)
-        4: ['J', 'F'],      // Puzzle 4 (Thu Apr 2)
-        5: ['Z', 'G']       // Puzzle 5 - Z very rare, G for GERARDIA (Easter Sat Apr 4)
+        1: ['Q'],           // Puzzle 1 (Fri Mar 27)
     } as Record<number, string[]>,
 
     // Clues - revealed daily, separate from puzzles

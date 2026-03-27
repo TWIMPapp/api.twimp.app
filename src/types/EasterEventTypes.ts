@@ -86,15 +86,22 @@ export interface ChapterScene {
 }
 
 // Puzzle definition
+export interface PuzzleComponent {
+    name: string;               // Component name (e.g. "Wordle")
+    answer: string;             // Answer for the component to validate
+    props?: Record<string, any>; // Additional component-specific props
+}
+
 export interface Puzzle {
     id: number;
     title: string;
     startDayOffset: number;     // Day puzzle becomes available
-    durationHours: number;      // 48 hours each
-    image: string;              // Puzzle image asset
-    hint: string;
-    answer: string;
-    rewardLetters: string[];    // 2 letters per puzzle
+    durationHours: number;      // Hours puzzle is active
+    image?: string;             // Puzzle image asset (for image-based puzzles)
+    hint?: string;              // Text hint (for text-based puzzles)
+    answer: string;             // Canonical answer for validation
+    component?: PuzzleComponent; // Interactive component (e.g. Wordle)
+    rewardLetters: string[];    // Letters awarded on solve
 }
 
 // Mission update definition

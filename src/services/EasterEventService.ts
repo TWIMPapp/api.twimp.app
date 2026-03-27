@@ -718,7 +718,8 @@ export class EasterEventService {
                 id: activePuzzle.id,
                 title: activePuzzle.title,
                 image: activePuzzle.image,
-                hint: activePuzzle.hint
+                hint: activePuzzle.hint,
+                component: activePuzzle.component
             },
             startTime,
             endTime,
