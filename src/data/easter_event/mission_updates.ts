@@ -17,7 +17,7 @@ export const MISSION_UPDATES: MissionUpdate[] = [
         message: "Children across the nation have joined the search for the missing eggs! The Easter Bunny is counting on us!",
         iconEmoji: "🔍",
         dayOffset: 0,
-        hourOffset: 9  // 9am
+        hourOffset: 15  // 9am
     },
     {
         id: "mu_002",
@@ -26,7 +26,7 @@ export const MISSION_UPDATES: MissionUpdate[] = [
         message: "Some children are reporting strange symbols on the eggs. What could they mean?",
         iconEmoji: "❓",
         dayOffset: 0,
-        hourOffset: 14  // 2pm
+        hourOffset: 18  // 2pm
     },
 
     // Day 2 — dayOffset 1 (Sat Mar 28)
