@@ -3,7 +3,7 @@ import { Puzzle } from '../../types/EasterEventTypes';
 // Daily puzzles for the Easter Event
 // Each puzzle is available for 24 hours
 // Correct answer awards 1 rare codex letter
-// Puzzles can be text-based (hint/answer) or component-based (Wordle, etc.)
+// Answer always lives inside the component definition
 
 export const PUZZLES: Puzzle[] = [
     {
@@ -15,7 +15,6 @@ export const PUZZLES: Puzzle[] = [
             name: "Wordle",
             answer: "CLUES"
         },
-        answer: "clues",
         rewardLetters: ['Q']
     }
     // More daily puzzles to be added for Days 2-10

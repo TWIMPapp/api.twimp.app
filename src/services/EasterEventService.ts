@@ -752,8 +752,10 @@ export class EasterEventService {
             return { ok: false, message: "This puzzle is not currently active" };
         }
 
-        // Check answer (case-insensitive, unlimited guesses)
-        const isCorrect = answer.toLowerCase().trim() === puzzle.answer.toLowerCase().trim();
+        // Check answer — component puzzles store answer in component.answer
+        const correctAnswer = puzzle.component?.answer;
+        if (!correctAnswer) return { ok: false, message: "Puzzle has no answer configured" };
+        const isCorrect = answer.toLowerCase().trim() === correctAnswer.toLowerCase().trim();
 
         if (!isCorrect) {
             return {

@@ -32,7 +32,7 @@ export const EASTER_EVENT_CONFIG = {
     COLLECTION_RADIUS_METERS: 20,
     MIN_SPAWN_DISTANCE_METERS: 20,
     PUZZLE_DURATION_HOURS: 48,
-    PUZZLE_START_HOUR: 17,  // 5pm - puzzles start at this hour each day
+    PUZZLE_START_HOUR: 16,  // 4pm - puzzles start at this hour each day
 
     // TEST MODE: Set to 0-7 to override day, or null for real date
     // Day 0 = event start, Day 7 = Easter Sunday

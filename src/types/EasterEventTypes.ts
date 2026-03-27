@@ -99,8 +99,7 @@ export interface Puzzle {
     durationHours: number;      // Hours puzzle is active
     image?: string;             // Puzzle image asset (for image-based puzzles)
     hint?: string;              // Text hint (for text-based puzzles)
-    answer: string;             // Canonical answer for validation
-    component?: PuzzleComponent; // Interactive component (e.g. Wordle)
+    component?: PuzzleComponent; // Interactive component — answer lives here
     rewardLetters: string[];    // Letters awarded on solve
 }
 
