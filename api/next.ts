@@ -24,35 +24,40 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Easter Event uses action-based routing
     if (ref === 'easter-event') {
         const { test_day, tk } = req.body;
+        const { EASTER_EVENT_CONFIG } = require('../src/data/easter_event/config');
+        const originalOverride = EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE;
         if (test_day !== undefined && tk === 'eggstra26') {
-            const { EASTER_EVENT_CONFIG } = require('../src/data/easter_event/config');
             EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE = parseInt(test_day);
         }
-        switch (action) {
-            case 'collect':
-                return res.json({ body: await EasterEventService.collectEgg(user_id, answer || '') });
+        try {
+            switch (action) {
+                case 'collect':
+                    return res.json({ body: await EasterEventService.collectEgg(user_id, answer || '') });
 
-            case 'puzzle':
-                return res.json({ body: await EasterEventService.submitPuzzleAnswer(user_id, puzzle_id, answer) });
+                case 'puzzle':
+                    return res.json({ body: await EasterEventService.submitPuzzleAnswer(user_id, puzzle_id, answer) });
 
-            case 'acknowledge':
-                return res.json({ body: await EasterEventService.acknowledgeSafety(user_id) });
+                case 'acknowledge':
+                    return res.json({ body: await EasterEventService.acknowledgeSafety(user_id) });
 
-            case 'hazard':
-                return res.json({ body: await EasterEventService.reportHazard(user_id) });
+                case 'hazard':
+                    return res.json({ body: await EasterEventService.reportHazard(user_id) });
 
-            case 'restart':
-                await SessionService.clearUniversalSession(user_id, 'EASTER_EVENT');
-                return res.json({ body: { ok: true, message: "Easter Event game restarted" } });
+                case 'restart':
+                    await SessionService.clearUniversalSession(user_id, 'EASTER_EVENT');
+                    return res.json({ body: { ok: true, message: "Easter Event game restarted" } });
 
-            case 'reset-spawn':
-                if (!lat || !lng) {
-                    return res.status(400).json({ ok: false, message: "lat and lng required for reset-spawn" });
-                }
-                return res.json({ body: await EasterEventService.resetSpawnLocation(user_id, parseFloat(lat), parseFloat(lng)) });
+                case 'reset-spawn':
+                    if (!lat || !lng) {
+                        return res.status(400).json({ ok: false, message: "lat and lng required for reset-spawn" });
+                    }
+                    return res.json({ body: await EasterEventService.resetSpawnLocation(user_id, parseFloat(lat), parseFloat(lng)) });
 
-            default:
-                return res.status(400).json({ ok: false, message: `Unknown action: ${action}` });
+                default:
+                    return res.status(400).json({ ok: false, message: `Unknown action: ${action}` });
+            }
+        } finally {
+            EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE = originalOverride;
         }
     }
 
