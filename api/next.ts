@@ -64,6 +64,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 case 'clear-custom-trail':
                     return res.json({ body: await EasterEventService.clearCustomTrail(user_id) });
 
+                case 'help': {
+                    const { message: helpMessage } = req.body;
+                    if (!helpMessage || !helpMessage.trim()) {
+                        return res.status(400).json({ ok: false, message: "Message is required" });
+                    }
+                    const result = await EasterEventService.sendHelpEmail(user_id, helpMessage.trim());
+                    return res.json({ body: result });
+                }
+
                 default:
                     return res.status(400).json({ ok: false, message: `Unknown action: ${action}` });
             }

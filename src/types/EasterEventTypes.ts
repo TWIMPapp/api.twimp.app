@@ -31,6 +31,10 @@ export interface EasterEventSession {
     uniqueLettersFound: number;
     goldenEggCollected: boolean;
 
+    // Dynamic daily egg limit (locked in on first egg of each day)
+    dailyEggLimit?: number;
+    dailyEggLimitDay?: string;
+
     // Custom trail mode - user-defined egg locations
     customTrail?: {
         locations: Array<{ lat: number; lng: number }>;

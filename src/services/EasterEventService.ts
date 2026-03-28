@@ -16,6 +16,7 @@ import { STORY_CHAPTERS } from '../data/easter_event/chapters';
 import { PUZZLES } from '../data/easter_event/puzzles';
 import { MISSION_UPDATES } from '../data/easter_event/mission_updates';
 import { EggHuntQuestions } from '../data/easter_event/egg_hunt_questions';
+import { Resend } from 'resend';
 
 export class EasterEventService {
     // ===== Session Management =====
@@ -45,7 +46,7 @@ export class EasterEventService {
             ...session,
             dailyProgress: {
                 collected: this.getEggsCollectedToday(session),
-                max: dayConfig.max
+                max: this.getDailyEggLimit(session)
             },
             spawnRadius: {
                 center: session.startPosition,
@@ -100,8 +101,28 @@ export class EasterEventService {
         return session.dailyEggs[dayKey]?.length || 0;
     }
 
+    static getDailyEggLimit(session: EasterEventSession): number {
+        try {
+            const dayKey = String(this.getDaysSinceEventStart());
+
+            // Lock in the limit on first call each day
+            if (session.dailyEggLimitDay !== dayKey) {
+                const uniqueLetters = session.uniqueLettersFound || 0;
+                const eventEnd = new Date(EASTER_EVENT_CONFIG.EVENT_END_DATE + 'T23:59:59Z');
+                const now = new Date();
+                const daysRemaining = Math.max(Math.ceil((eventEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)), 1);
+                session.dailyEggLimit = Math.min(Math.max(Math.floor((26 - uniqueLetters) * 2 / daysRemaining), 5), 20);
+                session.dailyEggLimitDay = dayKey;
+            }
+
+            return session.dailyEggLimit || 5;
+        } catch {
+            return 5;
+        }
+    }
+
     static canCollectMoreEggsToday(session: EasterEventSession): boolean {
-        return this.getEggsCollectedToday(session) < this.getCurrentDayConfig().max;
+        return this.getEggsCollectedToday(session) < this.getDailyEggLimit(session);
     }
 
     // ===== Weighted Random Letter Selection =====
@@ -137,6 +158,11 @@ export class EasterEventService {
             session.customTrail.currentIndex++;
             this.spawnCustomTrailEgg(session, nextLocation.lat, nextLocation.lng, isBonusEgg);
             return;
+        }
+
+        // Clear exhausted custom trail so frontend knows to switch mode
+        if (session.customTrail && session.customTrail.currentIndex >= session.customTrail.locations.length) {
+            session.customTrail = null;
         }
 
         // Normal random spawn
@@ -208,7 +234,7 @@ export class EasterEventService {
 
         const dayConfig = this.getCurrentDayConfig();
         const eggsCollectedToday = this.getEggsCollectedToday(session);
-        const eggsRemaining = dayConfig.max - eggsCollectedToday;
+        const eggsRemaining = this.getDailyEggLimit(session) - eggsCollectedToday;
 
         // Allow any number of locations - eggs beyond daily limit become bonus eggs
         if (locations.length === 0) {
@@ -252,7 +278,7 @@ export class EasterEventService {
             session,
             dailyProgress: {
                 collected: eggsCollectedToday,
-                max: dayConfig.max
+                max: this.getDailyEggLimit(session)
             }
         };
     }
@@ -308,7 +334,7 @@ export class EasterEventService {
                 session,
                 dailyProgress: {
                     collected: this.getEggsCollectedToday(session),
-                    max: dayConfig.max
+                    max: this.getDailyEggLimit(session)
                 },
                 spawnRadius: {
                     center: session.startPosition,
@@ -409,7 +435,7 @@ export class EasterEventService {
                 },
                 dailyProgress: {
                     collected: this.getEggsCollectedToday(session),
-                    max: dayConfig.max
+                    max: this.getDailyEggLimit(session)
                 },
                 spawnRadius: {
                     center: session.startPosition,
@@ -439,7 +465,7 @@ export class EasterEventService {
             }],
             dailyProgress: {
                 collected: this.getEggsCollectedToday(session),
-                max: dayConfig.max
+                max: this.getDailyEggLimit(session)
             },
             spawnRadius: {
                 center: session.startPosition,
@@ -515,7 +541,7 @@ export class EasterEventService {
                 session,
                 dailyProgress: {
                     collected: this.getEggsCollectedToday(session),
-                    max: dayConfig.max
+                    max: this.getDailyEggLimit(session)
                 },
                 isBonusEgg
             };
@@ -546,7 +572,7 @@ export class EasterEventService {
                 session,
                 dailyProgress: {
                     collected: this.getEggsCollectedToday(session),
-                    max: dayConfig.max
+                    max: this.getDailyEggLimit(session)
                 }
             };
         }
@@ -564,7 +590,7 @@ export class EasterEventService {
             session,
             dailyProgress: {
                 collected: this.getEggsCollectedToday(session),
-                max: dayConfig.max
+                max: this.getDailyEggLimit(session)
             }
         };
     }
@@ -985,7 +1011,7 @@ export class EasterEventService {
             goldenEggCollected: session.goldenEggCollected || false,
             dailyProgress: {
                 collected: this.getEggsCollectedToday(session),
-                max: dayConfig.max
+                max: this.getDailyEggLimit(session)
             },
             codex: this.getCodexDisplay(session),
             spawnRadius: {
@@ -1059,6 +1085,38 @@ export class EasterEventService {
     static async restartGame(userId: string): Promise<any> {
         await SessionService.clearUniversalSession(userId, 'EASTER_EVENT');
         return { ok: true, message: "Game reset" };
+    }
+
+    // ===== Help Email =====
+
+    static async sendHelpEmail(userId: string, message: string): Promise<any> {
+        try {
+            const session = await SessionService.getUniversalSession(userId, 'EASTER_EVENT') as EasterEventSession;
+            const resend = new Resend(process.env.RESEND_API_KEY);
+
+            await resend.emails.send({
+                from: 'Twimp <hello@twimp.app>',
+                to: 'hello@twimp.app',
+                subject: 'EASTER - Help',
+                html: `
+                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
+                        <h2 style="color: #22c55e;">Easter Event Help Request</h2>
+                        <p style="color: #1f2937; font-size: 16px; line-height: 1.6; white-space: pre-wrap;">${message.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+                        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+                        <p style="color: #6b7280; font-size: 12px;">User ID: ${userId}</p>
+                        <details style="margin-top: 12px;">
+                            <summary style="color: #6b7280; font-size: 12px; cursor: pointer;">Session Data</summary>
+                            <pre style="background: #f3f4f6; padding: 12px; border-radius: 8px; font-size: 11px; overflow-x: auto;">${JSON.stringify(session, null, 2)}</pre>
+                        </details>
+                    </div>
+                `
+            });
+
+            return { ok: true, message: "Message sent! We'll get back to you soon." };
+        } catch (err) {
+            console.error('Failed to send help email:', err);
+            return { ok: false, message: "Failed to send message. Please try again." };
+        }
     }
 
     // ===== Utility Methods =====
