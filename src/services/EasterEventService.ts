@@ -1096,7 +1096,7 @@ export class EasterEventService {
 
             await resend.emails.send({
                 from: 'Twimp <hello@twimp.app>',
-                to: 'hello@twimp.app',
+                to: 'help@ethoss.uk',
                 subject: 'EASTER - Help',
                 html: `
                     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
