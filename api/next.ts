@@ -53,6 +53,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     }
                     return res.json({ body: await EasterEventService.resetSpawnLocation(user_id, parseFloat(lat), parseFloat(lng)) });
 
+                case 'set-custom-trail': {
+                    const { locations } = req.body;
+                    if (!locations || !Array.isArray(locations)) {
+                        return res.status(400).json({ ok: false, message: "locations array required" });
+                    }
+                    return res.json({ body: await EasterEventService.setCustomTrail(user_id, locations) });
+                }
+
+                case 'clear-custom-trail':
+                    return res.json({ body: await EasterEventService.clearCustomTrail(user_id) });
+
                 default:
                     return res.status(400).json({ ok: false, message: `Unknown action: ${action}` });
             }

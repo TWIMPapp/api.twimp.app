@@ -217,8 +217,8 @@ export class EasterEventService {
 
         const bonusEggCount = Math.max(0, locations.length - eggsRemaining);
 
-        // Validate 200m spacing between all eggs
-        const MIN_SPACING_METERS = 200;
+        // Validate spacing between all eggs
+        const MIN_SPACING_METERS = EASTER_EVENT_CONFIG.MIN_SPAWN_DISTANCE_METERS;
         for (let i = 0; i < locations.length; i++) {
             for (let j = i + 1; j < locations.length; j++) {
                 const distance = GeoService.getDistanceFromLatLonInMeters(
