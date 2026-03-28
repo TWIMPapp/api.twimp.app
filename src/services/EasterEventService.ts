@@ -129,12 +129,12 @@ export class EasterEventService {
         }
 
         const dayConfig = this.getCurrentDayConfig();
-        const eggsCollectedToday = this.getEggsCollectedToday(session);
         const isBonusEgg = !this.canCollectMoreEggsToday(session);
 
-        // Check if using custom trail - custom trails can have more eggs than daily limit
-        if (session.customTrail && eggsCollectedToday < session.customTrail.locations.length) {
-            const nextLocation = session.customTrail.locations[eggsCollectedToday];
+        // Check if using custom trail - use trail's own index, not daily egg count
+        if (session.customTrail && session.customTrail.currentIndex < session.customTrail.locations.length) {
+            const nextLocation = session.customTrail.locations[session.customTrail.currentIndex];
+            session.customTrail.currentIndex++;
             this.spawnCustomTrailEgg(session, nextLocation.lat, nextLocation.lng, isBonusEgg);
             return;
         }
@@ -235,7 +235,7 @@ export class EasterEventService {
         }
 
         // Save custom trail and spawn first egg
-        session.customTrail = { locations };
+        session.customTrail = { locations, currentIndex: 0 };
         session.currentEgg = null; // Clear any existing egg
         this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
 

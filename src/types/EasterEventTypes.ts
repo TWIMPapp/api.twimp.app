@@ -34,6 +34,7 @@ export interface EasterEventSession {
     // Custom trail mode - user-defined egg locations
     customTrail?: {
         locations: Array<{ lat: number; lng: number }>;
+        currentIndex: number;   // Next egg to spawn (independent of daily count)
     } | null;
 }
 
