@@ -11,9 +11,9 @@ interface DayConfig {
 }
 
 const DAY_CONFIG: Record<number, DayConfig> = {
-    0: { max: 5, expire: 30, radius: 50 },   // Days 0-6: Default settings
-    4: { max: 5, expire: 25, radius: 200 },   // Day 4: Slightly harder (shorter timer, smaller radius)
-    7: { max: 5, expire: 25, radius: 400 },   // Day 7+: Slightly harder (shorter timer, smaller radius)
+    0: { max: 5, expire: 30, radius: 100 },   // Days 0-6: Default settings
+    4: { max: 5, expire: 25, radius: 100 },   // Day 4: Slightly harder (shorter timer, smaller radius)
+    7: { max: 5, expire: 25, radius: 100 },   // Day 7+: Slightly harder (shorter timer, smaller radius)
 };
 
 // Get effective config for a specific event day
