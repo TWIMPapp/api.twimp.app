@@ -27,7 +27,7 @@ export class EasterEventService {
         if (!session) {
             session = this.createNewSession(userId, lat, lng);
             this.spawnNewEgg(session, lat, lng);
-            await SessionService.saveUniversalSession(session);
+            await this.saveSession(session);
         } else {
             // Update start position if provided (allows changing spawn location)
             if (lat !== 0 && lng !== 0) {
@@ -38,7 +38,7 @@ export class EasterEventService {
                 console.log(`[EasterEvent] Egg expired for user ${userId}, respawning.`);
                 this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
             }
-            await SessionService.saveUniversalSession(session);
+            await this.saveSession(session);
         }
 
         const dayConfig = this.getCurrentDayConfig();
@@ -265,7 +265,7 @@ export class EasterEventService {
         session.currentEgg = null; // Clear any existing egg
         this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
 
-        await SessionService.saveUniversalSession(session);
+        await this.saveSession(session);
 
         const message = bonusEggCount > 0
             ? `Custom trail set with ${locations.length} eggs (${bonusEggCount} bonus).`
@@ -290,7 +290,7 @@ export class EasterEventService {
         session.customTrail = null;
         session.currentEgg = null; // Clear current egg, will respawn randomly on next AWTY
 
-        await SessionService.saveUniversalSession(session);
+        await this.saveSession(session);
 
         return {
             ok: true,
@@ -323,7 +323,7 @@ export class EasterEventService {
             }
         }
 
-        await SessionService.saveUniversalSession(session);
+        await this.saveSession(session);
 
         if (!session.currentEgg) {
             // This should rarely happen now since we always spawn eggs
@@ -358,7 +358,7 @@ export class EasterEventService {
                         session.currentEgg.currentAnswer = goldenQ.answer;
                         session.currentEgg.currentOptions = goldenQ.options;
                     }
-                    await SessionService.saveUniversalSession(session);
+                    await this.saveSession(session);
                 }
 
                 return {
@@ -418,7 +418,7 @@ export class EasterEventService {
                 console.log(`[EasterEvent] User ${userId} arrived at bonus egg (not counted toward daily limit).`);
             }
 
-            await SessionService.saveUniversalSession(session);
+            await this.saveSession(session);
 
             return {
                 ok: true,
@@ -532,7 +532,7 @@ export class EasterEventService {
             session.currentEgg = null;
             // Always spawn next egg (bonus eggs allowed)
             this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
-            await SessionService.saveUniversalSession(session);
+            await this.saveSession(session);
 
             return {
                 ok: true,
@@ -557,7 +557,7 @@ export class EasterEventService {
         session.currentEgg = null;
         this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
 
-        await SessionService.saveUniversalSession(session);
+        await this.saveSession(session);
 
         // Get the symbol for this letter
         const symbol = this.getSymbolForLetter(letter, session.codexMapping);
@@ -622,7 +622,7 @@ export class EasterEventService {
             this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
         }
 
-        await SessionService.saveUniversalSession(session);
+        await this.saveSession(session);
 
         // Encode GERARDIA with player's codex
         const message = EASTER_EVENT_CONFIG.GOLDEN_EGG.message;
@@ -807,7 +807,7 @@ export class EasterEventService {
             }
         });
 
-        await SessionService.saveUniversalSession(session);
+        await this.saveSession(session);
 
         // Get symbols for awarded letters
         const awardedSymbols = awardedLetters.map(letter => ({
@@ -987,7 +987,7 @@ export class EasterEventService {
         let session = await SessionService.getUniversalSession(userId, 'EASTER_EVENT') as EasterEventSession;
         if (!session) {
             session = this.createNewSession(userId, 0, 0); // Location will be set when they start playing
-            await SessionService.saveUniversalSession(session);
+            await this.saveSession(session);
         }
 
         const dayConfig = this.getCurrentDayConfig();
@@ -1040,7 +1040,7 @@ export class EasterEventService {
         if (!session) return { ok: false, message: "No active session" };
 
         session.safetyVerified = true;
-        await SessionService.saveUniversalSession(session);
+        await this.saveSession(session);
 
         return { ok: true, message: "Safety acknowledged", session };
     }
@@ -1052,7 +1052,7 @@ export class EasterEventService {
         console.log(`[EasterEvent] Hazard reported by ${userId}, respawning egg.`);
 
         this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
-        await SessionService.saveUniversalSession(session);
+        await this.saveSession(session);
 
         return { ok: true, message: "Egg respawned", session };
     }
@@ -1077,7 +1077,7 @@ export class EasterEventService {
 
         // Respawn egg at new location
         this.spawnNewEgg(session, lat, lng);
-        await SessionService.saveUniversalSession(session);
+        await this.saveSession(session);
 
         return { ok: true, message: "Spawn location updated", session };
     }
@@ -1117,6 +1117,18 @@ export class EasterEventService {
             console.error('Failed to send help email:', err);
             return { ok: false, message: "Failed to send message. Please try again." };
         }
+    }
+
+    // ===== Progress =====
+
+    private static updateProgress(session: EasterEventSession): void {
+        // Progress = codex completion (26 letters)
+        (session as any).progress = Math.min((session.uniqueLettersFound || 0) / 26, 1);
+    }
+
+    private static async saveSession(session: EasterEventSession): Promise<void> {
+        this.updateProgress(session);
+        await SessionService.saveUniversalSession(session);
     }
 
     // ===== Utility Methods =====
