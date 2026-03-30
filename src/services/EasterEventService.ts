@@ -322,6 +322,14 @@ export class EasterEventService {
             this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
         }
 
+        // Fix bonus flag if stale
+        if (session.currentEgg) {
+            const shouldBeBonus = !this.canCollectMoreEggsToday(session);
+            if (session.currentEgg.isBonusEgg !== shouldBeBonus) {
+                session.currentEgg.isBonusEgg = shouldBeBonus;
+            }
+        }
+
         // If no egg, spawn one (bonus eggs allowed after daily limit)
         if (!session.currentEgg) {
             // Check golden egg first

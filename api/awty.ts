@@ -30,6 +30,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
         try {
             const result = await EasterEventService.handleAWTY(user_id, parseFloat(lat), parseFloat(lng));
+            console.log('[AWTY]', JSON.stringify(result));
             return res.json({ body: result });
         } finally {
             EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE = originalOverride;
