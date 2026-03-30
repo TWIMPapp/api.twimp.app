@@ -324,7 +324,10 @@ export class EasterEventService {
 
         // Fix bonus flag if stale
         if (session.currentEgg) {
-            const shouldBeBonus = !this.canCollectMoreEggsToday(session);
+            const collected = this.getEggsCollectedToday(session);
+            const limit = this.getDailyEggLimit(session);
+            const shouldBeBonus = collected >= limit;
+            console.log(`[AWTY-bonus-check] collected=${collected} limit=${limit} shouldBeBonus=${shouldBeBonus} currentFlag=${session.currentEgg.isBonusEgg}`);
             if (session.currentEgg.isBonusEgg !== shouldBeBonus) {
                 session.currentEgg.isBonusEgg = shouldBeBonus;
             }
