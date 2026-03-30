@@ -38,6 +38,15 @@ export class EasterEventService {
                 console.log(`[EasterEvent] Egg expired for user ${userId}, respawning.`);
                 this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
             }
+
+            // Fix bonus flag if it's stale (e.g. from test_day leak)
+            if (session.currentEgg) {
+                const shouldBeBonus = !this.canCollectMoreEggsToday(session);
+                if (session.currentEgg.isBonusEgg !== shouldBeBonus) {
+                    session.currentEgg.isBonusEgg = shouldBeBonus;
+                }
+            }
+
             await this.saveSession(session);
         }
 
@@ -389,35 +398,7 @@ export class EasterEventService {
 
             const isBonusEgg = session.currentEgg.isBonusEgg === true;
 
-            // Record collection immediately (but NOT for bonus eggs - they don't count toward daily limit)
-            if (!isBonusEgg) {
-                const letter = session.currentEgg.assignedLetter;
-                const dayKey = String(this.getDaysSinceEventStart());
-
-                if (!session.dailyEggs[dayKey]) {
-                    session.dailyEggs[dayKey] = [];
-                }
-
-                // Only add if not already recorded (prevent duplicate entries on multiple AWTY calls)
-                const alreadyRecorded = session.dailyEggs[dayKey].some(
-                    egg => egg.lat === session.currentEgg!.lat && egg.lng === session.currentEgg!.lng
-                );
-
-                if (!alreadyRecorded) {
-                    session.dailyEggs[dayKey].push({
-                        letter,
-                        collectedAt: Date.now(),
-                        isDuplicate: session.unlockedLetters[letter] === true,
-                        lat: session.currentEgg.lat,
-                        lng: session.currentEgg.lng
-                    });
-                    session.totalEggsCollected++;
-                    console.log(`[EasterEvent] User ${userId} arrived at egg, counted as collected.`);
-                }
-            } else {
-                console.log(`[EasterEvent] User ${userId} arrived at bonus egg (not counted toward daily limit).`);
-            }
-
+            // Save the assigned question to the session (so collectEgg uses the same one)
             await this.saveSession(session);
 
             return {
@@ -526,8 +507,7 @@ export class EasterEventService {
         const isDuplicate = session.unlockedLetters[letter] === true;
 
         if (!isCorrect) {
-            // Wrong answer - respawn egg, don't reveal letter
-            // Egg is already counted (from confirmArrival), just clear and respawn
+            // Wrong answer - respawn egg, don't reveal letter, don't record
             console.log(`[EasterEvent] Wrong answer from ${userId}, respawning egg.`);
             session.currentEgg = null;
             // Always spawn next egg (bonus eggs allowed)
@@ -552,6 +532,21 @@ export class EasterEventService {
             session.unlockedLetters[letter] = true;
             session.uniqueLettersFound++;
         }
+
+        // Record in daily eggs
+        const dayKey = String(this.getDaysSinceEventStart());
+        if (!session.dailyEggs[dayKey]) {
+            session.dailyEggs[dayKey] = [];
+        }
+        session.dailyEggs[dayKey].push({
+            letter,
+            collectedAt: Date.now(),
+            isDuplicate,
+            isBonusEgg,
+            lat: session.currentEgg.lat,
+            lng: session.currentEgg.lng
+        });
+        session.totalEggsCollected++;
 
         // Clear current egg and spawn next (bonus eggs allowed)
         session.currentEgg = null;
@@ -1054,7 +1049,15 @@ export class EasterEventService {
         this.spawnNewEgg(session, session.startPosition.lat, session.startPosition.lng);
         await this.saveSession(session);
 
-        return { ok: true, message: "Egg respawned", session };
+        return {
+            ok: true,
+            message: "Egg respawned",
+            session,
+            dailyProgress: {
+                collected: this.getEggsCollectedToday(session),
+                max: this.getDailyEggLimit(session)
+            }
+        };
     }
 
     static async getSpawnRadius(userId: string): Promise<any> {
