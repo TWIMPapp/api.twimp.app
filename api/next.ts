@@ -23,14 +23,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Easter Event uses action-based routing
     if (ref === 'easter-event') {
-        const { test_day, tk } = req.body;
-        const { EASTER_EVENT_CONFIG } = require('../src/data/easter_event/config');
-        const originalOverride = EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE;
-        if (test_day !== undefined && tk === 'eggstra26') {
-            EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE = parseInt(test_day);
-        }
-        try {
-            switch (action) {
+        switch (action) {
                 case 'collect':
                     return res.json({ body: await EasterEventService.collectEgg(user_id, answer || '') });
 
@@ -76,9 +69,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 default:
                     return res.status(400).json({ ok: false, message: `Unknown action: ${action}` });
             }
-        } finally {
-            EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE = originalOverride;
-        }
     }
 
     // Dino Egg Hunt

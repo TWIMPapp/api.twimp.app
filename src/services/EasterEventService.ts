@@ -324,10 +324,7 @@ export class EasterEventService {
 
         // Fix bonus flag if stale
         if (session.currentEgg) {
-            const collected = this.getEggsCollectedToday(session);
-            const limit = this.getDailyEggLimit(session);
-            const shouldBeBonus = collected >= limit;
-            console.log(`[AWTY-bonus-check] collected=${collected} limit=${limit} shouldBeBonus=${shouldBeBonus} currentFlag=${session.currentEgg.isBonusEgg}`);
+            const shouldBeBonus = !this.canCollectMoreEggsToday(session);
             if (session.currentEgg.isBonusEgg !== shouldBeBonus) {
                 session.currentEgg.isBonusEgg = shouldBeBonus;
             }
@@ -647,31 +644,8 @@ export class EasterEventService {
 
     // ===== Puzzle Management =====
 
-    // Returns the simulated "now" timestamp that respects TEST_DAY_OVERRIDE
-    // Uses real time of day but on the simulated day
     private static getSimulatedNow(): number {
-        if (EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE === null) {
-            return Date.now();
-        }
-
-        // Get the real time of day (hours, minutes, seconds, ms)
-        const realNow = new Date();
-        const hoursIntoDay = realNow.getHours();
-        const minutesIntoHour = realNow.getMinutes();
-        const secondsIntoMinute = realNow.getSeconds();
-        const msIntoSecond = realNow.getMilliseconds();
-
-        // Calculate ms into the day
-        const msIntoDay = (hoursIntoDay * 60 * 60 * 1000) +
-            (minutesIntoHour * 60 * 1000) +
-            (secondsIntoMinute * 1000) +
-            msIntoSecond;
-
-        // Return event start + simulated days + real time of day
-        const eventStart = new Date(EASTER_EVENT_CONFIG.EVENT_START_DATE + 'T00:00:00');
-        return eventStart.getTime() +
-            (EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE * 24 * 60 * 60 * 1000) +
-            msIntoDay;
+        return Date.now();
     }
 
     // Helper to calculate puzzle start time (5pm on the puzzle's start day)
@@ -1148,22 +1122,12 @@ export class EasterEventService {
     // ===== Utility Methods =====
 
     private static getDaysSinceEventStart(): number {
-        // TEST MODE: Allow day override for testing
-        if (EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE !== null) {
-            return EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE;
-        }
-
         const eventStart = new Date(EASTER_EVENT_CONFIG.EVENT_START_DATE + 'T00:00:00Z');
         const now = new Date();
         return Math.floor((now.getTime() - eventStart.getTime()) / (1000 * 60 * 60 * 24));
     }
 
     private static getHoursSinceEventStart(): number {
-        // TEST MODE: If day is overridden, return hours as if it's noon on that day
-        if (EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE !== null) {
-            return EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE * 24 + 12;
-        }
-
         const eventStart = new Date(EASTER_EVENT_CONFIG.EVENT_START_DATE + 'T00:00:00Z');
         const now = new Date();
         return Math.floor((now.getTime() - eventStart.getTime()) / (1000 * 60 * 60));

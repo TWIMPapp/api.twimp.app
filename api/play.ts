@@ -23,18 +23,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Easter Event uses dedicated service
     if (ref === 'easter-event') {
-        const { test_day, tk } = req.body;
-        const { EASTER_EVENT_CONFIG } = require('../src/data/easter_event/config');
-        const originalOverride = EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE;
-        if (test_day !== undefined && tk === 'eggstra26') {
-            EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE = parseInt(test_day);
-        }
-        try {
-            const result = await EasterEventService.startOrResumeGame(user_id, parseFloat(lat), parseFloat(lng));
-            return res.json({ body: result });
-        } finally {
-            EASTER_EVENT_CONFIG.TEST_DAY_OVERRIDE = originalOverride;
-        }
+        const result = await EasterEventService.startOrResumeGame(user_id, parseFloat(lat), parseFloat(lng));
+        return res.json({ body: result });
     }
 
     // Dino Egg Hunt

@@ -34,10 +34,6 @@ export const EASTER_EVENT_CONFIG = {
     PUZZLE_DURATION_HOURS: 48,
     PUZZLE_START_HOUR: 16,  // 4pm - puzzles start at this hour each day
 
-    // TEST MODE: Set to 0-7 to override day, or null for real date
-    // Day 0 = event start, Day 7 = Easter Sunday
-    TEST_DAY_OVERRIDE: null as number | null,
-
     // Event dates (update each year)
     // For 2026: Easter Sunday is April 5, event starts Friday March 27 (9 days before)
     EVENT_START_DATE: "2026-03-27",
