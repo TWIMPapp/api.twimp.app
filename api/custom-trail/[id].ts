@@ -38,6 +38,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.status(404).json({ ok: false, message: 'Trail not found or has expired' });
         }
 
+        // Check for existing session if user_id provided
+        const { user_id } = req.query;
+        let existingProgress = null;
+        if (user_id) {
+            const { SessionService } = require('../../src/services/SessionService');
+            const session = await SessionService.getUniversalSession(user_id as string, `CUSTOM_TRAIL_${trailId}`);
+            if (session && session.collectedPins?.length > 0) {
+                existingProgress = {
+                    collected: session.collectedPins.length,
+                    total: trail.pins.length || trail.dynamicConfig?.count || 0,
+                    completed: session.completed || false
+                };
+            }
+        }
+
         return res.json({
             body: {
                 ok: true,
@@ -52,7 +67,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     playCount: trail.playCount,
                     createdAt: trail.createdAt,
                     expiresAt: trail.expiresAt
-                }
+                },
+                existingProgress
             }
         });
     }
