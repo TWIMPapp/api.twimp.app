@@ -14,6 +14,11 @@ export interface CustomPin {
     order: number;          // sequential position (0-indexed)
 }
 
+export interface TrailSettings {
+    competitive: boolean;       // shared pins, first-come-first-served
+    hotCold: boolean;           // hide pins, show temperature indicator
+}
+
 export interface CustomTrail {
     id: string;
     creatorId: string;
@@ -22,8 +27,7 @@ export interface CustomTrail {
     startLocation: { lat: number; lng: number } | null; // null = generate pins on first play
     pins: CustomPin[];
     mode: 'random' | 'custom';
-    competitive: boolean;           // true = shared pins, free-roam, first-come-first-served
-    hotCold: boolean;               // true = hide pins, show temperature indicator
+    settings: TrailSettings;
     globalCollectedPins: number[];  // pin indices claimed globally (competitive mode only)
     globalCollectedBy: Record<number, string>; // pinIndex -> userId who claimed it
     createdAt: number;

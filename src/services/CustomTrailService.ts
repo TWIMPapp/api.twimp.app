@@ -124,8 +124,7 @@ export class CustomTrailService {
         startLocation: { lat: number; lng: number },
         pins: CustomPin[],
         mode: 'random' | 'custom',
-        competitive: boolean = false,
-        hotCold: boolean = false
+        settings: { competitive?: boolean; hotCold?: boolean } = {}
     ): Promise<{ ok: boolean; trail?: CustomTrail; message?: string }> {
 
         // Validate pins
@@ -193,8 +192,10 @@ export class CustomTrailService {
             startLocation,
             pins: sanitisedPins,
             mode,
-            competitive,
-            hotCold,
+            settings: {
+                competitive: settings.competitive || false,
+                hotCold: settings.hotCold || false
+            },
             globalCollectedPins: [],
             globalCollectedBy: {},
             createdAt: now,
@@ -494,7 +495,7 @@ export class CustomTrailService {
             const session = existing as any as CustomTrailPlaySession;
             if (!session.completed) {
                 // In competitive + random, check if all pins are now globally collected
-                const isCompetitiveRandom = trail.competitive && trail.mode === 'random';
+                const isCompetitiveRandom = trail.settings.competitive && trail.mode === 'random';
                 const effectiveCompleted = isCompetitiveRandom
                     ? trail.globalCollectedPins.length >= trail.pins.length
                     : session.completed;
@@ -502,7 +503,7 @@ export class CustomTrailService {
                 return {
                     ok: true,
                     resumed: true,
-                    competitive: trail.competitive,
+                    competitive: trail.settings.competitive,
                     trail: this.getTrailForPlayer(trail, session),
                     session: {
                         currentPinIndex: session.currentPinIndex,
@@ -542,14 +543,14 @@ export class CustomTrailService {
 
         return {
             ok: true,
-            competitive: trail.competitive,
+            competitive: trail.settings.competitive,
             trail: this.getTrailForPlayer(trail, session),
             session: {
                 currentPinIndex: 0,
                 collectedPins: [],
                 completed: false,
                 totalPins: trail.pins.length,
-                ...(trail.competitive && trail.mode === 'random' && {
+                ...(trail.settings.competitive && trail.mode === 'random' && {
                     globalCollectedPins: trail.globalCollectedPins,
                     globalCollectedBy: trail.globalCollectedBy,
                     remainingPins: trail.pins.length - trail.globalCollectedPins.length
@@ -580,10 +581,10 @@ export class CustomTrailService {
         // Update position
         session.lastPosition = { lat, lng };
 
-        console.log(`[AWTY] trail=${trailId} mode=${trail.mode} competitive=${trail.competitive} pins=${trail.pins.length} user=${userId}`);
+        console.log(`[AWTY] trail=${trailId} mode=${trail.mode} competitive=${trail.settings.competitive} pins=${trail.pins.length} user=${userId}`);
 
         // ===== Competitive + Random: shared pins, first-come-first-served =====
-        if (trail.competitive && trail.mode === 'random') {
+        if (trail.settings.competitive && trail.mode === 'random') {
             // Check if all pins globally collected
             if (trail.globalCollectedPins.length >= trail.pins.length) {
                 session.completed = true;
@@ -639,7 +640,7 @@ export class CustomTrailService {
         }
 
         // ===== Non-competitive Random: personal collection, any order =====
-        if (trail.mode === 'random' && !trail.competitive) {
+        if (trail.mode === 'random' && !trail.settings.competitive) {
             // Check if user has collected all pins
             if (session.collectedPins.length >= trail.pins.length) {
                 session.completed = true;
@@ -784,7 +785,7 @@ export class CustomTrailService {
         const session = existing as any as CustomTrailPlaySession;
 
         // ===== Competitive + Random: shared pins, first-come-first-served =====
-        if (trail.competitive && trail.mode === 'random') {
+        if (trail.settings.competitive && trail.mode === 'random') {
             const pinIdx = targetPinIndex ?? session.currentPinIndex;
             const pin = trail.pins[pinIdx];
             if (!pin) {
@@ -837,7 +838,7 @@ export class CustomTrailService {
         }
 
         // ===== Non-competitive Random: personal collection =====
-        if (trail.mode === 'random' && !trail.competitive) {
+        if (trail.mode === 'random' && !trail.settings.competitive) {
             const pinIdx = targetPinIndex ?? 0;
             const pin = trail.pins[pinIdx];
             if (!pin) {
@@ -947,7 +948,7 @@ export class CustomTrailService {
      * Competitive: shows all pins with global collected status.
      */
     private static getTrailForPlayer(trail: CustomTrail, session: CustomTrailPlaySession): any {
-        if (trail.competitive) {
+        if (trail.settings.competitive) {
             // Competitive + Random: all pins visible, race to collect
             // Competitive + Custom: only pins marked visible by creator are shown
             const pins = trail.pins
@@ -1039,7 +1040,7 @@ export class CustomTrailService {
         if (session.collectedPins.includes(pinIndex)) {
             return { ok: false, message: 'Pin already collected.' };
         }
-        if (trail.competitive && trail.globalCollectedPins.includes(pinIndex)) {
+        if (trail.settings.competitive && trail.globalCollectedPins.includes(pinIndex)) {
             return { ok: false, message: 'Pin already collected.' };
         }
 
@@ -1078,7 +1079,7 @@ export class CustomTrailService {
                 collectedPins: session.collectedPins,
                 totalPins: trail.pins.length,
                 completed: session.completed,
-                ...(trail.competitive && {
+                ...(trail.settings.competitive && {
                     globalCollectedPins: trail.globalCollectedPins,
                     globalCollectedBy: trail.globalCollectedBy,
                     remainingPins: trail.pins.length - trail.globalCollectedPins.length,
@@ -1131,7 +1132,7 @@ export class CustomTrailService {
                     collectedBy: trail.globalCollectedBy[idx] || null
                 })),
                 mode: trail.mode,
-                competitive: trail.competitive,
+                competitive: trail.settings.competitive,
                 playCount: trail.playCount,
                 createdAt: trail.createdAt,
                 expiresAt: trail.expiresAt,
@@ -1225,7 +1226,10 @@ export class CustomTrailService {
             startLocation: data.start_location,
             pins: data.pins,
             mode: data.mode,
-            competitive: data.competitive || false,
+            settings: {
+                competitive: data.settings?.competitive ?? data.competitive ?? false,
+                hotCold: data.settings?.hotCold ?? data.hot_cold ?? false,
+            },
             globalCollectedPins: data.global_collected_pins || [],
             globalCollectedBy: data.global_collected_by || {},
             createdAt: data.created_at,
@@ -1245,7 +1249,7 @@ export class CustomTrailService {
             start_location: trail.startLocation,
             pins: trail.pins,
             mode: trail.mode,
-            competitive: trail.competitive,
+            settings: trail.settings,
             global_collected_pins: trail.globalCollectedPins,
             global_collected_by: trail.globalCollectedBy,
             created_at: trail.createdAt,

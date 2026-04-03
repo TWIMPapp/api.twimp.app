@@ -48,8 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     startLocation: trail.startLocation,
                     pinCount: trail.pins.length || trail.dynamicConfig?.count || 0,
                     mode: trail.mode,
-                    competitive: trail.competitive,
-                    hotCold: trail.hotCold || false,
+                    settings: trail.settings,
                     playCount: trail.playCount,
                     createdAt: trail.createdAt,
                     expiresAt: trail.expiresAt
