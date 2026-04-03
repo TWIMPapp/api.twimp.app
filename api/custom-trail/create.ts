@@ -10,7 +10,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(405).json({ ok: false, message: 'Method not allowed' });
     }
 
-    const { creator_id: body_creator_id, theme, name, start_location, pins, mode, competitive, count, has_questions, spawn_radius } = req.body;
+    const { creator_id: body_creator_id, theme, name, start_location, pins, mode, competitive, hot_cold, count, has_questions, spawn_radius } = req.body;
 
     // Resolve creator_id: API key takes priority, then body
     const authResult = await resolveCreatorFromApiKey(req);
@@ -53,7 +53,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         start_location,
         finalPins,
         mode || 'custom',
-        !!competitive
+        !!competitive,
+        !!hot_cold
     );
 
     if (!result.ok) {

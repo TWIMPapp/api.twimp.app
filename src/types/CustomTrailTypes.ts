@@ -23,6 +23,7 @@ export interface CustomTrail {
     pins: CustomPin[];
     mode: 'random' | 'custom';
     competitive: boolean;           // true = shared pins, free-roam, first-come-first-served
+    hotCold: boolean;               // true = hide pins, show temperature indicator
     globalCollectedPins: number[];  // pin indices claimed globally (competitive mode only)
     globalCollectedBy: Record<number, string>; // pinIndex -> userId who claimed it
     createdAt: number;

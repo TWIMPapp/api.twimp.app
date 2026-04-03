@@ -124,7 +124,8 @@ export class CustomTrailService {
         startLocation: { lat: number; lng: number },
         pins: CustomPin[],
         mode: 'random' | 'custom',
-        competitive: boolean = false
+        competitive: boolean = false,
+        hotCold: boolean = false
     ): Promise<{ ok: boolean; trail?: CustomTrail; message?: string }> {
 
         // Validate pins
@@ -193,6 +194,7 @@ export class CustomTrailService {
             pins: sanitisedPins,
             mode,
             competitive,
+            hotCold,
             globalCollectedPins: [],
             globalCollectedBy: {},
             createdAt: now,
