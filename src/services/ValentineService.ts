@@ -78,7 +78,8 @@ export class ValentineService {
             1, // Just 1 pin for secret valentine
             'heart_red',
             message.trim(),
-            false // Not competitive
+            false, // Not competitive
+            true   // Allow respawn (recipient may open from different location)
         );
 
         if (!result.ok || !result.trail) {

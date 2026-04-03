@@ -58,7 +58,8 @@ export class CustomTrailService {
         count: number,
         icon?: string,
         successMessage?: string,
-        competitive: boolean = false
+        competitive: boolean = false,
+        allowRespawn: boolean = false
     ): Promise<{ ok: boolean; trail?: CustomTrail; message?: string }> {
         if (count < 1 || count > MAX_PINS) {
             return { ok: false, message: `Count must be between 1 and ${MAX_PINS}` };
@@ -95,7 +96,11 @@ export class CustomTrailService {
             startLocation: null, // Will be set on first play
             pins: [], // Will be generated on first play
             mode: 'random',
-            competitive,
+            settings: {
+                competitive,
+                hotCold: false,
+                allowRespawn
+            },
             globalCollectedPins: [],
             globalCollectedBy: {},
             createdAt: Date.now(),
@@ -194,7 +199,8 @@ export class CustomTrailService {
             mode,
             settings: {
                 competitive: settings.competitive || false,
-                hotCold: settings.hotCold || false
+                hotCold: settings.hotCold || false,
+                allowRespawn: settings.allowRespawn ?? false
             },
             globalCollectedPins: [],
             globalCollectedBy: {},
@@ -1229,6 +1235,7 @@ export class CustomTrailService {
             settings: {
                 competitive: data.settings?.competitive ?? data.competitive ?? false,
                 hotCold: data.settings?.hotCold ?? data.hot_cold ?? false,
+                allowRespawn: data.settings?.allowRespawn ?? false,
             },
             globalCollectedPins: data.global_collected_pins || [],
             globalCollectedBy: data.global_collected_by || {},

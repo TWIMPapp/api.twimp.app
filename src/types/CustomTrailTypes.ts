@@ -17,6 +17,7 @@ export interface CustomPin {
 export interface TrailSettings {
     competitive: boolean;       // shared pins, first-come-first-served
     hotCold: boolean;           // hide pins, show temperature indicator
+    allowRespawn: boolean;      // let player reset pins to current location
 }
 
 export interface CustomTrail {
