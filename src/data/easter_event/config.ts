@@ -35,9 +35,9 @@ export const EASTER_EVENT_CONFIG = {
     PUZZLE_START_HOUR: 16,  // 4pm - puzzles start at this hour each day
 
     // Event dates (update each year)
-    // For 2026: Easter Sunday is April 5, event starts Friday March 27 (9 days before)
-    EVENT_START_DATE: "2026-03-27",
-    EVENT_END_DATE: "2026-04-05",
+    // For 2026: Event starts Thu April 3 (day after Easter), ends Sun April 12
+    EVENT_START_DATE: "2026-04-03",
+    EVENT_END_DATE: "2026-04-12",
 
     // Weighted letter probabilities (0-1 scale)
     // Vowels: 0.9, Common: 0.5, Rare: 0.2, Very rare: 0.1
@@ -52,7 +52,7 @@ export const EASTER_EVENT_CONFIG = {
     // Puzzle rewards (rare letters from puzzles)
     // Daily puzzles, 1 letter each
     PUZZLE_REWARD_LETTERS: {
-        1: ['Q'],           // Puzzle 1 (Fri Mar 27)
+        1: ['Q'],           // Puzzle 1 (Thu Apr 3)
     } as Record<number, string[]>,
 
     // Clues - revealed daily, separate from puzzles
@@ -73,7 +73,7 @@ export const EASTER_EVENT_CONFIG = {
     // Golden Egg configuration
     GOLDEN_EGG: {
         message: "GERARDIA",    // False Foxglove - cliffhanger
-        dayOffset: 9            // Easter Sunday (April 5, 2026)
+        dayOffset: 9            // Final day (April 12, 2026)
     },
 
     // 26 emoji symbols for codex (same as existing game)

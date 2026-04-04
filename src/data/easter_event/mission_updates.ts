@@ -4,20 +4,20 @@ import { MissionUpdate } from '../../types/EasterEventTypes';
 // Filtered by date only (no puzzle/progress dependencies)
 // These appear in reverse chronological order (newest first)
 //
-// Timeline: Event starts March 27 (dayOffset 0), Easter Sunday = April 5 (dayOffset 9)
+// Timeline: Event starts April 3 (dayOffset 0), ends April 12 (dayOffset 9)
 // Rule: No mission update before 9am (hourOffset >= 9)
 // Rule: No update should reveal information before its corresponding chapter
 
 export const MISSION_UPDATES: MissionUpdate[] = [
-    // Day 1 — dayOffset 0 (Fri Mar 27) — Chapter 1 available at 8am
+    // Day 1 — dayOffset 0 (Thu Apr 3) — Chapter 1 available at 8am
     {
         id: "mu_001",
         type: "story",
         title: "Mission Begins!",
-        message: "Children across the nation have joined the search for the missing eggs! The Easter Bunny is counting on us!",
+        message: "Easter Sunday was ruined, but the holidays aren't over! Children across the nation have joined the search for the missing eggs!",
         iconEmoji: "🔍",
         dayOffset: 0,
-        hourOffset: 15  // 9am
+        hourOffset: 15
     },
     {
         id: "mu_002",
@@ -26,10 +26,10 @@ export const MISSION_UPDATES: MissionUpdate[] = [
         message: "Some children are reporting strange symbols on the eggs. What could they mean?",
         iconEmoji: "❓",
         dayOffset: 0,
-        hourOffset: 18  // 2pm
+        hourOffset: 18
     },
 
-    // Day 2 — dayOffset 1 (Sat Mar 28)
+    // Day 2 — dayOffset 1 (Fri Apr 4)
     {
         id: "mu_003",
         type: "community",
@@ -37,7 +37,7 @@ export const MISSION_UPDATES: MissionUpdate[] = [
         message: "Over 1,000 eggs have been collected nationwide! Keep searching!",
         iconEmoji: "📈",
         dayOffset: 1,
-        hourOffset: 9  // 9am
+        hourOffset: 9
     },
     {
         id: "mu_004",
@@ -46,10 +46,10 @@ export const MISSION_UPDATES: MissionUpdate[] = [
         message: "Some players are suggesting the symbols might be a secret alphabet...",
         iconEmoji: "💡",
         dayOffset: 1,
-        hourOffset: 16  // 4pm
+        hourOffset: 16
     },
 
-    // Day 3 — dayOffset 2 (Sun Mar 29) — Chapter 2 available at 8am
+    // Day 3 — dayOffset 2 (Sat Apr 5) — Chapter 2 available at 8am
     {
         id: "mu_005",
         type: "community",
@@ -57,10 +57,10 @@ export const MISSION_UPDATES: MissionUpdate[] = [
         message: "We've passed 5,000 eggs collected! The Easter Bunny is amazed by your help!",
         iconEmoji: "🎉",
         dayOffset: 2,
-        hourOffset: 9  // 9am
+        hourOffset: 9
     },
 
-    // Day 4 — dayOffset 3 (Mon Mar 30) — Chapter 2 already out, purple glove safe to reference
+    // Day 4 — dayOffset 3 (Sun Apr 6) — Chapter 2 already out, purple glove safe to reference
     {
         id: "mu_006",
         type: "story",
@@ -68,10 +68,10 @@ export const MISSION_UPDATES: MissionUpdate[] = [
         message: "The Easter Bunny has found a purple glove at the warehouse! A suspect emerges...",
         iconEmoji: "🧤",
         dayOffset: 3,
-        hourOffset: 9  // 9am
+        hourOffset: 9
     },
 
-    // Day 5 — dayOffset 4 (Tue Mar 31)
+    // Day 5 — dayOffset 4 (Mon Apr 7)
     {
         id: "mu_008",
         type: "community",
@@ -79,10 +79,10 @@ export const MISSION_UPDATES: MissionUpdate[] = [
         message: "Incredible! 10,000 eggs collected! You're all amazing egg hunters!",
         iconEmoji: "🏆",
         dayOffset: 4,
-        hourOffset: 9  // 9am
+        hourOffset: 9
     },
 
-    // Day 6 — dayOffset 5 (Wed Apr 1) — Chapter 3 available at 8am
+    // Day 6 — dayOffset 5 (Tue Apr 8) — Chapter 3 available at 8am
     // Codex and recipe reveals now safe (Chapter 3 already out)
     {
         id: "mu_007",
@@ -91,7 +91,7 @@ export const MISSION_UPDATES: MissionUpdate[] = [
         message: "It's confirmed - the symbols ARE letters! Build your Codex to decode the clues!",
         iconEmoji: "📜",
         dayOffset: 5,
-        hourOffset: 12  // Noon — gives morning to read Chapter 3
+        hourOffset: 12
     },
     {
         id: "mu_009",
@@ -100,10 +100,10 @@ export const MISSION_UPDATES: MissionUpdate[] = [
         message: "The decoded clues seem to be... ingredients? Is someone making something?",
         iconEmoji: "🍳",
         dayOffset: 5,
-        hourOffset: 18  // 6pm
+        hourOffset: 18
     },
 
-    // Day 7 — dayOffset 6 (Thu Apr 2) — Chapter 3 already out
+    // Day 7 — dayOffset 6 (Wed Apr 9) — Chapter 3 already out
     {
         id: "mu_010",
         type: "story",
@@ -111,10 +111,10 @@ export const MISSION_UPDATES: MissionUpdate[] = [
         message: "Why would Fergus care about ingredients? The Easter Bunny is confused...",
         iconEmoji: "🤔",
         dayOffset: 6,
-        hourOffset: 9  // 9am
+        hourOffset: 9
     },
 
-    // Day 8 — dayOffset 7 (Fri Apr 3)
+    // Day 8 — dayOffset 7 (Thu Apr 10)
     {
         id: "mu_012",
         type: "hint",
@@ -122,31 +122,31 @@ export const MISSION_UPDATES: MissionUpdate[] = [
         message: "Keep collecting eggs! The more Codex letters we unlock, the more clues we can read!",
         iconEmoji: "🔑",
         dayOffset: 7,
-        hourOffset: 9  // 9am
+        hourOffset: 9
     },
 
-    // Day 9 — dayOffset 8 (Sat Apr 4) — Easter Eve
+    // Day 9 — dayOffset 8 (Fri Apr 11)
     {
         id: "mu_011",
         type: "community",
-        title: "Easter Eve!",
-        message: "Tomorrow is Easter Sunday! Can we solve the mystery in time?",
+        title: "Last Push!",
+        message: "Tomorrow is the last day of the holidays! Can we solve the mystery in time?",
         iconEmoji: "🌙",
         dayOffset: 8,
-        hourOffset: 9  // 9am
+        hourOffset: 9
     },
 
-    // Day 10 — dayOffset 9 (Sun Apr 5) — Easter Sunday
+    // Day 10 — dayOffset 9 (Sat Apr 12) — Final day
     // Chapter 4 available at 8am, Golden Egg available
     // IMPORTANT: No update reveals "simnel cake" before 6pm
     {
         id: "mu_013",
         type: "special",
-        title: "Happy Easter!",
-        message: "It's Easter Sunday! Thanks to all the children who helped, the eggs have been collected and Easter Egg hunts can go ahead! You did it!",
+        title: "Easter Is Saved!",
+        message: "Thanks to all the children who helped, the eggs have been collected and Easter Egg hunts can go ahead before the holidays end! You did it!",
         iconEmoji: "🐰",
         dayOffset: 9,
-        hourOffset: 9  // 9am
+        hourOffset: 9
     },
     {
         id: "mu_014",
@@ -155,7 +155,7 @@ export const MISSION_UPDATES: MissionUpdate[] = [
         message: "A mysterious GOLDEN EGG has appeared! Could it hold the answer to the mystery?",
         iconEmoji: "🌟",
         dayOffset: 9,
-        hourOffset: 10  // 10am
+        hourOffset: 10
     },
     {
         id: "mu_015",
@@ -164,6 +164,6 @@ export const MISSION_UPDATES: MissionUpdate[] = [
         message: "Children who found the Golden Egg have discovered that the ingredients spell out a recipe for a Simnel Cake! But that's not all — inside the egg was a strange new clue: GERARDIA. What could it mean? The Easter Bunny says the case isn't closed yet... stay tuned for Part 2!",
         iconEmoji: "🎂",
         dayOffset: 9,
-        hourOffset: 18  // 6pm — wraps up the day for everyone
+        hourOffset: 18
     }
 ];

@@ -17,9 +17,9 @@ export const STORY_CHAPTERS: StoryChapter[] = [
                 emotion: "worried",
                 narration: `Oh goodness, thank you so much for coming!
 
-Last night, something terrible happened. Someone broke into my warehouse and took ALL of my Easter eggs! Every single one of them!
+Something terrible has happened. Someone broke into my warehouse and took ALL of my Easter eggs! Every single one of them!
 
-Easter Egg hunts are about to start all over the country and I have nothing to give the children!`
+Children all over the country are missing out on their Easter Egg hunts. But the holidays aren't over yet - we can still make this right!`
             },
             {
                 id: "ch1_s2",
@@ -50,9 +50,9 @@ I need YOUR help! Can you collect the eggs that are in safe areas near you while
                 emotion: "determined",
                 narration: `Here's the strange thing - whoever took my eggs has put questions on them! You'll need to answer a question to collect each egg.
 
-I don't know why they've done this, but we don't have time to figure it out now. Will you help me save Easter?
+I don't know why they've done this, but we don't have time to figure it out now. Will you help me save the Easter holidays?
 
-Go out with a grown-up, stay safe, and collect as many eggs as you can! I'll be in touch with updates.`
+Go out with a grown-up, stay safe, and collect as many eggs as you can! If we work together, we can still hold Easter Egg hunts before the holidays end. I'll be in touch with updates.`
             }
         ]
     },
@@ -146,7 +146,7 @@ So if he can't cook, why would he need recipe ingredients? Something doesn't add
                 emotion: "determined",
                 narration: `Keep collecting eggs and solving puzzles! The more of the Codex we unlock, the more of the clues we can read.
 
-Easter is almost here. We need to solve this mystery!`
+The holidays are running out. We need to solve this mystery!`
             }
         ]
     },
@@ -162,7 +162,7 @@ Easter is almost here. We need to solve this mystery!`
                 emotion: "happy",
                 narration: `I can't believe it... you actually did it!
 
-Children all over the country have helped collect the eggs, and Easter Egg hunts are SAVED! I could cry. Actually, I think I am crying. These are happy tears!
+Children all over the country have helped collect the eggs, and we can finally hold Easter Egg hunts before the holidays end! I could cry. Actually, I think I am crying. These are happy tears!
 
 Thank you, thank you, THANK YOU!`
             },
@@ -195,7 +195,7 @@ I don't know where it came from or who left it.`
 
 Whoever is behind all of this went to a LOT of effort. The symbols, the questions, the ingredients... there has to be a reason.
 
-If you want to go and find that Golden Egg, I think it might finally tell us what this whole thing has been about. But only if you want to - you've already saved Easter!`
+If you want to go and find that Golden Egg, I think it might finally tell us what this whole thing has been about. But only if you want to - you've already saved the Easter holidays!`
             }
         ]
     }
