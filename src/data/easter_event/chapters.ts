@@ -30,7 +30,7 @@ Children all over the country are missing out on their Easter Egg hunts. But the
 
 That means I can place them anywhere and they won't melt until the timer goes off. It's how I set up Easter Egg hunts the night before without the chocolate going bad.
 
-But now someone has stolen them all, and if I don't get them back before the timers expire, they'll turn into chocolate and I don't where!  They could end up being found by doggies and it will make them very sick!`
+But now someone has stolen them all, and if I don't get them back before the timers expire, they'll turn into chocolate and I won't know where!  They could end up being found by doggies and it will make them very sick!`
             },
             {
                 id: "ch1_s3",
