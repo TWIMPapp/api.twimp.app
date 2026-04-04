@@ -15,6 +15,7 @@ export const STORY_CHAPTERS: StoryChapter[] = [
                 character: "easter_bunny",
                 characterImage: "easterbunny.png",
                 emotion: "worried",
+                audioFile: "ch1_s1.m4a",
                 narration: `Oh goodness, thank you so much for coming!
 
 Something terrible has happened. Someone broke into my warehouse and took ALL of my Easter eggs! Every single one of them!
@@ -26,6 +27,7 @@ Children all over the country are missing out on their Easter Egg hunts. But the
                 character: "easter_bunny",
                 characterImage: "easterbunny.png",
                 emotion: "worried",
+                audioFile: "ch1_s2.m4a",
                 narration: `You probably don't know this, but my eggs are special. They're digitised!
 
 That means I can place them anywhere and they won't melt until the timer goes off. It's how I set up Easter Egg hunts the night before without the chocolate going bad.
@@ -37,6 +39,7 @@ But now someone has stolen them all, and if I don't get them back before the tim
                 character: "easter_bunny",
                 characterImage: "easterbunnydetermined.png",
                 emotion: "determined",
+                audioFile: "ch1_s3.m4a",
                 narration: `I've managed to track some of the eggs - they've been scattered all over the country!
 
 Some are in safe places like parks and neighbourhoods, but others are in dangerous locations where children shouldn't go.
@@ -48,6 +51,7 @@ I need YOUR help! Can you collect the eggs that are in safe areas near you while
                 character: "easter_bunny",
                 characterImage: "easterbunnydetermined.png",
                 emotion: "determined",
+                audioFile: "ch1_s4.m4a",
                 narration: `Here's the strange thing - whoever took my eggs has put questions on them! You'll need to answer a question to collect each egg.
 
 I don't know why they've done this, but we don't have time to figure it out now. Will you help me save the Easter holidays?
@@ -66,6 +70,7 @@ Go out with a grown-up, stay safe, and collect as many eggs as you can! If we wo
                 character: "easter_bunny",
                 characterImage: "easterbunny.png",
                 emotion: "default",
+                audioFile: "ch2_s1.m4a",
                 narration: `I've made a discovery! I went back to the warehouse to look for clues, and guess what I found?
 
 Right next to where I stored my eggs, there was a footprint... well, a paw print actually. It's unmistakably from a fox. I'm a bunny, I know these things!`
@@ -75,6 +80,7 @@ Right next to where I stored my eggs, there was a footprint... well, a paw print
                 character: "easter_bunny",
                 characterImage: "easterbunny.png",
                 emotion: "default",
+                audioFile: "ch2_s2.m4a",
                 narration: `And that's not all! I also found one muddy purple glove nearby.
 
 There's only one fox I know of that wears purple gloves like these - Detective Fergus Dunce!`
@@ -82,6 +88,7 @@ There's only one fox I know of that wears purple gloves like these - Detective F
             {
                 id: "ch2_s3",
                 character: "narrator",
+                audioFile: "ch2_s3.m4a",
                 narration: `Detective Fergus Dunce... well, he THINKS he's a detective.
 
 He once accused Farmer Brown of stealing his neighbour's prize-winning cow, Clover. But it turned out she was just taking a spa day at the local mud bath - a Moo-thers Day treat to herself!
@@ -93,6 +100,7 @@ Ever since, everyone calls him "Defective Dunce."`
                 character: "easter_bunny",
                 characterImage: "easterbunny.png",
                 emotion: "worried",
+                audioFile: "ch2_s4.m4a",
                 narration: `Children from all over the country have been reporting something strange about the eggs they're collecting.
 
 Each egg seems to have a symbol on it - like a secret code! I don't know what they mean yet, but I'm keeping track of them.
@@ -111,6 +119,7 @@ Keep collecting eggs and let's see if we can figure out what's going on!`
                 character: "easter_bunny",
                 characterImage: "easterbunnyhappy.png",
                 emotion: "happy",
+                audioFile: "ch3_s1.m4a",
                 narration: `Amazing news! Thanks to all the children helping out, we've collected thousands of eggs!
 
 And we've figured something out about those symbols - they're LETTERS! Each symbol represents a letter of the alphabet!
@@ -122,6 +131,7 @@ Check your Codex to see which letters you've unlocked.`
                 character: "easter_bunny",
                 characterImage: "easterbunny.png",
                 emotion: "default",
+                audioFile: "ch3_s2.m4a",
                 narration: `But here's where it gets really strange...
 
 The clues we've been finding seem to spell out INGREDIENTS. Like for a recipe! Flour, butter, eggs...
@@ -133,6 +143,7 @@ Someone isn't just stealing my Easter eggs - they're trying to MAKE something!`
                 character: "easter_bunny",
                 characterImage: "easterbunnydetermined.png",
                 emotion: "determined",
+                audioFile: "ch3_s3.m4a",
                 narration: `But wait... if Detective Fergus Dunce is behind this, that doesn't make sense.
 
 Anyone who's ever been invited to Fergus's house for dinner will tell you - he is a TERRIBLE cook! He once burned a salad!
@@ -144,6 +155,7 @@ So if he can't cook, why would he need recipe ingredients? Something doesn't add
                 character: "easter_bunny",
                 characterImage: "easterbunnydetermined.png",
                 emotion: "determined",
+                audioFile: "ch3_s4.m4a",
                 narration: `Keep collecting eggs and solving puzzles! The more of the Codex we unlock, the more of the clues we can read.
 
 The holidays are running out. We need to solve this mystery!`
@@ -160,6 +172,7 @@ The holidays are running out. We need to solve this mystery!`
                 character: "easter_bunny",
                 characterImage: "easterbunnyhappy.png",
                 emotion: "happy",
+                audioFile: "ch4_s1.m4a",
                 narration: `I can't believe it... you actually did it!
 
 Children all over the country have helped collect the eggs, and we can finally hold Easter Egg hunts before the holidays end! I could cry. Actually, I think I am crying. These are happy tears!
@@ -171,6 +184,7 @@ Thank you, thank you, THANK YOU!`
                 character: "easter_bunny",
                 characterImage: "easterbunnyhappy.png",
                 emotion: "happy",
+                audioFile: "ch4_s2.m4a",
                 narration: `I've been getting messages from children everywhere telling me how many eggs they've found. You've all been absolutely incredible.
 
 I honestly didn't know if we'd pull it off, but you proved that when everyone works together, anything is possible!`
@@ -180,6 +194,7 @@ I honestly didn't know if we'd pull it off, but you proved that when everyone wo
                 character: "easter_bunny",
                 characterImage: "easterbunny.png",
                 emotion: "default",
+                audioFile: "ch4_s3.m4a",
                 narration: `Now, there IS one more thing...
 
 I've been getting reports from some of you about a strange egg that's appeared. A GOLDEN one. It's not one of mine - my eggs are all accounted for now.
@@ -191,6 +206,7 @@ I don't know where it came from or who left it.`
                 character: "easter_bunny",
                 characterImage: "easterbunnydetermined.png",
                 emotion: "determined",
+                audioFile: "ch4_s4.m4a",
                 narration: `I don't need you to collect it - you've done more than enough already. But... I'd be lying if I said I wasn't curious.
 
 Whoever is behind all of this went to a LOT of effort. The symbols, the questions, the ingredients... there has to be a reason.
