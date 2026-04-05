@@ -20,7 +20,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (req.method === 'GET') {
-        const { creator_id: query_creator_id } = req.query;
+        const { creator_id: query_creator_id, players } = req.query;
+        
+        // Lightweight player position view for Wild Goose and others
+        if (players === 'true') {
+            const { SessionService } = require('../../src/services/SessionService');
+            const sessions = await SessionService.getSessionsByGameType(`CUSTOM_TRAIL_${trailId}`);
+            const playerPositions = sessions.map((s: any) => ({
+                id: s.userId,
+                lat: s.lastPosition?.lat,
+                lng: s.lastPosition?.lng
+            })).filter((p: any) => p.lat && p.lng);
+            return res.json({ body: { ok: true, players: playerPositions } });
+        }
+
         const creator_id = authResult?.creator_id || (Array.isArray(query_creator_id) ? query_creator_id[0] : query_creator_id);
 
         // Creator view — returns full trail data + all player positions

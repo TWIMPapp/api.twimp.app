@@ -41,7 +41,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Trail games
-    const trail = TrailService.getResolvedTrail(ref);
+    const trail = await TrailService.getResolvedTrailAsync(ref) || TrailService.getResolvedTrail(ref);
     if (!trail) {
         return res.status(404).json({ ok: false, message: "Game not found" });
     }

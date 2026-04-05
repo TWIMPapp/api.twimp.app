@@ -4,15 +4,63 @@ import { Trail } from '../types/index';
 import { GeoService } from './GeoService';
 import { SessionService } from './SessionService';
 import { GameConfigService } from './GameConfigService';
+import { supabase, isSupabaseConfigured } from '../config/supabase';
+
+// Cache for dynamic trails (TTL-based)
+let dynamicTrailCache: Trail[] | null = null;
+let dynamicCacheTime = 0;
+const CACHE_TTL_MS = 30_000; // 30 seconds
 
 export class TrailService {
+    // Get all trails — static files + dynamic from Supabase
     static getAllTrails(): Trail[] {
-        return getStoredTrails();
+        const staticTrails = getStoredTrails();
+        const dynamic = dynamicTrailCache || [];
+        return [...staticTrails, ...dynamic];
     }
 
+    // Get a single trail by ref — check static first, then dynamic/Supabase
     static getTrailByRef(ref: string): Trail | undefined {
-        const trails = getStoredTrails();
-        return trails.find(t => t.ref === ref);
+        const staticTrail = getStoredTrails().find(t => t.ref === ref);
+        if (staticTrail) return staticTrail;
+
+        // Check cache
+        if (dynamicTrailCache) {
+            const cached = dynamicTrailCache.find(t => t.ref === ref);
+            if (cached) return cached;
+        }
+
+        return undefined;
+    }
+
+    // Async version that checks Supabase if not found in cache
+    static async getTrailByRefAsync(ref: string): Promise<Trail | undefined> {
+        // Check static first
+        const staticTrail = getStoredTrails().find(t => t.ref === ref);
+        if (staticTrail) return staticTrail;
+
+        // Check cache
+        if (dynamicTrailCache) {
+            const cached = dynamicTrailCache.find(t => t.ref === ref);
+            if (cached) return cached;
+        }
+
+        // Fetch from Supabase
+        if (!isSupabaseConfigured()) return undefined;
+
+        try {
+            const { data, error } = await supabase!
+                .from('trails')
+                .select('trail_data')
+                .eq('ref', ref)
+                .eq('is_active', true)
+                .single();
+
+            if (error || !data) return undefined;
+            return data.trail_data as Trail;
+        } catch {
+            return undefined;
+        }
     }
 
     static getResolvedTrail(ref: string): Trail | null {
@@ -20,7 +68,68 @@ export class TrailService {
         return trail ? resolveTrail(trail) : null;
     }
 
+    // Async version for dynamic trails
+    static async getResolvedTrailAsync(ref: string): Promise<Trail | null> {
+        const trail = await this.getTrailByRefAsync(ref);
+        return trail ? resolveTrail(trail) : null;
+    }
+
+    // Save a dynamically created trail to Supabase
+    static async saveTrail(trail: Trail, creatorId?: string, source: string = 'dynamic'): Promise<{ ok: boolean; message?: string }> {
+        if (!isSupabaseConfigured()) {
+            return { ok: false, message: 'Database not configured' };
+        }
+
+        try {
+            const { error } = await supabase!
+                .from('trails')
+                .upsert({
+                    ref: trail.ref,
+                    trail_data: trail,
+                    creator_id: creatorId || null,
+                    source,
+                    is_active: true
+                }, { onConflict: 'ref' });
+
+            if (error) {
+                console.error('Failed to save trail:', error);
+                return { ok: false, message: error.message };
+            }
+
+            // Invalidate cache
+            dynamicTrailCache = null;
+
+            return { ok: true };
+        } catch (e) {
+            console.error('Failed to save trail:', e);
+            return { ok: false, message: 'Failed to save trail' };
+        }
+    }
+
+    // Refresh dynamic trail cache from Supabase
+    static async refreshDynamicTrails(): Promise<void> {
+        if (!isSupabaseConfigured()) return;
+        if (Date.now() - dynamicCacheTime < CACHE_TTL_MS && dynamicTrailCache) return;
+
+        try {
+            const { data, error } = await supabase!
+                .from('trails')
+                .select('trail_data')
+                .eq('is_active', true);
+
+            if (!error && data) {
+                dynamicTrailCache = data.map((d: any) => d.trail_data as Trail);
+                dynamicCacheTime = Date.now();
+            }
+        } catch {
+            // Keep existing cache on failure
+        }
+    }
+
     static async getTrailSummaries(lat?: number, lng?: number, userId?: string) {
+        // Refresh dynamic trails
+        await this.refreshDynamicTrails();
+
         const trails = this.getAllTrails();
         const userSessions = userId ? await SessionService.getUserSessions(userId) : [];
         const sessionTrailRefs = new Set(userSessions.map(s => s.trail));

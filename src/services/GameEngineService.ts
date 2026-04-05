@@ -6,7 +6,7 @@ import { GameSession } from './SessionService';
 export class GameEngineService {
     static async handleAWTY(userId: string, trailRef: string, lat: number, lng: number, accuracy: number = 10, currentTaskId?: number) {
         const session = await SessionService.getSession(userId, trailRef);
-        const trail = TrailService.getResolvedTrail(trailRef);
+        const trail = await TrailService.getResolvedTrailAsync(trailRef) || TrailService.getResolvedTrail(trailRef);
 
         if (!trail) {
             return { ok: false, reason: "Trail not found" };
@@ -43,7 +43,9 @@ export class GameEngineService {
                 trackingEnabled: step.trackingEnabled !== false
             };
 
-            const allowed = results.notBeenHereBefore && !results.isCurrentStep;
+            // A step with a state requirement is only allowed if the session state matches
+            const stateRequired = step.state ? session.state === step.state : true;
+            const allowed = results.notBeenHereBefore && !results.isCurrentStep && stateRequired;
 
             return { ...step, ...results, allowed };
         }).sort((a: any, b: any) => a.distanceInMetres - b.distanceInMetres);
@@ -93,7 +95,7 @@ export class GameEngineService {
 
     static async handleNext(userId: string, trailRef: string, answer?: string) {
         const session = await SessionService.getSession(userId, trailRef);
-        const trail = TrailService.getResolvedTrail(trailRef);
+        const trail = await TrailService.getResolvedTrailAsync(trailRef) || TrailService.getResolvedTrail(trailRef);
 
         if (!trail) return { ok: false, message: "Trail not found" };
 
