@@ -13,8 +13,12 @@ const MIN_SPACING_METERS = 50;
 const MAX_PINS = 50;
 const MAX_TEXT_LENGTH = 200;
 const COLLECTION_RADIUS_METERS = 30;
-const RANDOM_SPAWN_RADIUS_METERS = 500;
-const MAX_TRAILS_PER_CREATOR = 5;
+const RANDOM_SPAWN_RADIUS_METERS = 500;       // default spawn radius
+const MAX_RANDOM_SPAWN_RADIUS_METERS = 1500;  // hard cap on caller-supplied spawn_radius
+const MAX_GAMES_PER_CREATOR = 5;              // default cap, overridden by API key fields
+const DEFAULT_MAX_ACTIVE_GAMES = 1;           // default cap, overridden by API key fields
+// Respawn behaviour: how far from the player a respawning pin must land.
+const RESPAWN_MIN_DIST_FROM_PLAYER = 200;
 const ID_ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789';
 const ID_LENGTH = 4;
 
@@ -59,22 +63,33 @@ export class CustomTrailService {
         icon?: string,
         successMessage?: string,
         competitive: boolean = false,
-        allowRespawn: boolean = false
+        allowRespawn: boolean = false,
+        limits?: { maxActive?: number; maxTotal?: number }
     ): Promise<{ ok: boolean; trail?: CustomTrail; message?: string }> {
         if (count < 1 || count > MAX_PINS) {
             return { ok: false, message: `Count must be between 1 and ${MAX_PINS}` };
         }
 
-        // Check 1 active trail limit per creator
-        const existingActive = await this.getActiveTrailByCreator(creatorId);
-        if (existingActive) {
-            return { ok: false, message: 'You already have an active trail. Stop it first to create a new one.' };
+        const maxActive = limits?.maxActive ?? DEFAULT_MAX_ACTIVE_GAMES;
+        const maxTotal = limits?.maxTotal ?? MAX_GAMES_PER_CREATOR;
+
+        // Check active trail limit per creator
+        if (maxActive <= 1) {
+            const existingActive = await this.getActiveTrailByCreator(creatorId);
+            if (existingActive) {
+                return { ok: false, message: 'You already have an active trail. Stop it first to create a new one.' };
+            }
+        } else {
+            const activeTrails = await this.getActiveTrailsByCreator(creatorId);
+            if (activeTrails.length >= maxActive) {
+                return { ok: false, message: `You already have the maximum of ${maxActive} active games.` };
+            }
         }
 
         // Check total trail limit per creator
         const allTrails = await this.getTrailsByCreator(creatorId);
-        if (allTrails.length >= MAX_TRAILS_PER_CREATOR) {
-            return { ok: false, message: `You can only create up to ${MAX_TRAILS_PER_CREATOR} games.` };
+        if (allTrails.length >= maxTotal) {
+            return { ok: false, message: `You can only create up to ${maxTotal} games.` };
         }
 
         // Generate unique ID
@@ -129,7 +144,15 @@ export class CustomTrailService {
         startLocation: { lat: number; lng: number },
         pins: CustomPin[],
         mode: 'random' | 'custom',
-        settings: { competitive?: boolean; hotCold?: boolean } = {}
+        settings: {
+            competitive?: boolean;
+            hotCold?: boolean;
+            allowRespawn?: boolean;
+            respawnAfterMs?: number;
+            recenter?: boolean;
+            privatePlayerPositions?: boolean;
+        } = {},
+        limits?: { maxActive?: number; maxTotal?: number }
     ): Promise<{ ok: boolean; trail?: CustomTrail; message?: string }> {
 
         // Validate pins
@@ -152,16 +175,26 @@ export class CustomTrailService {
             }
         }
 
-        // Check 1 active trail limit per creator
-        const existingActive = await this.getActiveTrailByCreator(creatorId);
-        if (existingActive) {
-            return { ok: false, message: 'You already have an active trail. Stop it first to create a new one.' };
+        const maxActive = limits?.maxActive ?? DEFAULT_MAX_ACTIVE_GAMES;
+        const maxTotal = limits?.maxTotal ?? MAX_GAMES_PER_CREATOR;
+
+        // Check active trail limit per creator
+        if (maxActive <= 1) {
+            const existingActive = await this.getActiveTrailByCreator(creatorId);
+            if (existingActive) {
+                return { ok: false, message: 'You already have an active trail. Stop it first to create a new one.' };
+            }
+        } else {
+            const activeTrails = await this.getActiveTrailsByCreator(creatorId);
+            if (activeTrails.length >= maxActive) {
+                return { ok: false, message: `You already have the maximum of ${maxActive} active games.` };
+            }
         }
 
         // Check total trail limit per creator
         const allTrails = await this.getTrailsByCreator(creatorId);
-        if (allTrails.length >= MAX_TRAILS_PER_CREATOR) {
-            return { ok: false, message: `You can only create up to ${MAX_TRAILS_PER_CREATOR} games.` };
+        if (allTrails.length >= maxTotal) {
+            return { ok: false, message: `You can only create up to ${maxTotal} games.` };
         }
 
         // Sanitise text fields
@@ -200,7 +233,10 @@ export class CustomTrailService {
             settings: {
                 competitive: settings.competitive || false,
                 hotCold: settings.hotCold || false,
-                allowRespawn: settings.allowRespawn ?? false
+                allowRespawn: settings.allowRespawn ?? false,
+                ...(settings.respawnAfterMs !== undefined ? { respawnAfterMs: settings.respawnAfterMs } : {}),
+                ...(settings.recenter !== undefined ? { recenter: settings.recenter } : {}),
+                ...(settings.privatePlayerPositions !== undefined ? { privatePlayerPositions: settings.privatePlayerPositions } : {}),
             },
             globalCollectedPins: [],
             globalCollectedBy: {},
@@ -300,6 +336,16 @@ export class CustomTrailService {
             } catch (e) { /* skip corrupt files */ }
         }
         return null;
+    }
+
+    /**
+     * Returns all active (non-expired, isActive=true) trails for a creator.
+     * Used when an API key permits more than one concurrent active trail.
+     */
+    static async getActiveTrailsByCreator(creatorId: string): Promise<CustomTrail[]> {
+        const all = await this.getTrailsByCreator(creatorId);
+        const now = Date.now();
+        return all.filter(t => t.isActive && now <= t.expiresAt);
     }
 
     static async deleteTrail(creatorId: string, trailId: string, expire = false): Promise<{ ok: boolean; message: string }> {
@@ -565,6 +611,69 @@ export class CustomTrailService {
         };
     }
 
+    /**
+     * For trails with respawnAfterMs set, sweep pins in 'respawning' state and
+     * reseat any whose timer has elapsed. Mutates the trail in place.
+     * Returns true if any pins were mutated (caller should persist).
+     *
+     * If recenter is true, the trail's startLocation is moved to the player's
+     * current position before computing each new spawn point — this is what
+     * gives the "infinite world" effect when the player walks.
+     */
+    private static respawnPinsIfDue(trail: CustomTrail, lat: number, lng: number): boolean {
+        if (!trail.settings.respawnAfterMs) return false;
+
+        const now = Date.now();
+        const respawnDelay = trail.settings.respawnAfterMs;
+        const due = trail.pins.filter(p => p.state === 'respawning' && p.collectedAt !== undefined && (now - p.collectedAt!) >= respawnDelay);
+        if (due.length === 0) return false;
+
+        // Move the trail centre with the player if recenter is on. We do this
+        // once per sweep so all pins respawning in this tick share the new centre.
+        if (trail.settings.recenter) {
+            trail.startLocation = { lat, lng };
+        }
+
+        const center = trail.startLocation;
+        if (!center) return false;
+
+        // Spawn radius defaults to RANDOM_SPAWN_RADIUS_METERS if the trail
+        // doesn't carry a specific one. (We don't currently persist the
+        // creator-supplied spawn_radius — it's only used at create time.
+        // For respawn we use the max permitted, which gives Go Bucks the
+        // 1km world it expects.)
+        const spawnRadius = MAX_RANDOM_SPAWN_RADIUS_METERS;
+
+        let mutated = false;
+        for (const pin of due) {
+            const otherAvailable = trail.pins
+                .filter(p => p !== pin && p.state !== 'respawning')
+                .map(p => ({ lat: p.lat, lng: p.lng }));
+
+            const newLocation = HazardService.findConstrainedSpawnPoint({
+                gameCenter: center,
+                spawnRadius,
+                playerPosition: { lat, lng },
+                minDistFromPlayer: RESPAWN_MIN_DIST_FROM_PLAYER,
+                existingPoints: otherAvailable,
+                minSpacing: MIN_SPACING_METERS,
+                exclusionZones: [],
+                exclusionRadius: 0,
+            });
+
+            if (newLocation) {
+                pin.lat = newLocation.lat;
+                pin.lng = newLocation.lng;
+                pin.state = 'available';
+                pin.collectedAt = undefined;
+                mutated = true;
+            }
+            // else leave the pin in 'respawning' — next AWTY tick will retry.
+        }
+
+        return mutated;
+    }
+
     static async handleAWTY(
         userId: string,
         trailId: string,
@@ -586,6 +695,14 @@ export class CustomTrailService {
 
         // Update position
         session.lastPosition = { lat, lng };
+
+        // Lazy respawn sweep: any pins past their respawn deadline are reseated
+        // at a fresh constrained location. If recenter is on, the trail centre
+        // also moves to the player so the world follows them.
+        const respawned = this.respawnPinsIfDue(trail, lat, lng);
+        if (respawned) {
+            await this.saveTrail(trail);
+        }
 
         console.log(`[AWTY] trail=${trailId} mode=${trail.mode} competitive=${trail.settings.competitive} pins=${trail.pins.length} user=${userId}`);
 
@@ -647,21 +764,30 @@ export class CustomTrailService {
 
         // ===== Non-competitive Random: personal collection, any order =====
         if (trail.mode === 'random' && !trail.settings.competitive) {
-            // Check if user has collected all pins
-            if (session.collectedPins.length >= trail.pins.length) {
+            const respawning = !!trail.settings.respawnAfterMs;
+
+            // For respawning trails, completion is meaningless — pins keep coming back.
+            // Skip the "all collected" check so the world is endless.
+            if (!respawning && session.collectedPins.length >= trail.pins.length) {
                 session.completed = true;
                 await SessionService.saveUniversalSession(session as any);
                 return { ok: true, completed: true, message: 'You found all the eggs!' };
             }
 
-            // Find the nearest uncollected pin within range
+            // Find the nearest uncollected pin within range.
+            // For respawning trails, "uncollected" means state !== 'respawning'.
+            // For normal trails, it means not in session.collectedPins.
             let nearestPin: CustomPin | null = null;
             let nearestIdx = -1;
             let nearestDist = Infinity;
 
             for (let i = 0; i < trail.pins.length; i++) {
-                if (session.collectedPins.includes(i)) continue; // already collected by this user
                 const pin = trail.pins[i];
+                if (respawning) {
+                    if (pin.state === 'respawning') continue; // currently invisible
+                } else {
+                    if (session.collectedPins.includes(i)) continue;
+                }
                 const dist = GeoService.getDistanceFromLatLonInMeters(lat, lng, pin.lat, pin.lng);
                 if (dist < nearestDist) {
                     nearestDist = dist;
@@ -845,15 +971,22 @@ export class CustomTrailService {
 
         // ===== Non-competitive Random: personal collection =====
         if (trail.mode === 'random' && !trail.settings.competitive) {
+            const respawning = !!trail.settings.respawnAfterMs;
             const pinIdx = targetPinIndex ?? 0;
             const pin = trail.pins[pinIdx];
             if (!pin) {
                 return { ok: false, message: 'Invalid pin' };
             }
 
-            // Check if already collected by this user
-            if (session.collectedPins.includes(pinIdx)) {
-                return { ok: false, message: 'You already found this one!' };
+            // Check if already collected
+            if (respawning) {
+                if (pin.state === 'respawning') {
+                    return { ok: false, message: 'This one is regenerating, try another.' };
+                }
+            } else {
+                if (session.collectedPins.includes(pinIdx)) {
+                    return { ok: false, message: 'You already found this one!' };
+                }
             }
 
             // Validate answer if question pin
@@ -867,7 +1000,33 @@ export class CustomTrailService {
                 }
             }
 
-            // Collect for this user
+            if (respawning) {
+                // Non-destructive: pin enters respawning state and will reseat
+                // itself on a future AWTY tick once the timer elapses.
+                pin.state = 'respawning';
+                pin.collectedAt = Date.now();
+                await this.saveTrail(trail);
+
+                session.score++;
+                await SessionService.saveUniversalSession(session as any);
+
+                return {
+                    ok: true,
+                    correct: true,
+                    collected: true,
+                    successMessage: pin.successMessage || 'Found it! 🪙',
+                    completed: false,
+                    session: {
+                        collectedPins: [],
+                        totalPins: trail.pins.length,
+                        completed: false,
+                        score: session.score
+                    },
+                    trail: this.getTrailForPlayer(trail, session)
+                };
+            }
+
+            // Standard destructive collection
             session.collectedPins.push(pinIdx);
             session.score++;
 
@@ -983,6 +1142,29 @@ export class CustomTrailService {
                 pins,
                 totalPins: trail.pins.length,
                 remainingPins: trail.pins.length - trail.globalCollectedPins.length
+            };
+        }
+
+        // Respawning trails (Go Bucks et al): show every available pin, hide those mid-respawn.
+        if (trail.settings.respawnAfterMs) {
+            const visiblePins = trail.pins
+                .filter(pin => pin.state !== 'respawning')
+                .map(pin => ({
+                    lat: pin.lat,
+                    lng: pin.lng,
+                    icon: pin.icon,
+                    colour: pin.colour,
+                    order: pin.order,
+                    collected: false,
+                }));
+            return {
+                id: trail.id,
+                theme: trail.theme,
+                name: trail.name,
+                competitive: false,
+                startLocation: trail.startLocation,
+                pins: visiblePins,
+                totalPins: trail.pins.length
             };
         }
 
@@ -1134,11 +1316,14 @@ export class CustomTrailService {
                     visible: pin.visible,
                     question: pin.question,
                     successMessage: pin.successMessage,
+                    state: pin.state || 'available',
+                    collectedAt: pin.collectedAt,
                     globallyCollected: trail.globalCollectedPins.includes(idx),
                     collectedBy: trail.globalCollectedBy[idx] || null
                 })),
                 mode: trail.mode,
                 competitive: trail.settings.competitive,
+                settings: trail.settings,
                 playCount: trail.playCount,
                 createdAt: trail.createdAt,
                 expiresAt: trail.expiresAt,
@@ -1236,6 +1421,9 @@ export class CustomTrailService {
                 competitive: data.settings?.competitive ?? data.competitive ?? false,
                 hotCold: data.settings?.hotCold ?? data.hot_cold ?? false,
                 allowRespawn: data.settings?.allowRespawn ?? false,
+                ...(data.settings?.respawnAfterMs !== undefined ? { respawnAfterMs: data.settings.respawnAfterMs } : {}),
+                ...(data.settings?.recenter !== undefined ? { recenter: data.settings.recenter } : {}),
+                ...(data.settings?.privatePlayerPositions !== undefined ? { privatePlayerPositions: data.settings.privatePlayerPositions } : {}),
             },
             globalCollectedPins: data.global_collected_pins || [],
             globalCollectedBy: data.global_collected_by || {},

@@ -12,12 +12,17 @@ export interface CustomPin {
     answer?: string;        // answer to validate (max 200 chars)
     successMessage?: string; // shown on collection / clue for next pin (max 200 chars)
     order: number;          // sequential position (0-indexed)
+    state?: 'available' | 'respawning'; // missing == 'available'; used by trails with respawnAfterMs
+    collectedAt?: number;   // ms epoch, set when transitioned to 'respawning'
 }
 
 export interface TrailSettings {
     competitive: boolean;       // shared pins, first-come-first-served
     hotCold: boolean;           // hide pins, show temperature indicator
     allowRespawn: boolean;      // let player reset pins to current location
+    respawnAfterMs?: number;    // if set, collected pins respawn after this delay at a new location
+    recenter?: boolean;         // if true, trail centre follows the player on each respawn
+    privatePlayerPositions?: boolean; // if true, ?players=true returns no positions (Go Bucks etc.)
 }
 
 export interface CustomTrail {

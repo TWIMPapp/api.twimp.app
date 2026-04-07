@@ -72,7 +72,7 @@ export class HazardService {
      * - At least minSpacing from all existingPoints
      * - At least exclusionRadius from ALL exclusion zones
      */
-    private static findConstrainedSpawnPoint(params: {
+    static findConstrainedSpawnPoint(params: {
         gameCenter: { lat: number; lng: number };
         spawnRadius: number;
         playerPosition: { lat: number; lng: number };

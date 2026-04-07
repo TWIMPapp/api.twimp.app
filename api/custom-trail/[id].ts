@@ -24,6 +24,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         
         // Lightweight player position view for Wild Goose and others
         if (players === 'true') {
+            // Trails with privatePlayerPositions never expose player locations,
+            // even to authenticated callers. Used by child-safety partners (Go Bucks).
+            const trailForPrivacy = await CustomTrailService.getActiveTrail(trailId);
+            if (!trailForPrivacy) {
+                return res.status(404).json({ ok: false, message: 'Trail not found or has expired' });
+            }
+            if (trailForPrivacy.settings?.privatePlayerPositions) {
+                return res.json({ body: { ok: true, players: [] } });
+            }
+
             const { SessionService } = require('../../src/services/SessionService');
             const sessions = await SessionService.getSessionsByGameType(`CUSTOM_TRAIL_${trailId}`);
             const playerPositions = sessions.map((s: any) => ({

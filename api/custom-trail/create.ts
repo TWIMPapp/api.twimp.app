@@ -17,7 +17,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (authResult && 'error' in authResult) {
         return res.status(401).json({ ok: false, message: authResult.error });
     }
-    const creator_id = authResult?.creator_id || body_creator_id;
+    const creator_id = (authResult && 'creator_id' in authResult) ? authResult.creator_id : body_creator_id;
 
     if (!creator_id) {
         return res.status(400).json({ ok: false, message: 'creator_id is required' });
@@ -26,13 +26,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ ok: false, message: 'start_location with lat and lng is required' });
     }
 
+    // Per-API-key game limits (defaults applied inside the service when undefined).
+    const limits = (authResult && 'creator_id' in authResult)
+        ? { maxActive: authResult.max_active_games, maxTotal: authResult.max_total_games }
+        : undefined;
+
     let finalPins = pins;
 
     if (mode === 'random') {
         if (!count || count < 1 || count > 20) {
             return res.status(400).json({ ok: false, message: 'count must be between 1 and 20 for random mode' });
         }
-        const radius = (spawn_radius && spawn_radius >= 100 && spawn_radius <= 500)
+        const radius = (spawn_radius && spawn_radius >= 100 && spawn_radius <= 1500)
             ? spawn_radius
             : 500;
         finalPins = CustomTrailService.generateRandomPins(
@@ -53,7 +58,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         start_location,
         finalPins,
         mode || 'custom',
-        bodySettings || { competitive: !!competitive, hotCold: !!hot_cold }
+        bodySettings || { competitive: !!competitive, hotCold: !!hot_cold },
+        limits
     );
 
     if (!result.ok) {
