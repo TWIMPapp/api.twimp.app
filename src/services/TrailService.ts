@@ -126,26 +126,53 @@ export class TrailService {
         }
     }
 
-    static async getTrailSummaries(lat?: number, lng?: number, userId?: string) {
-        // Refresh dynamic trails
-        await this.refreshDynamicTrails();
+    // Generic query against the trails table with optional filters.
+    // Used for any scoped listing (e.g. by creator). Bypasses the static
+    // set and the dynamic cache.
+    static async queryTrails(filters: { creatorId?: string; isActive?: boolean } = {}): Promise<Trail[]> {
+        if (!isSupabaseConfigured()) return [];
+        try {
+            let q = supabase!.from('trails').select('trail_data');
+            if (filters.creatorId !== undefined) q = q.eq('creator_id', filters.creatorId);
+            if (filters.isActive !== undefined) q = q.eq('is_active', filters.isActive);
+            const { data, error } = await q;
+            if (error || !data) return [];
+            return data.map((d: any) => d.trail_data as Trail);
+        } catch {
+            return [];
+        }
+    }
 
-        const trails = this.getAllTrails();
+    static async getTrailSummaries(lat?: number, lng?: number, userId?: string, creatorId?: string) {
         const userSessions = userId ? await SessionService.getUserSessions(userId) : [];
         const sessionTrailRefs = new Set(userSessions.map(s => s.trail));
 
-        // Get game config to filter active games
-        const gameConfig = await GameConfigService.getAll();
-        const configMap = new Map(gameConfig.map(c => [c.ref, c]));
+        // Creator-scoped path: return only that creator's dynamic trails,
+        // skipping static trails and the game_config curation filter.
+        // 'twimp' is a sentinel for the curated (default) path.
+        const isCreatorScoped = creatorId !== undefined && creatorId !== 'twimp';
 
-        // Only include trails that exist in game_config (default is inactive/hidden)
-        const activeTrails = trails.filter(t => {
-            const config = configMap.get(t.ref);
-            return config && config.status !== 'inactive';
-        });
+        let activeTrails: Trail[];
+        let configMap: Map<string, { ref: string; status: string }>;
+
+        if (isCreatorScoped) {
+            activeTrails = await this.queryTrails({ creatorId: creatorId!, isActive: true });
+            configMap = new Map(); // no curation filter for creator-scoped listings
+        } else {
+            // Refresh dynamic trails (only needed for the curated path)
+            await this.refreshDynamicTrails();
+            const trails = this.getAllTrails();
+            const gameConfig = await GameConfigService.getAll();
+            configMap = new Map(gameConfig.map(c => [c.ref, c]));
+            // Only include trails that exist in game_config (default is inactive/hidden)
+            activeTrails = trails.filter(t => {
+                const config = configMap.get(t.ref);
+                return config && config.status !== 'inactive';
+            });
+        }
 
         const summaries = activeTrails.map(t => {
-            const config = configMap.get(t.ref)!;
+            const config = configMap.get(t.ref);
             // EVENT games (content_pack) work anywhere, no location needed
             const isEvent = t.type === 'EVENT' || t.content_pack;
 
@@ -176,7 +203,7 @@ export class TrailService {
                 type: t.type,
                 gradient: t.gradient,
                 content_pack: t.content_pack,
-                status: config.status
+                status: config?.status ?? 'active'
             };
         });
 

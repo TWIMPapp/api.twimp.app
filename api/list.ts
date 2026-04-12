@@ -11,12 +11,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(405).json({ ok: false, message: 'Method not allowed' });
     }
 
-    const { lat, lng, user_id } = req.query;
+    const { lat, lng, user_id, creator_id } = req.query;
 
     const result = await TrailService.getTrailSummaries(
         lat ? parseFloat(lat as string) : undefined,
         lng ? parseFloat(lng as string) : undefined,
-        user_id as string
+        user_id as string,
+        creator_id as string | undefined
     );
 
     res.json(result);
