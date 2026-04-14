@@ -71,7 +71,8 @@ export class GameEngineService {
             return { ok: true, message, distance, direction };
         } else {
             // Step activated
-            const stepIndex = nearby[0].index;
+            const step = nearby[0];
+            const stepIndex = step.index;
             const pathArr = session.path ? session.path.split("|") : [];
             pathArr.push(stepIndex.toString());
 
@@ -79,17 +80,17 @@ export class GameEngineService {
             session.path = pathArr.join("|");
             session.task = stepIndex * 100;
 
-            const items = this.updateItems(session, nearby[0]);
+            const items = this.updateItems(session, step);
             // Also check tasks[0] of the step
-            const taskItems = this.updateItems(session, nearby[0].tasks[0]);
+            const taskItems = this.updateItems(session, step.tasks[0]);
 
-            const task = { ...nearby[0].tasks[0] };
+            const task = { ...step.tasks[0] };
 
             // Cleanup task for frontend
             this.cleanupTaskForFrontend(task);
 
             await SessionService.saveSession(session);
-            return { ok: true, task, outcome: { items: [...items, ...taskItems] } };
+            return { ok: true, step_type: step.type, task, outcome: { items: [...items, ...taskItems] } };
         }
     }
 
