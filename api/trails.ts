@@ -31,5 +31,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.json({ ok: true, ref: trail.ref });
     }
 
+    if (req.method === 'GET') {
+        const ref = req.query.ref as string | undefined;
+        if (!ref) {
+            return res.status(400).json({ ok: false, message: 'ref query param required' });
+        }
+        const trail = await TrailService.getTrailByRefAsync(ref);
+        if (!trail) {
+            return res.status(404).json({ ok: false, message: 'Trail not found' });
+        }
+        return res.json({ ok: true, trail });
+    }
+
     return res.status(405).json({ ok: false, message: 'Method not allowed' });
 }
