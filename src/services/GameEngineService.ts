@@ -31,12 +31,19 @@ export class GameEngineService {
         // Calculate proximity and allowed steps
         const steps = (trail as any).steps.map((step: any, index: number) => {
             const distanceInMetres = GeoService.getDistanceFromLatLonInMeters(lat, lng, step.location.lat, step.location.lng);
-            const proximityRadius = step.on_search?.proximity_radius || 20;
+            // Base radius: per-step override (for large objects like buildings)
+            // or 10m default (small GPS pins). Accuracy buffer expands the
+            // catchment when GPS is poor. Capped at 40m to prevent absurd radii.
+            //   accuracy  2m, no override → min(40, 10 +  3) = 13m
+            //   accuracy  2m, override 20 → min(40, 20 +  3) = 23m
+            //   accuracy 20m, override 20 → min(40, 20 + 30) = 40m (capped)
+            const baseRadius = step.on_search?.proximity_radius || 10;
+            const catchmentRadius = Math.min(40, baseRadius + (accuracy * 1.5));
 
             const results = {
                 index,
                 distanceInMetres,
-                inRange: distanceInMetres < (proximityRadius + (accuracy / 2)),
+                inRange: distanceInMetres < catchmentRadius,
                 // Port other conditions from legacy
                 notBeenHereBefore: !session.path.split("|").includes(index.toString()) || (step.on_search?.can_revisit === true),
                 isCurrentStep: index === currentStep,
