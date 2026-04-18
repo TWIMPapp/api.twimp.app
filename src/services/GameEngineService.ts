@@ -31,14 +31,19 @@ export class GameEngineService {
         // Calculate proximity and allowed steps
         const steps = (trail as any).steps.map((step: any, index: number) => {
             const distanceInMetres = GeoService.getDistanceFromLatLonInMeters(lat, lng, step.location.lat, step.location.lng);
-            // Base radius: per-step override (for large objects like buildings)
-            // or 10m default (small GPS pins). Accuracy buffer expands the
-            // catchment when GPS is poor. Capped at 40m to prevent absurd radii.
-            //   accuracy  2m, no override → min(40, 10 +  3) = 13m
-            //   accuracy  2m, override 20 → min(40, 20 +  3) = 23m
-            //   accuracy 20m, override 20 → min(40, 20 + 30) = 40m (capped)
-            const baseRadius = step.on_search?.proximity_radius || 10;
-            const catchmentRadius = Math.min(40, baseRadius + (accuracy * 1.5));
+            // Catchment = object_size + accuracy_buffer
+            //   accuracy_buffer = 1.5 * accuracy, clamped to [10, 40]
+            //   object_size     = on_search.proximity_radius ?? 1
+            //
+            // Examples:
+            //   normal pin (prox=1),   acc=1  → 1  + 10 = 11m
+            //   normal pin (prox=1),   acc=30 → 1  + 40 = 41m
+            //   building (prox=50),    acc=1  → 50 + 10 = 60m (perimeter of 50m-wide)
+            //   building (prox=50),    acc=30 → 50 + 40 = 90m
+            //   stadium (prox=200),    acc=5  → 200 + 10 = 210m
+            const proximityRadius = step.on_search?.proximity_radius ?? 1;
+            const accuracyBuffer = Math.min(40, Math.max(10, accuracy * 1.5));
+            const catchmentRadius = proximityRadius + accuracyBuffer;
 
             const results = {
                 index,
