@@ -5,7 +5,9 @@
 // registerTools() against their own server, so tool implementations are
 // defined exactly once.
 
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+// Type-only import — the runtime McpServer class is loaded dynamically in
+// api/mcp.ts because the SDK is ESM-only and this file is compiled as CJS.
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 
 import { geocode, reverseGeocode } from './geocode';
