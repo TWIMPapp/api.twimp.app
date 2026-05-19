@@ -289,20 +289,3 @@ export function gameRefFromTags(tags?: Array<{ tag: string }>): string | null {
   }
   return null;
 }
-) return null;
-  for (const t of tags) {
-    if (t.tag && t.tag.startsWith(TWIMP_TAG_PREFIX)) {
-      return t.tag.slice(TWIMP_TAG_PREFIX.length);
-    }
-  }
-  return null;
-}
-romTags(tags?: Array<{ tag: string }>): string | null {
-  if (!tags) return null;
-  for (const t of tags) {
-    if (t.tag && t.tag.startsWith(TWIMP_TAG_PREFIX)) {
-      return t.tag.slice(TWIMP_TAG_PREFIX.length);
-    }
-  }
-  return null;
-}

@@ -40,11 +40,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return unauthorized(res, 'Missing or invalid bearer token');
   }
 
-  // Dynamic-import the ESM SDK from our CJS module
-  const { McpServer } = await import('@modelcontextprotocol/sdk/server/mcp.js');
-  const { StreamableHTTPServerTransport } = await import(
+  // Dynamic-import the ESM SDK from our CJS module. Cast to `any`:
+  // Node16 module resolution otherwise gives the dynamic-import value an
+  // ESM type identity that doesn't match the CJS type tools.ts (and our
+  // locals) see — same runtime class, separate nominal types in TS.
+  // We're past type-safety territory here; just want the runtime to work.
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const { McpServer } = (await import('@modelcontextprotocol/sdk/server/mcp.js')) as any;
+  const { StreamableHTTPServerTransport } = (await import(
     '@modelcontextprotocol/sdk/server/streamableHttp.js'
-  );
+  )) as any;
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 
   const server = new McpServer({ name: 'twimp', version: '1.0.0' });
   registerTools(server);
