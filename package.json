@@ -2,6 +2,8 @@
   "name": "api-twimp-app",
   "version": "1.0.0",
   "scripts": {
+    "dev": "vercel dev --listen 3001 --yes",
+    "dev:all": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,green\" \"npm run dev\" \"npm run dev --prefix ../game.twimp.app\"",
     "build": "tsc"
   },
   "keywords": [],
@@ -10,13 +12,16 @@
   "description": "Twimp API Backend",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
+    "@modelcontextprotocol/sdk": "^1.27.1",
     "@supabase/supabase-js": "^2.91.1",
     "dotenv": "^17.2.3",
-    "resend": "^6.9.2"
+    "resend": "^6.9.2",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^25.0.6",
     "@vercel/node": "^3.0.0",
+    "concurrently": "^8.2.2",
     "typescript": "^5.9.3"
   }
 }
