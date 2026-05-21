@@ -55,8 +55,11 @@ export class GameEngineService {
                 trackingEnabled: step.trackingEnabled !== false
             };
 
-            // A step with a state requirement is only allowed if the session state matches
-            const stateRequired = step.state ? session.state === step.state : true;
+            // A step with a state requirement is only allowed if the session state matches.
+            // step.state may be a string (single gate) or an array (any-match).
+            const stateRequired = step.state
+                ? (Array.isArray(step.state) ? step.state.includes(session.state) : session.state === step.state)
+                : true;
             const allowed = results.notBeenHereBefore && !results.isCurrentStep && stateRequired;
 
             return { ...step, ...results, allowed };
@@ -92,22 +95,22 @@ export class GameEngineService {
             session.path = pathArr.join("|");
             session.task = stepIndex * 100;
 
-            // step.on_arrival has two schemas:
-            //   - object form { items_added, items_removed } → handled by updateItems
-            //   - array form ["setState -value TOM", ...] → handled by applyActions
-            // Array form is the natural fit for "walking to this location flips
-            // state" — fires immediately on activation, before the player sees the
-            // first task. The two forms are mutually exclusive per step.
+            // step.on_arrival supports three schemas:
+            //   - { items_added, items_removed }  → legacy items, handled by updateItems
+            //   - ["setState -value TOM", ...]    → unconditional actions
+            //   - { TOM: ["setState ..."], ... }  → conditional by entry state. Entry state
+            //                                       is read BEFORE any setState in the actions
+            //                                       fires (otherwise the lookup races itself).
             const items = this.updateItems(session, step);
             const taskItems = this.updateItems(session, step.tasks[0]);
-            const stepArrivalActions = Array.isArray(step.on_arrival)
-                ? this.applyActions(session, step.on_arrival, trail).items
-                : [];
+            const entryState = session.state;
+            const resolvedActions = this.resolveConditionalActions(step.on_arrival, entryState);
+            const stepArrivalItems = resolvedActions ? this.applyActions(session, resolvedActions, trail).items : [];
 
-            const task = this.cleanupTaskForFrontend(step.tasks[0]);
+            const task = this.cleanupTaskForFrontend(step.tasks[0], session.state);
 
             await SessionService.saveSession(session);
-            return { ok: true, step_type: step.type, task, outcome: { items: [...items, ...taskItems, ...stepArrivalActions] } };
+            return { ok: true, step_type: step.type, task, outcome: { items: [...items, ...taskItems, ...stepArrivalItems] } };
         }
     }
 
@@ -166,15 +169,16 @@ export class GameEngineService {
         }
 
         if (task) {
-            if (Array.isArray(task.on_arrival)) {
-                const r = this.applyActions(session, task.on_arrival, trail);
+            const taskActions = this.resolveConditionalActions(task.on_arrival, session.state);
+            if (taskActions) {
+                const r = this.applyActions(session, taskActions, trail);
                 if (r.items.length) {
                     outcome = outcome || { items: [] };
                     outcome.items = [...(outcome.items || []), ...r.items];
                 }
             }
 
-            task = this.cleanupTaskForFrontend(task);
+            task = this.cleanupTaskForFrontend(task, session.state);
             session.task = stepIndex * 100 + taskIndex;
             await SessionService.saveSession(session);
         }
@@ -259,12 +263,13 @@ export class GameEngineService {
         return outcome;
     }
 
-    // Returns a shallow clone with frontend-only fields stripped. MUST NOT mutate
-    // the input — `task` is a reference into the module-cached trail data, and
-    // mutating it permanently corrupts the trail for every subsequent request on
-    // the warm serverless instance (on_arrival/options would disappear after the
-    // first user hit that task, breaking state transitions and question answers).
-    private static cleanupTaskForFrontend(task: any) {
+    // Returns a shallow clone with frontend-only fields stripped + conditional
+    // markers resolved against session.state. MUST NOT mutate the input — `task`
+    // is a reference into the module-cached trail data, and mutating it
+    // permanently corrupts the trail for every subsequent request on the warm
+    // serverless instance (on_arrival/options would disappear after the first
+    // user hit that task, breaking state transitions and question answers).
+    private static cleanupTaskForFrontend(task: any, sessionState: string = '') {
         if (!task) return task;
         const clean = { ...task };
         delete clean.on_arrival;
@@ -273,6 +278,29 @@ export class GameEngineService {
         if (clean.type === "question_single") {
             delete clean.options;
         }
+        // Map task markers may be state-keyed: { STATE_NAME: [...locationIds] }.
+        // Resolve to a plain array of the markers visible in the current state.
+        if (clean.type === "map" && clean.markers && !Array.isArray(clean.markers) && typeof clean.markers === 'object') {
+            clean.markers = clean.markers[sessionState] || [];
+        }
         return clean;
+    }
+
+    // step.on_arrival / task.on_arrival can be:
+    //   - undefined / null                       → no actions
+    //   - { items_added, items_removed }         → legacy items form, handled by updateItems
+    //   - ["setState ...", ...]                  → unconditional action array
+    //   - { STATE_NAME: ["setState ..."], ... }  → conditional by entry state
+    // This returns the resolved action array (or null) for the given state.
+    private static resolveConditionalActions(onArrival: any, sessionState: string): string[] | null {
+        if (!onArrival) return null;
+        if (Array.isArray(onArrival)) return onArrival;
+        if (typeof onArrival === 'object') {
+            // Legacy items form has its own keys — leave it for updateItems
+            if ('items_added' in onArrival || 'items_removed' in onArrival) return null;
+            const branch = onArrival[sessionState];
+            return Array.isArray(branch) ? branch : null;
+        }
+        return null;
     }
 }

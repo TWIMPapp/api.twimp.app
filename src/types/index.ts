@@ -25,9 +25,15 @@ export interface TrailTask {
     image?: string;
     image_url?: string;
     audio_url?: string;
-    markers?: any[] | string[];
+    // Array form is unconditional ["uuid", ...]; object form is state-keyed
+    // { STATE_NAME: ["uuid", ...] } and is resolved against session.state at
+    // the moment the task is returned to the client.
+    markers?: any;
     options?: any[];
-    on_arrival?: string[];
+    // Array form is unconditional; object form is state-keyed conditional
+    // ({ STATE_NAME: ["setState -value FOO", ...] }) resolved against the
+    // session state at the moment the task is advanced to.
+    on_arrival?: any;
     on_answer?: string[];
     theme?: string;
     options_randomised?: boolean;
@@ -41,11 +47,13 @@ export interface Step {
     hidden?: boolean;
     tasks: TrailTask[];
     id?: string;
-    state?: string;
+    // Single state name gates on exact match; array gates accept any-match.
+    state?: string | string[];
     on_search?: any;
-    // Object form { items_added, items_removed } handled by updateItems on
-    // activation. Array form ["setState -value TOM", ...] handled by
-    // applyActions on activation. Forms are mutually exclusive per step.
+    // Three forms:
+    //   - { items_added, items_removed }      → legacy items, handled by updateItems
+    //   - ["setState ...", ...]               → unconditional action array
+    //   - { STATE_NAME: ["setState ..."], ... } → conditional by entry state
     on_arrival?: any;
     can_revisit?: boolean;
     trackingEnabled?: boolean;

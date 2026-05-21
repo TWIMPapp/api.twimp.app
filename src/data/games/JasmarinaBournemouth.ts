@@ -163,6 +163,7 @@ export const JasmarinaBournemouth: Trail = {
             "type": "TRAIL_NODE",
             "hidden": false,
             "state": "TOM",
+            "on_arrival": ["setState -value STASH"],
             "tasks": [
                 {
                     "id": "400",
@@ -215,11 +216,17 @@ export const JasmarinaBournemouth: Trail = {
         },
         {
             "locationId": "533994ff-48fe-4816-8a37-0b895bd5ba79",
-            "name": "Doris First",
+            "name": "Doris",
             "type": "TRAIL_NODE",
             "hidden": false,
-            "state": "UNDECIDED",
-            "on_arrival": ["setState -value DORIS"],
+            // Reachable two ways: directly from Bridge (state UNDECIDED) or as a
+            // detour after meeting Tom at the Stash (state STASH). Only the
+            // first-visit branch flips state — the STASH detour keeps STASH so
+            // Pumpkin's STASH branch fires next.
+            "state": ["UNDECIDED", "STASH"],
+            "on_arrival": {
+                "UNDECIDED": ["setState -value DORIS"]
+            },
             "tasks": [
                 {
                     "id": "500",
@@ -243,8 +250,18 @@ export const JasmarinaBournemouth: Trail = {
             "name": "Pumpkin",
             "type": "TRAIL_NODE",
             "hidden": false,
-            "state": "DORIS",
-            "on_arrival": ["setState -value TOM_WITH_MAP"],
+            // Two entries:
+            //   DORIS = first-time path (Bridge → Doris → here): player gets
+            //           the map, ends in MAP state, can either head back to
+            //           reunite with Tom or skip straight to Obscura.
+            //   STASH = already-met-Tom detour (Bridge → Old Man → Stash →
+            //           Doris → here): player gets the map, ends in TOM_MAP,
+            //           goes straight to Obscura With Map.
+            "state": ["DORIS", "STASH"],
+            "on_arrival": {
+                "DORIS": ["addItem -item map", "setState -value MAP"],
+                "STASH": ["addItem -item map", "setState -value TOM_MAP"]
+            },
             "tasks": [
                 {
                     "id": "600",
@@ -265,18 +282,26 @@ export const JasmarinaBournemouth: Trail = {
                     "type": "information",
                     "content": `\"You now have possession and knowledge in equal measure.  But remember, as long as you are prepared to turn left to right a wrong, you'll always be on the right path.\"\n\nYou: \"Thank you Pumpkin!  I'm sorry to ask as you've already helped me so much but do you know where I could find Captain Olaf?\"\n\nPumpkin whistles over to another smaller bird who comes over and tweets in his ear.  “He's just arrived at Obscura Cafe in the Square.  Good luck!”`,
                     "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/jasmarina/bournemouth/pumpkin.png",
-                    "on_arrival": [
-                        "addItem -item map"
-                    ],
                     "required": false
                 },
                 {
                     "type": "map",
                     "content": `Ready to go?`,
-                    "markers": [
-                        "e65abf88-df57-4c65-8ba4-cc7def8406fb",
-                        "3de63b11-0285-4f84-891c-0e99732fab0f"
-                    ],
+                    // Marker set depends on how the player got here. From the
+                    // first-time Doris path (state MAP after Pumpkin's DORIS
+                    // branch fired) we offer the reunite-with-Tom path AND the
+                    // skip-Tom shortcut. From the Stash-detour path (state
+                    // TOM_MAP) Tom is already at the Stash, so offering Old
+                    // Man's bench would dead-end — only Obscura is sensible.
+                    "markers": {
+                        "MAP": [
+                            "e65abf88-df57-4c65-8ba4-cc7def8406fb",
+                            "3de63b11-0285-4f84-891c-0e99732fab0f"
+                        ],
+                        "TOM_MAP": [
+                            "3de63b11-0285-4f84-891c-0e99732fab0f"
+                        ]
+                    },
                     "required": false
                 }
             ]
@@ -286,8 +311,8 @@ export const JasmarinaBournemouth: Trail = {
             "name": "Old Man With Map",
             "type": "TRAIL_NODE",
             "hidden": false,
-            "state": "TOM_WITH_MAP",
-            "on_arrival": ["setState -value TOM_WITH_MAP_REUNITED"],
+            "state": "MAP",
+            "on_arrival": ["setState -value TOM_MAP"],
             "tasks": [
                 {
                     "id": "700",
@@ -311,7 +336,7 @@ export const JasmarinaBournemouth: Trail = {
             "name": "The Stash With Map",
             "type": "TRAIL_NODE",
             "hidden": false,
-            "state": "TOM_WITH_MAP_REUNITED",
+            "state": "TOM_MAP",
             "tasks": [
                 {
                     "id": "800",
@@ -359,7 +384,7 @@ export const JasmarinaBournemouth: Trail = {
             "name": "Obscura Cafe No Map",
             "type": "TRAIL_NODE",
             "hidden": false,
-            "state": "TOM",
+            "state": "STASH",
             "tasks": [
                 {
                     "id": "900",
@@ -382,7 +407,7 @@ export const JasmarinaBournemouth: Trail = {
             "name": "Obscura Cafe With Map",
             "type": "TRAIL_NODE",
             "hidden": false,
-            "state": "TOM_WITH_MAP_REUNITED",
+            "state": "TOM_MAP",
             "tasks": [
                 {
                     "id": "1000",
@@ -405,7 +430,7 @@ export const JasmarinaBournemouth: Trail = {
             "name": "Obscura Cafe Without Tom",
             "type": "TRAIL_NODE",
             "hidden": false,
-            "state": "TOM_WITH_MAP",
+            "state": "MAP",
             "tasks": [
                 {
                     "id": "1100",
