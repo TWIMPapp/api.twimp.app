@@ -98,6 +98,7 @@ export const JasmarinaBournemouth: Trail = {
             "name": "The Bridge",
             "type": "TRAIL_NODE",
             "hidden": false,
+            "on_arrival": ["setState -value UNDECIDED"],
             "tasks": [
                 {
                     "id": "200",
@@ -118,7 +119,6 @@ export const JasmarinaBournemouth: Trail = {
                     "type": "information",
                     "content": `What will you do now?\n\n1) Follow the old man (path to the left)\n2) Go find Doris (path to the right)`,
                     "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/jasmarina/bournemouth/path_choice.png",
-                    "on_arrival": ["setState -value UNDECIDED"],
                     "required": false
                 },
                 {
@@ -138,6 +138,7 @@ export const JasmarinaBournemouth: Trail = {
             "type": "TRAIL_NODE",
             "hidden": false,
             "state": "UNDECIDED",
+            "on_arrival": ["setState -value TOM"],
             "tasks": [
                 {
                     "id": "300",
@@ -152,7 +153,6 @@ export const JasmarinaBournemouth: Trail = {
                     "markers": [
                         "25359375-75fe-48de-991d-7477acdf9702"
                     ],
-                    "on_arrival": ["setState -value TOM"],
                     "required": false
                 }
             ]
@@ -219,6 +219,7 @@ export const JasmarinaBournemouth: Trail = {
             "type": "TRAIL_NODE",
             "hidden": false,
             "state": "UNDECIDED",
+            "on_arrival": ["setState -value DORIS"],
             "tasks": [
                 {
                     "id": "500",
@@ -233,7 +234,6 @@ export const JasmarinaBournemouth: Trail = {
                     "markers": [
                         "d1329dd0-652e-469d-b877-e1e45a43fe26"
                     ],
-                    "on_arrival": ["setState -value DORIS"],
                     "required": false
                 }
             ]
@@ -244,6 +244,7 @@ export const JasmarinaBournemouth: Trail = {
             "type": "TRAIL_NODE",
             "hidden": false,
             "state": "DORIS",
+            "on_arrival": ["setState -value TOM_WITH_MAP"],
             "tasks": [
                 {
                     "id": "600",
@@ -265,8 +266,7 @@ export const JasmarinaBournemouth: Trail = {
                     "content": `\"You now have possession and knowledge in equal measure.  But remember, as long as you are prepared to turn left to right a wrong, you'll always be on the right path.\"\n\nYou: \"Thank you Pumpkin!  I'm sorry to ask as you've already helped me so much but do you know where I could find Captain Olaf?\"\n\nPumpkin whistles over to another smaller bird who comes over and tweets in his ear.  “He's just arrived at Obscura Cafe in the Square.  Good luck!”`,
                     "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/jasmarina/bournemouth/pumpkin.png",
                     "on_arrival": [
-                        "addItem -item map",
-                        "setState -value TOM_WITH_MAP"
+                        "addItem -item map"
                     ],
                     "required": false
                 },
@@ -287,6 +287,7 @@ export const JasmarinaBournemouth: Trail = {
             "type": "TRAIL_NODE",
             "hidden": false,
             "state": "TOM_WITH_MAP",
+            "on_arrival": ["setState -value TOM_WITH_MAP_REUNITED"],
             "tasks": [
                 {
                     "id": "700",
@@ -301,7 +302,6 @@ export const JasmarinaBournemouth: Trail = {
                     "markers": [
                         "25359375-75fe-48de-991d-7477acdf9702"
                     ],
-                    "on_arrival": ["setState -value TOM_WITH_MAP_REUNITED"],
                     "required": false
                 }
             ]
