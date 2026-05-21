@@ -92,17 +92,22 @@ export class GameEngineService {
             session.path = pathArr.join("|");
             session.task = stepIndex * 100;
 
+            // step.on_arrival has two schemas:
+            //   - object form { items_added, items_removed } → handled by updateItems
+            //   - array form ["setState -value TOM", ...] → handled by applyActions
+            // Array form is the natural fit for "walking to this location flips
+            // state" — fires immediately on activation, before the player sees the
+            // first task. The two forms are mutually exclusive per step.
             const items = this.updateItems(session, step);
-            // Also check tasks[0] of the step
             const taskItems = this.updateItems(session, step.tasks[0]);
+            const stepArrivalActions = Array.isArray(step.on_arrival)
+                ? this.applyActions(session, step.on_arrival, trail).items
+                : [];
 
-            const task = { ...step.tasks[0] };
-
-            // Cleanup task for frontend
-            this.cleanupTaskForFrontend(task);
+            const task = this.cleanupTaskForFrontend(step.tasks[0]);
 
             await SessionService.saveSession(session);
-            return { ok: true, step_type: step.type, task, outcome: { items: [...items, ...taskItems] } };
+            return { ok: true, step_type: step.type, task, outcome: { items: [...items, ...taskItems, ...stepArrivalActions] } };
         }
     }
 
@@ -146,7 +151,8 @@ export class GameEngineService {
                     }
                     outcome = match.response;
                     if (outcome?.action) {
-                        task = this.handleResponseActions(session, outcome.action, trail, task);
+                        const r = this.applyActions(session, outcome.action, trail);
+                        if (r.items.length) outcome.items = [...(outcome.items || []), ...r.items];
                     }
                     task = step.tasks[taskIndex];
                 } else {
@@ -160,16 +166,20 @@ export class GameEngineService {
         }
 
         if (task) {
-            if (task.on_arrival) {
-                task = this.handleResponseActions(session, task.on_arrival, trail, task);
+            if (Array.isArray(task.on_arrival)) {
+                const r = this.applyActions(session, task.on_arrival, trail);
+                if (r.items.length) {
+                    outcome = outcome || { items: [] };
+                    outcome.items = [...(outcome.items || []), ...r.items];
+                }
             }
 
-            this.cleanupTaskForFrontend(task);
+            task = this.cleanupTaskForFrontend(task);
             session.task = stepIndex * 100 + taskIndex;
             await SessionService.saveSession(session);
         }
 
-        return { ok, task, outcome: outcome || (task as any)?.outcome };
+        return { ok, task, outcome };
     }
 
     static async handleRestart(userId: string, trailRef: string) {
@@ -201,8 +211,16 @@ export class GameEngineService {
         return items;
     }
 
-    private static handleResponseActions(session: GameSession, actions: string[], trail: any, task: any) {
-        if (!actions) return task;
+    // Applies an array of action strings (e.g. "setState -value TOM",
+    // "addItem -item map", "addScore -value 5") to the session. Returns an
+    // outcome { items } suitable for merging into the response payload.
+    //
+    // MUST NOT mutate the source trail. Previously the addItem branch wrote
+    // to task.outcome on the source task, which on warm serverless instances
+    // caused outcomes to accumulate across requests.
+    private static applyActions(session: GameSession, actions: any, trail: any): { items: any[] } {
+        const outcome: { items: any[] } = { items: [] };
+        if (!Array.isArray(actions)) return outcome;
 
         for (const action of actions) {
             const [cmd, ...params] = action.split(' ');
@@ -226,8 +244,7 @@ export class GameEngineService {
                         session.items.push(pMap.item);
                         const tItem = trail.items?.find((x: any) => x.key === pMap.item);
                         if (tItem) {
-                            if (!task.outcome) task.outcome = { items: [] };
-                            task.outcome.items.push({ sentiment: "positive", title: tItem.name, ...tItem });
+                            outcome.items.push({ sentiment: "positive", title: tItem.name, ...tItem });
                         }
                     }
                     break;
@@ -239,16 +256,23 @@ export class GameEngineService {
             }
         }
 
-        return task;
+        return outcome;
     }
 
+    // Returns a shallow clone with frontend-only fields stripped. MUST NOT mutate
+    // the input — `task` is a reference into the module-cached trail data, and
+    // mutating it permanently corrupts the trail for every subsequent request on
+    // the warm serverless instance (on_arrival/options would disappear after the
+    // first user hit that task, breaking state transitions and question answers).
     private static cleanupTaskForFrontend(task: any) {
-        if (!task) return;
-        delete task.on_arrival;
-        delete task.on_search;
-        delete task.on_answer;
-        if (task.type === "question_single") {
-            delete task.options;
+        if (!task) return task;
+        const clean = { ...task };
+        delete clean.on_arrival;
+        delete clean.on_search;
+        delete clean.on_answer;
+        if (clean.type === "question_single") {
+            delete clean.options;
         }
+        return clean;
     }
 }

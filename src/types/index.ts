@@ -43,6 +43,10 @@ export interface Step {
     id?: string;
     state?: string;
     on_search?: any;
+    // Object form { items_added, items_removed } handled by updateItems on
+    // activation. Array form ["setState -value TOM", ...] handled by
+    // applyActions on activation. Forms are mutually exclusive per step.
+    on_arrival?: any;
     can_revisit?: boolean;
     trackingEnabled?: boolean;
     index?: number;
