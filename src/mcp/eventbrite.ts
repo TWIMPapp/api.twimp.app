@@ -114,7 +114,8 @@ export async function createVenue(opts: {
 
 export async function createEvent(opts: {
   name: string;
-  descriptionHtml?: string;
+  summary?: string;              // Eventbrite's short summary (shown in listings)
+  descriptionHtml?: string;      // Legacy short HTML description. Prefer setEventOverview for the body copy.
   startLocal: string; // ISO-ish "2026-05-19T10:00:00"
   endLocal: string;
   timezone?: string; // default Europe/London
@@ -122,11 +123,13 @@ export async function createEvent(opts: {
   venueId?: string;
   capacity?: number;
   tags?: string[];
+  logoId?: string;               // Eventbrite media id from uploadImageFromUrl
 }): Promise<EventbriteEvent> {
   const tz = opts.timezone || 'Europe/London';
   const body: any = {
     event: {
       name: { html: opts.name },
+      summary: opts.summary,
       description: opts.descriptionHtml ? { html: opts.descriptionHtml } : undefined,
       start: { timezone: tz, utc: toUtc(opts.startLocal, tz) },
       end: { timezone: tz, utc: toUtc(opts.endLocal, tz) },
@@ -136,6 +139,7 @@ export async function createEvent(opts: {
       capacity: opts.capacity,
       listed: true,
       shareable: true,
+      logo_id: opts.logoId,
     },
   };
   const created = await eb<EventbriteEvent>(`/organizations/${orgId()}/events/`, {
@@ -147,6 +151,60 @@ export async function createEvent(opts: {
     await setEventTags(created.id, opts.tags);
   }
   return created;
+}
+
+// Set the "About this event" body via Eventbrite's structured content API.
+// This is the long-form description shown beneath the summary. Each new event
+// starts at version 1 — subsequent revisions would increment.
+export async function setEventOverview(eventId: string, html: string): Promise<void> {
+  await eb(`/events/${eventId}/structured_content/1/`, {
+    method: 'POST',
+    body: JSON.stringify({
+      modules: [{
+        type: 'text',
+        data: { body: { type: 'html', text: html } },
+      }],
+      publish: true,
+      purpose: 'listing',
+    }),
+  });
+}
+
+// Upload an image from a URL to Eventbrite's media store and return the media
+// id. The upload is a three-step dance: request a presigned destination, POST
+// the file there (this URL is NOT eventbriteapi.com — usually S3 — so do not
+// send the bearer token), then finalise to get the persistent media id.
+export async function uploadImageFromUrl(imageUrl: string): Promise<string> {
+  const imgRes = await fetch(imageUrl);
+  if (!imgRes.ok) throw new Error(`Failed to fetch image ${imageUrl}: ${imgRes.status}`);
+  const imgBytes = Buffer.from(await imgRes.arrayBuffer());
+  const contentType = imgRes.headers.get('content-type') || 'image/png';
+  const filename = imageUrl.split('/').pop() || 'image.png';
+
+  // Step 1: ask Eventbrite where to upload
+  const init = await eb<any>('/media/upload/?type=image-event-logo');
+  const uploadUrl: string = init.upload_url;
+  const uploadToken: string = init.upload_token;
+  const uploadData: Record<string, string> = init.upload_data || {};
+  const fileField: string = init.file_parameter_name || 'file';
+
+  // Step 2: POST the file to the presigned destination
+  const form = new FormData();
+  for (const [k, v] of Object.entries(uploadData)) form.append(k, String(v));
+  form.append(fileField, new Blob([new Uint8Array(imgBytes)], { type: contentType }), filename);
+  const uploadRes = await fetch(uploadUrl, { method: 'POST', body: form });
+  if (!uploadRes.ok) {
+    const text = await uploadRes.text();
+    throw new Error(`Image upload to presigned URL failed: ${uploadRes.status} ${text.slice(0, 200)}`);
+  }
+
+  // Step 3: tell Eventbrite the upload finished, receive the media id
+  const finalized = await eb<any>('/media/upload/', {
+    method: 'POST',
+    body: JSON.stringify({ upload_token: uploadToken }),
+  });
+  if (!finalized.id) throw new Error('Finalise returned no media id');
+  return finalized.id;
 }
 
 export async function setEventTags(eventId: string, tags: string[]): Promise<void> {

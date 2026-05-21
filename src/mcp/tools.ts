@@ -21,6 +21,8 @@ import {
   deleteEvent,
   listOrgEvents,
   listEventAttendees,
+  setEventOverview,
+  uploadImageFromUrl,
   gameRefFromTags,
   TWIMP_TAG_PREFIX,
 } from './eventbrite';
@@ -31,6 +33,25 @@ const DEFAULT_END_HOUR = 22;
 const DEFAULT_CAPACITY = 20;
 const DEFAULT_PRICE_MINOR = 1000; // £10.00
 const DEFAULT_CURRENCY = 'GBP';
+
+// Same summary across every TWIMP event — it's a brand-level pitch, not a
+// per-trail one. The trail-specific copy goes into the structured-content
+// Overview (set via setEventOverview).
+const TWIMP_SUMMARY = 'TWIMP is an outdoor interactive storytelling app for all the family.';
+
+// Trail descriptions are plain text with \n\n paragraph breaks. Eventbrite's
+// structured-content text module accepts HTML, so wrap each paragraph in <p>
+// and turn single newlines into <br>. Escape any stray HTML in the source.
+function descriptionToOverviewHtml(plain: string): string {
+  const escaped = plain
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  return escaped
+    .split(/\n\n+/)
+    .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
+    .join('');
+}
 
 function ymd(date: Date): string {
   const y = date.getUTCFullYear();
@@ -302,9 +323,24 @@ Creates a venue from the game's start lat/lng (reverse-geocoded for a readable a
           venueId = venue.id;
         }
 
+        // Upload the game image once and reuse the media id across every event
+        // in the batch — Eventbrite returns a persistent id we can attach as
+        // each event's logo. Failure isn't fatal; events just won't have an
+        // image (and the report will say so).
+        let logoId: string | undefined;
+        let imageError: string | undefined;
+        if (game.image_url) {
+          try {
+            logoId = await uploadImageFromUrl(game.image_url);
+          } catch (err: any) {
+            imageError = err.message;
+          }
+        }
+
         const created: Array<{ date: string; eventId: string }> = [];
         const skipped: string[] = [];
         const failed: Array<{ date: string; error: string }> = [];
+        const overviewFailures: Array<{ date: string; error: string }> = [];
 
         for (const d of dateRange(startYmd, days)) {
           if (existingDates.has(d)) { skipped.push(d); continue; }
@@ -313,7 +349,7 @@ Creates a venue from the game's start lat/lng (reverse-geocoded for a readable a
             const endLocal = `${d}T${String(DEFAULT_END_HOUR).padStart(2, '0')}:00:00`;
             const ev = await createEvent({
               name: game.name,
-              descriptionHtml: game.description || '',
+              summary: TWIMP_SUMMARY,
               startLocal,
               endLocal,
               timezone: DEFAULT_TZ,
@@ -321,6 +357,7 @@ Creates a venue from the game's start lat/lng (reverse-geocoded for a readable a
               venueId,
               capacity,
               tags: [`${TWIMP_TAG_PREFIX}${game_ref}`],
+              logoId,
             });
             await createTicketClass(ev.id, {
               name: 'Standard',
@@ -329,6 +366,15 @@ Creates a venue from the game's start lat/lng (reverse-geocoded for a readable a
               free: !price_pennies,
               currency: DEFAULT_CURRENCY,
             });
+            // Set the trail's full description as the Overview (the "About
+            // this event" body). Soft-fail: the event is created either way.
+            if (game.description) {
+              try {
+                await setEventOverview(ev.id, descriptionToOverviewHtml(game.description));
+              } catch (err: any) {
+                overviewFailures.push({ date: d, error: err.message });
+              }
+            }
             created.push({ date: d, eventId: ev.id });
           } catch (err: any) {
             failed.push({ date: d, error: err.message });
@@ -336,13 +382,18 @@ Creates a venue from the game's start lat/lng (reverse-geocoded for a readable a
         }
 
         let text = `Eventbrite events for '${game_ref}'\n\n`;
-        text += `Venue: ${venueId}\n\n`;
+        text += `Venue: ${venueId}\n`;
+        text += `Image: ${logoId ? `uploaded (${logoId})` : imageError ? `FAILED — ${imageError}` : 'none on game'}\n\n`;
         text += `Created (draft): ${created.length}\n`;
         created.forEach(c => { text += `  - ${c.date} → ${c.eventId}\n`; });
         if (skipped.length) text += `\nSkipped (already exists): ${skipped.length}\n  ${skipped.join(', ')}\n`;
         if (failed.length) {
           text += `\nFailed: ${failed.length}\n`;
           failed.forEach(f => { text += `  - ${f.date}: ${f.error}\n`; });
+        }
+        if (overviewFailures.length) {
+          text += `\nOverview set failed for ${overviewFailures.length} event(s) (event itself still created):\n`;
+          overviewFailures.forEach(f => { text += `  - ${f.date}: ${f.error}\n`; });
         }
         if (created.length) text += `\nReview in the Eventbrite UI, then publish_eventbrite_event for each.\n`;
         return { content: [{ type: 'text', text }] };
