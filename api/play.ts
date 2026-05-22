@@ -64,12 +64,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
     }
 
-    // Default MapTask
+    // Default MapTask — shown at the very start of a session. The white card
+    // on the frontend renders `content` above the map, so keep it short or the
+    // map (and the start pin) gets pushed off-screen. Authors can override
+    // with `trail.start_node_caption`; otherwise we use a generic prompt.
     const visibleSteps = (trail as any).steps.filter((s: any) => !s.hidden && s.location && s.location.lat);
+    const firstStepName = trail.steps[0]?.name;
     const mapTask = {
         id: -1,
         type: 'map',
-        content: trail.description || (trail.steps[0]?.name + " - Go here!"),
+        content: trail.start_node_caption || (firstStepName ? `Head to ${firstStepName} to begin` : 'Tap a pin to begin'),
         required: false,
         markers: visibleSteps.map((s: any) => ({
             lat: s.location.lat,
