@@ -64,24 +64,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
     }
 
-    // Default MapTask — shown at the very start of a session. Content comes
-    // from the trail's own `start_node_caption` if the author set one; if not,
-    // the map renders without a welcome card. No engine-side fallback string:
-    // welcome copy belongs in trail data, not hardcoded here.
-    const visibleSteps = (trail as any).steps.filter((s: any) => !s.hidden && s.location && s.location.lat);
+    // Default MapTask — shown at the very start of a session. Only the first
+    // step is offered as a marker: this screen exists to tell the player
+    // where to *start*, not to advertise every location in the trail. State
+    // gates would block most of them anyway (state="" matches only ungated
+    // steps), and showing every pin upfront also leaks the route. Content
+    // comes from trail.start_node_caption (no engine-side fallback string).
+    const firstStep = (trail as any).steps?.[0];
+    const startLoc = firstStep?.location;
     const mapTask = {
         id: -1,
         type: 'map',
         content: trail.start_node_caption || '',
         required: false,
-        markers: visibleSteps.map((s: any) => ({
-            lat: s.location.lat,
-            lng: s.location.lng,
-            title: s.name,
-            subtitle: "Go here",
+        markers: startLoc ? [{
+            lat: startLoc.lat,
+            lng: startLoc.lng,
+            title: firstStep.name,
+            subtitle: 'Go here',
             colour: 'red',
-            status: 'active'
-        }))
+            status: 'active',
+        }] : [],
     };
 
     res.json({ body: { ok: true, task: mapTask } });

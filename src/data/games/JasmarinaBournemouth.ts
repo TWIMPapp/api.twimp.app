@@ -192,14 +192,14 @@ export const JasmarinaBournemouth: Trail = {
                 {
                     "id": "402",
                     "type": "information",
-                    "content": `“HAHA!!! Great job!!” Tom seems ecstatic and enthusiastically starts patting you on the back. “Ahh, I could have done with a first mate like you.”  Tom enters the number and the padlock springs open and you both peer inside.\nIt's a little treasure trove of piracy, piles of coins, small chests full of maps, charts and the occasional jewel, all manner of strange tools and ornate daggers, even a small keg of rum”\n\nTom rifles through the chests frantically “Blast, it's not here!  He must still have it on him.  Hmm… let me ponder for a moment.”  Tom wanders off towards the back wall, bends his knee so his peg leg rests against the wall and leans onto it, stroking his beard rhythmically.\n\nInitially you just watch him but after a minute goes past you think maybe he needs a little help.\n\n“All I know is that what he really wants is his map, Scamp says he lost it in the Woodland somewhere and that we should go speak to Doris?”.\n\n“You can go searching for his map if you want to but like all pirates, Olaf likes money.  So let's make him an offer he can't refuse!”.  As Tom says this he starts grabbing handfuls of coins from the open chests and dumps them into his pockets before locking the cupboard.`,
+                    "content": `“HAHA!!! Great job!!” Tom seems ecstatic and enthusiastically starts patting you on the back. “Ahh, I could have done with a first mate like you.”  Tom enters the number and the padlock springs open and you both peer inside.\nIt's a little treasure trove of piracy, piles of coins, small chests full of maps, charts and the occasional jewel, all manner of strange tools and ornate daggers, even a small keg of rum”\n\nTom rifles through the chests frantically “Blast, it's not here!  He must still have it on him.  Hmm… let me ponder for a moment.”  Tom wanders off towards the back wall, bends his knee so his peg leg rests against the wall and leans onto it, stroking his beard rhythmically.\n\nInitially you just watch him but after a minute goes past you think maybe he needs a little help.\n\n“All I know is that what he really wants is his map, Scamp says he lost it in the Woodland somewhere and that we should go speak to Doris?”.\n\n“You can go searching for his map if you want to but like all pirates, Olaf likes money.  So let's make him an offer he can't refuse!”.  As Tom says this he starts grabbing handfuls of coins from the open chests and dumps them into his pockets before locking the cupboard.\n\n“Olaf moves around a fair bit but I know one of his usual hangouts — we can try there and ask around if he's not in.”`,
                     "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/jasmarina/bournemouth/open_cabinet.png",
                     "required": false
                 },
                 {
                     "id": "403",
                     "type": "information",
-                    "content": `What would you like to do?\n\n1) Follow Tom to Obscura\n2) Tell Tom you need to find the map and go off in search for Doris`,
+                    "content": `What would you like to do?\n\n1) Follow Tom and try the hangout he knows\n2) Tell Tom you need to find the map first and go off in search of Doris`,
                     "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/jasmarina/bournemouth/path_choice.png",
                     "required": false
                 },
@@ -259,8 +259,8 @@ export const JasmarinaBournemouth: Trail = {
             //           goes straight to Obscura With Map.
             "state": ["DORIS", "STASH"],
             "on_arrival": {
-                "DORIS": ["addItem -item map", "setState -value MAP"],
-                "STASH": ["addItem -item map", "setState -value TOM_MAP"]
+                "DORIS": ["setState -value MAP"],
+                "STASH": ["setState -value TOM_MAP"]
             },
             "tasks": [
                 {
@@ -282,6 +282,7 @@ export const JasmarinaBournemouth: Trail = {
                     "type": "information",
                     "content": `\"You now have possession and knowledge in equal measure.  But remember, as long as you are prepared to turn left to right a wrong, you'll always be on the right path.\"\n\nYou: \"Thank you Pumpkin!  I'm sorry to ask as you've already helped me so much but do you know where I could find Captain Olaf?\"\n\nPumpkin whistles over to another smaller bird who comes over and tweets in his ear.  “He's just arrived at Obscura Cafe in the Square.  Good luck!”`,
                     "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/jasmarina/bournemouth/pumpkin.png",
+                    "on_arrival": ["addItem -item map"],
                     "required": false
                 },
                 {

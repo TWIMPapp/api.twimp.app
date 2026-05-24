@@ -2,8 +2,8 @@
   "name": "api-twimp-app",
   "version": "1.0.0",
   "scripts": {
-    "dev": "vercel dev --listen 3001 --yes",
-    "dev:all": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,green\" \"npm run dev\" \"npm run dev --prefix ../game.twimp.app\"",
+    "dev:server": "vercel dev --listen 3001 --yes",
+    "dev:all": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,green\" \"npm run dev:server\" \"npm run dev --prefix ../game.twimp.app\"",
     "build": "tsc"
   },
   "keywords": [],
