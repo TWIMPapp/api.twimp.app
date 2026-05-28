@@ -146,8 +146,21 @@ export class GameEngineService {
             }
 
             // Handle branching or correct answer
-            if (task.options && answer) {
-                const match = task.options.find((o: any) => o.content.toLowerCase() === answer.trim().toLowerCase());
+            const hasOptions = Array.isArray(task.options) && task.options.length > 0;
+            if (hasOptions && !answer) {
+                // A question with options requires a valid answer. Without one we
+                // must NOT advance — otherwise an answerless /next (e.g. fired by
+                // a stuck "Next" button after a back-navigation) skips the
+                // question as if it were answered correctly.
+                ok = false;
+                task = undefined;
+            } else if (hasOptions && answer) {
+                // An option's `content` may be a single accepted answer (string)
+                // or several equivalent ones (string[]), e.g. ["1956", "56"].
+                const ans = answer.trim().toLowerCase();
+                const match = task.options.find((o: any) =>
+                    (Array.isArray(o.content) ? o.content : [o.content]).some((c: any) => String(c).toLowerCase() === ans)
+                );
                 if (match) {
                     if (match.response?.sentiment === "positive") {
                         taskIndex++;
@@ -163,6 +176,7 @@ export class GameEngineService {
                     task = undefined; // Stay on same task
                 }
             } else {
+                // Free-text question (no options): store input (above) and advance.
                 taskIndex++;
                 task = step.tasks[taskIndex];
             }
