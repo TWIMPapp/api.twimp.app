@@ -136,6 +136,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Trail games use GameEngine
+    if (action === 'restart') {
+        const result = await GameEngineService.handleRestart(user_id, ref);
+        return res.json({ body: result });
+    }
     const result = await GameEngineService.handleNext(user_id, ref, answer);
     res.json({ body: result });
 }
