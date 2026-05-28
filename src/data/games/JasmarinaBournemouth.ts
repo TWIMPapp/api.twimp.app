@@ -24,6 +24,7 @@ export const JasmarinaBournemouth: Trail = {
             "name": "The Beach",
             "type": "TRAIL_NODE",
             "hidden": false, // Inferred default
+            "on_arrival": ["setState -value BEACH"],
             "tasks": [
                 {
                     "id": "0",
@@ -68,6 +69,8 @@ export const JasmarinaBournemouth: Trail = {
             "name": "The Pier",
             "type": "TRAIL_NODE",
             "hidden": false,
+            "state": "BEACH",
+            "on_arrival": ["setState -value BOOT"],
             "tasks": [
                 {
                     "id": "100",
@@ -98,6 +101,7 @@ export const JasmarinaBournemouth: Trail = {
             "name": "The Bridge",
             "type": "TRAIL_NODE",
             "hidden": false,
+            "state": "BOOT",
             "on_arrival": ["setState -value UNDECIDED"],
             "tasks": [
                 {
@@ -255,12 +259,16 @@ export const JasmarinaBournemouth: Trail = {
             //           the map, ends in MAP state, can either head back to
             //           reunite with Tom or skip straight to Obscura.
             //   STASH = already-met-Tom detour (Bridge → Old Man → Stash →
-            //           Doris → here): player gets the map, ends in TOM_MAP,
-            //           goes straight to Obscura With Map.
+            //           Doris → here): player gets the map, ends in STASH_MAP,
+            //           goes straight to Obscura With Map. STASH_MAP is kept
+            //           distinct from TOM_MAP so the co-located "Stash With Map"
+            //           step (gate TOM_MAP) — which this branch already did as
+            //           the plain "Stash" — can't re-arm if the player wanders
+            //           back past the cabinet.
             "state": ["DORIS", "STASH"],
             "on_arrival": {
                 "DORIS": ["setState -value MAP"],
-                "STASH": ["setState -value TOM_MAP"]
+                "STASH": ["setState -value STASH_MAP"]
             },
             "tasks": [
                 {
@@ -292,14 +300,14 @@ export const JasmarinaBournemouth: Trail = {
                     // first-time Doris path (state MAP after Pumpkin's DORIS
                     // branch fired) we offer the reunite-with-Tom path AND the
                     // skip-Tom shortcut. From the Stash-detour path (state
-                    // TOM_MAP) Tom is already at the Stash, so offering Old
+                    // STASH_MAP) Tom is already at the Stash, so offering Old
                     // Man's bench would dead-end — only Obscura is sensible.
                     "markers": {
                         "MAP": [
                             "e65abf88-df57-4c65-8ba4-cc7def8406fb",
                             "3de63b11-0285-4f84-891c-0e99732fab0f"
                         ],
-                        "TOM_MAP": [
+                        "STASH_MAP": [
                             "3de63b11-0285-4f84-891c-0e99732fab0f"
                         ]
                     },
@@ -408,7 +416,9 @@ export const JasmarinaBournemouth: Trail = {
             "name": "Obscura Cafe With Map",
             "type": "TRAIL_NODE",
             "hidden": false,
-            "state": "TOM_MAP",
+            // Both map-carrying branches converge here: TOM_MAP (got map then
+            // did Stash With Map) and STASH_MAP (did Stash first, then got map).
+            "state": ["TOM_MAP", "STASH_MAP"],
             "tasks": [
                 {
                     "id": "1000",
