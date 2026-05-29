@@ -78,7 +78,7 @@ export class GameEngineService {
                 distance = Math.floor(closest.distanceInMetres);
 
                 if (closest.trackingEnabled) {
-                    message = `You need to head ${direction} for ${distance} metres`;
+                    message = `Head ${direction} for ${distance} metres`;
                 }
             }
 
