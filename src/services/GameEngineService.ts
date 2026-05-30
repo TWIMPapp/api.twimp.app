@@ -28,6 +28,15 @@ export class GameEngineService {
 
         const currentStep = Math.floor(session.task / 100);
 
+        // Sets used by requiredSteps / requiredItems below — built once for the
+        // whole sweep rather than per-step.
+        const visitedSteps = new Set(
+            (session.path ? session.path.split('|') : []).filter(Boolean).map(s => parseInt(s, 10))
+        );
+        const heldItems = new Set(
+            (session.items || []).map((it: any) => typeof it === 'string' ? it : it?.key).filter(Boolean)
+        );
+
         // Calculate proximity and allowed steps
         const steps = (trail as any).steps.map((step: any, index: number) => {
             const distanceInMetres = GeoService.getDistanceFromLatLonInMeters(lat, lng, step.location.lat, step.location.lng);
@@ -60,7 +69,17 @@ export class GameEngineService {
             const stateRequired = step.state
                 ? (Array.isArray(step.state) ? step.state.includes(session.state) : session.state === step.state)
                 : true;
-            const allowed = results.notBeenHereBefore && !results.isCurrentStep && stateRequired;
+            // step.requiredSteps: every listed step index must already be in
+            // session.path. ANDed with state. Unset = no prerequisite.
+            const requiredStepsMet = Array.isArray(step.requiredSteps)
+                ? step.requiredSteps.every((i: number) => visitedSteps.has(i))
+                : true;
+            // step.requiredItems: every listed item key must be in session.items.
+            const requiredItemsMet = Array.isArray(step.requiredItems)
+                ? step.requiredItems.every((k: string) => heldItems.has(k))
+                : true;
+            const allowed = results.notBeenHereBefore && !results.isCurrentStep
+                && stateRequired && requiredStepsMet && requiredItemsMet;
 
             return { ...step, ...results, allowed };
         }).sort((a: any, b: any) => a.distanceInMetres - b.distanceInMetres);

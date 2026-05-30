@@ -1,5 +1,6 @@
 import { MeanGreenEggstravaganza } from './MeanGreenEggstravaganza';
 import { JasmarinaBournemouth } from './JasmarinaBournemouth';
+import { AnniesMurderBournemouth } from './AnniesMurderBournemouth';
 import { MatildasSpring } from './MatildasSpring';
 import { BryngarwMeadowSpring } from './BryngarwMeadowSpring';
 import { BryngarwMeadowSummer } from './BryngarwMeadowSummer';
@@ -14,6 +15,7 @@ import { EasterEvent } from './EasterEvent';
 export const Trails = [
     MeanGreenEggstravaganza,
     JasmarinaBournemouth,
+    AnniesMurderBournemouth,
     MatildasSpring,
     BryngarwMeadowSpring,
     BryngarwMeadowSummer,

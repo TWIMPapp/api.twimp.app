@@ -49,6 +49,14 @@ export interface Step {
     id?: string;
     // Single state name gates on exact match; array gates accept any-match.
     state?: string | string[];
+    // Indices of steps that must already be in session.path before this step is
+    // reachable. ANDed across the array, and ANDed with `state` if both are set.
+    // Unset = no step prerequisite.
+    requiredSteps?: number[];
+    // Item keys that must already be in session.items before this step is
+    // reachable. ANDed across the array, and ANDed with `state` / requiredSteps
+    // if also set. Unset = no item prerequisite.
+    requiredItems?: string[];
     on_search?: any;
     // Three forms:
     //   - { items_added, items_removed }      → legacy items, handled by updateItems
