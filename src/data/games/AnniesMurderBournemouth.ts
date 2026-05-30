@@ -13,7 +13,7 @@ export const AnniesMurderBournemouth: Trail = {
     "ownerId": null,
     "ageSuitability": "18+",
     "attributes": ["DOG_ACCESSIBLE", "PUSHCHAIR_ACCESSIBLE", "ALL_DAY", "PARKING_NEARBY"],
-    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/deanparkpolice.jpg",
+    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/deanparkpolice.png",
     "items": [],
     "steps": [
         {
@@ -32,6 +32,7 @@ export const AnniesMurderBournemouth: Trail = {
                     "id": "1",
                     "type": "information",
                     "content": `We also interviewed Peter's wife.  She corroborated his schedule, the dodgy plug socket and even his claim that he's a safe driver, I believe 'boring' was the term she used.  So if Peter is lying, she's backing him all the way.`,
+                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/peterwife.png",
                     "required": false
                 },
                 {
@@ -50,7 +51,7 @@ export const AnniesMurderBournemouth: Trail = {
                     "id": "4",
                     "type": "information",
                     "content": `Annie Sullivan`,
-                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/anniesullivan.jpg",
+                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/annie.png",
                     "required": false
                 },
                 {
@@ -63,7 +64,7 @@ export const AnniesMurderBournemouth: Trail = {
                     "id": "6",
                     "type": "information",
                     "content": `Peter Samson`,
-                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/petersamson.jpg",
+                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/peter.png",
                     "required": false
                 },
                 {
@@ -93,6 +94,7 @@ export const AnniesMurderBournemouth: Trail = {
                     "id": "100",
                     "type": "information",
                     "content": `Annie Sullivan's Neighbour Interview\n\n1. Please state your name for the record.\nNicky Foster\n\n2. Do you have any relationship to the deceased Annie Sullivan?\nOh my gosh!  Deceased.  Err... yeah we were friends.\n\n3. Would you say you were close?\nWouldn't say we were besties but yeah, we would hang out.  Annie isn't really one for gossip though.\n\n4. How do you know each other?\nWell we live here in the same block of flats and we both worked at the Cafe for a few months before I left.\nAnnie is a bit of a bookworm but she used to come out quite a lot for drinks, not so much recently.\n\n5. So her behaviour recently has changed?  Do you know who she's been spending her time with?\nUmm... no not really, just don't think she's been out much.  She goes to the gym most mornings and I know she's been working more recently.  A bit too much in my opinion, she seemed tired when I saw her at the weekend.\n\n6. Working at the cafe?\nWell yes, she mentioned that she really needed to build up some savings so she's taken on an extra shift on Saturday mornings.\nBut she's been working later for that family too, trouble trying to get the kids to bed, in fairness I never wanted to go to bed when I was little either.\n\n7. A witness reported seeing her with a man, do you know of any men in her life?\nHmm... no, like I said, doesn't really talk about boys much.\nOne of the regulars at the cafe asked her out months ago, she told him after that offer she was thinking of dating girls for a while!\nHahaha, oh my gosh, I still can't believe she's dead!\nI bet Nigel has been freaking out.\n\n8. Nigel?\nNigel Hampton, the owner of Meyrick Park cafe, he must be desperate for lunch staff now.\n\n9. OK, final question.  Before going to work, Annie seems to have taken a detour to buy some ginger nuts and some water.  Is that normal?\nGinger nuts!?  That is a bit odd, she's normally a bit of a health freak.  Sorry, I don't know.`,
+                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/nicky.png",
                     "required": false
                 },
                 {
@@ -105,7 +107,7 @@ export const AnniesMurderBournemouth: Trail = {
                     "id": "102",
                     "type": "information",
                     "content": `Nigel Hampton`,
-                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/nigelhampton.jpg",
+                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/nigel.png",
                     "required": false
                 },
                 {
@@ -135,6 +137,7 @@ export const AnniesMurderBournemouth: Trail = {
                     "id": "201",
                     "type": "information",
                     "content": `Maggie confirmed that she arrived somewhere between 08:55am and 09:00am.  When she arrived, she called out to Nigel and said that although she didn't see him for approximately 10 minutes, she heard him reply from the direction of the stock room.`,
+                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/maggie.png",
                     "required": false
                 },
                 {
