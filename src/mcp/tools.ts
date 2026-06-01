@@ -13,6 +13,13 @@ import { z } from 'zod';
 import { geocode, reverseGeocode } from './geocode';
 import { getAllVisibleGames, getLiveGames, getGameByRef } from './games';
 import {
+  createRandomTrail,
+  createCustomTrail,
+  getTrailDetails,
+  getMyTrails,
+  stopTrail,
+} from './trails';
+import {
   createVenue,
   createEvent,
   createTicketClass,
@@ -125,6 +132,204 @@ export function registerTools(server: McpServer): void {
         return { content: [{ type: 'text', text: `${games.length} game(s):\n\n${lines.join('\n')}` }] };
       } catch (e) {
         return { content: [{ type: 'text', text: `Error: ${e instanceof Error ? e.message : String(e)}` }], isError: true };
+      }
+    }
+  );
+
+  // ----- Trail creator -----
+  //
+  // Identify the creator from TWIMP_CREATOR_KEY (backend env). The outer MCP
+  // bearer token already authenticated the request itself — these tools just
+  // need the creator_id to pass to CustomTrailService.
+
+  server.tool(
+    'create_random_trail',
+    `Create a quick treasure hunt with randomly-placed pins around a location. Pins auto-collect when the player walks up — no questions.
+
+Use this for simple "go find them" hunts. For trails with questions, custom icons per pin, or hand-picked locations, use create_custom_trail instead.
+
+Constraints:
+- Pin count: 1-20 (recommend 5-10 for a good experience)
+- Spawn radius: 100-1500 metres (default 500m, use 200-300m for walkable pub/park hunts)
+- Pins must be at least 50m apart (enforced automatically)
+- Each creator can only have 1 active trail at a time — if creation fails for this reason,
+  use my_trails to find the active trail, then offer to stop it with stop_trail before retrying
+- Competitive mode: players race — first to reach a pin claims it exclusively
+
+Themes and their icons (pins cycle through these automatically):
+- "easter": egg_red, egg_blue, egg_green, egg_gold, egg_orange, basket, treasure_chest, question_mark
+- "valentine": heart_red, heart_pink, rose, love_letter, treasure_chest, question_mark
+- "general": pin, treasure_chest, star, question_mark, flag
+
+The trail is playable immediately at https://game.twimp.app/trail/{id}`,
+    {
+      lat: z.number().describe('Latitude of the centre point for the trail'),
+      lng: z.number().describe('Longitude of the centre point for the trail'),
+      count: z.number().min(1).max(20).describe('Number of pins to place (1-20)'),
+      theme: z.enum(['easter', 'valentine', 'general']).default('general').describe('Visual theme for the pins'),
+      name: z.string().optional().describe('Trail name (max 200 chars, shown to players)'),
+      competitive: z.boolean().default(false).describe('If true, players compete — first to reach a pin claims it'),
+      spawn_radius: z.number().min(100).max(1500).default(500).describe('Radius in metres to place pins (100-1500)'),
+    },
+    async ({ lat, lng, count, theme, name, competitive, spawn_radius }) => {
+      try {
+        const result = await createRandomTrail({
+          start_location: { lat, lng },
+          count,
+          theme,
+          name,
+          competitive,
+          spawn_radius,
+        });
+        if (!result.ok) {
+          return { content: [{ type: 'text', text: `Failed to create trail: ${result.message || 'Unknown error'}` }], isError: true };
+        }
+        const id = (result as any).trail?.id;
+        const playUrl = `https://game.twimp.app/trail/${id}`;
+        const text =
+          `Trail created.\n\n` +
+          `- ID: ${id}\n` +
+          `- Play URL: ${playUrl}\n` +
+          `- Pins: ${count}\n` +
+          `- Theme: ${theme}\n` +
+          `- Radius: ${spawn_radius}m\n` +
+          `- Competitive: ${competitive ? 'Yes' : 'No'}\n` +
+          `\nShare this link with players: ${playUrl}`;
+        return { content: [{ type: 'text', text }] };
+      } catch (e) {
+        return { content: [{ type: 'text', text: `Error creating trail: ${e instanceof Error ? e.message : String(e)}` }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
+    'create_custom_trail',
+    `Create a fully customised trail with hand-crafted pins. Each pin can have its own location, icon, question, and success message.
+
+Use this when the user wants:
+- Questions or trivia at each pin (quiz trails, educational hunts)
+- Specific pin locations (a route past landmarks, a pub crawl, a town walk)
+- Custom icons per pin to match the content or theme
+
+AGENT GUIDANCE — crafting a great trail:
+1. **Questions**: Free-text single-answer. Consider one per pin, themed around the occasion/location. Keep questions short (they display on mobile).
+
+   IMPORTANT — answer matching is EXACT (case-insensitive, trimmed). NO fuzzy matching or synonyms.
+   - Answers MUST be a single unambiguous word (e.g. "france" not "the french republic")
+   - Avoid alternative spellings (e.g. "colour" vs "color")
+   - Avoid numeric answers with format ambiguity (e.g. "3" vs "three", "co2" vs "carbon dioxide")
+   - The question should make the expected answer format obvious
+   - If in doubt, embed the choices: "Is it A) red, B) blue, or C) yellow?" → "c"
+
+2. **Icons** (match the question or pin's purpose):
+   - easter: egg_red, egg_blue, egg_green, egg_gold, egg_orange, basket, treasure_chest, question_mark
+   - valentine: heart_red, heart_pink, rose, love_letter, treasure_chest, question_mark
+   - general: pin, treasure_chest, star, question_mark, flag
+
+3. **Pin placement**: Pins must be at least 50m apart. For a walking trail, space 100-300m apart along a route. The start_location should be near the first pin.
+
+4. **Success messages**: Optional celebratory text shown when a pin is collected.
+
+5. **Preview**: Before creating, summarise the trail for the user — list each pin with location, question (if any), and icon. Let them confirm or adjust before calling this tool.
+
+Constraints:
+- Maximum 50 pins per trail
+- Each creator can only have 1 active trail at a time (use my_trails + stop_trail to clear it first)
+- Trail expires after 90 days`,
+    {
+      start_location_lat: z.number().describe('Latitude of the trail start/meeting point'),
+      start_location_lng: z.number().describe('Longitude of the trail start/meeting point'),
+      name: z.string().optional().describe('Trail name (max 200 chars)'),
+      theme: z.enum(['easter', 'valentine', 'general']).default('general').describe('Visual theme — sets default icons for pins without a specific icon'),
+      competitive: z.boolean().default(false).describe('If true, players race — first to reach a pin claims it'),
+      pins: z.string().describe('JSON array of pin objects. Each pin: { "lat": number, "lng": number, "icon"?: string, "colour"?: string, "question"?: string, "answer"?: string, "successMessage"?: string }'),
+    },
+    async ({ start_location_lat, start_location_lng, name, theme, competitive, pins: pinsJson }) => {
+      try {
+        let parsedPins: any[];
+        try {
+          parsedPins = JSON.parse(pinsJson);
+        } catch {
+          return { content: [{ type: 'text', text: 'Invalid pins JSON. Expected an array of pin objects.' }], isError: true };
+        }
+        if (!Array.isArray(parsedPins) || parsedPins.length === 0) {
+          return { content: [{ type: 'text', text: 'pins must be a non-empty array.' }], isError: true };
+        }
+
+        const result = await createCustomTrail({
+          start_location: { lat: start_location_lat, lng: start_location_lng },
+          pins: parsedPins,
+          theme,
+          name,
+          competitive,
+        });
+        if (!result.ok) {
+          return { content: [{ type: 'text', text: `Failed to create trail: ${result.message || 'Unknown error'}` }], isError: true };
+        }
+        const id = (result as any).trail?.id;
+        const playUrl = `https://game.twimp.app/trail/${id}`;
+        const hasQuestions = parsedPins.some(p => p.question && p.answer);
+        const text =
+          `Trail created.\n\n` +
+          `- ID: ${id}\n` +
+          `- Play URL: ${playUrl}\n` +
+          `- Pins: ${parsedPins.length}\n` +
+          `- Theme: ${theme}\n` +
+          `- Has questions: ${hasQuestions ? 'Yes' : 'No'}\n` +
+          `- Competitive: ${competitive ? 'Yes' : 'No'}\n` +
+          `\nShare this link with players: ${playUrl}`;
+        return { content: [{ type: 'text', text }] };
+      } catch (e) {
+        return { content: [{ type: 'text', text: `Error creating trail: ${e instanceof Error ? e.message : String(e)}` }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
+    'get_trail',
+    'Get details about an existing trail by its ID. Returns the full creator view (pins, settings, play count, current player positions).',
+    {
+      id: z.string().describe('The 4-character trail ID'),
+    },
+    async ({ id }) => {
+      try {
+        const result = await getTrailDetails(id);
+        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+      } catch (e) {
+        return { content: [{ type: 'text', text: `Error getting trail: ${e instanceof Error ? e.message : String(e)}` }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
+    'my_trails',
+    'List all trails created by you (identified via TWIMP_CREATOR_KEY). Shows active and inactive trails.',
+    {},
+    async () => {
+      try {
+        const trails = await getMyTrails();
+        if (trails.length === 0) {
+          return { content: [{ type: 'text', text: 'No trails yet.' }] };
+        }
+        return { content: [{ type: 'text', text: JSON.stringify(trails, null, 2) }] };
+      } catch (e) {
+        return { content: [{ type: 'text', text: `Error listing trails: ${e instanceof Error ? e.message : String(e)}` }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
+    'stop_trail',
+    'Deactivate an active trail. Frees the creator to make new trails. Ownership is verified server-side.',
+    {
+      id: z.string().describe('The 4-character trail ID to stop'),
+    },
+    async ({ id }) => {
+      try {
+        const result = await stopTrail(id);
+        return { content: [{ type: 'text', text: `Trail ${id} stopped.\n${JSON.stringify(result, null, 2)}` }] };
+      } catch (e) {
+        return { content: [{ type: 'text', text: `Error stopping trail: ${e instanceof Error ? e.message : String(e)}` }], isError: true };
       }
     }
   );
