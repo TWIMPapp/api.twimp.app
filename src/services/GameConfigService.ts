@@ -6,6 +6,9 @@ export interface GameConfig {
     ref: string;
     gameType: 'trail' | 'universal';
     status: GameStatus;
+    // Eventbrite event id to copy from when minting a per-date event for this
+    // game. Null if no template configured.
+    eventbriteTemplateId: string | null;
 }
 
 // In-memory cache with TTL
@@ -23,8 +26,8 @@ export class GameConfigService {
         if (!isSupabaseConfigured()) {
             // Fallback defaults when Supabase not configured
             return [
-                { ref: 'easter-event', gameType: 'universal', status: 'featured' },
-                { ref: 'the-eggstraordinary-case-of-the-missing-eggs-frome', gameType: 'trail', status: 'pending' }
+                { ref: 'easter-event', gameType: 'universal', status: 'featured', eventbriteTemplateId: null },
+                { ref: 'the-eggstraordinary-case-of-the-missing-eggs-frome', gameType: 'trail', status: 'pending', eventbriteTemplateId: null }
             ];
         }
 
@@ -41,7 +44,8 @@ export class GameConfigService {
             configCache = (data || []).map((d: any) => ({
                 ref: d.ref,
                 gameType: d.game_type,
-                status: d.status as GameStatus
+                status: d.status as GameStatus,
+                eventbriteTemplateId: d.eventbrite_template_id ?? null,
             }));
             cacheTime = Date.now();
 

@@ -298,6 +298,38 @@ export async function listEventAttendees(eventId: string): Promise<Array<{
   return attendees;
 }
 
+// ---------- Copy from template ----------
+
+// Duplicate an existing event via /events/{id}/copy/. The new event inherits
+// description, cover image, venue, ticket classes, etc. — but starts as a
+// draft on the original dates, so callers must follow up with setEventDates.
+export async function copyEvent(templateEventId: string): Promise<EventbriteEvent> {
+  return eb<EventbriteEvent>(`/events/${templateEventId}/copy/`, {
+    method: 'POST',
+    body: '{}',
+  });
+}
+
+// Update an event's start/end. Both inputs are local wall-clock ISO strings
+// (no Z, no offset) interpreted in `timezone`; we send the timezone alongside
+// the UTC conversion so Eventbrite stores both.
+export async function setEventDates(
+  eventId: string,
+  startLocal: string,
+  endLocal: string,
+  timezone = 'Europe/London',
+): Promise<void> {
+  await eb(`/events/${eventId}/`, {
+    method: 'POST',
+    body: JSON.stringify({
+      event: {
+        start: { timezone, utc: toUtc(startLocal, timezone) },
+        end:   { timezone, utc: toUtc(endLocal,   timezone) },
+      },
+    }),
+  });
+}
+
 // ---------- Helpers ----------
 
 // Convert a local ISO timestamp ("2026-05-19T10:00:00") in a given IANA

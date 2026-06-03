@@ -18,9 +18,16 @@ export interface GameSummary {
   lng: number | null;
   status: GameStatus;
   type?: string;
+  // Eventbrite template event id (from game_config.eventbrite_template_id).
+  // Null when no template is configured for this game.
+  eventbrite_template_id: string | null;
 }
 
-function summariseTrail(t: Trail, status: GameStatus): GameSummary {
+function summariseTrail(
+  t: Trail,
+  status: GameStatus,
+  eventbriteTemplateId: string | null,
+): GameSummary {
   // EVENT games (content_pack) have no physical start location
   const isEvent = t.type === 'EVENT' || !!t.content_pack;
   const firstStepLocationId = t.steps?.[0]?.locationId;
@@ -37,6 +44,7 @@ function summariseTrail(t: Trail, status: GameStatus): GameSummary {
     lng: isEvent ? null : (startLocation?.lng ?? null),
     status,
     type: t.type,
+    eventbrite_template_id: eventbriteTemplateId,
   };
 }
 
@@ -55,7 +63,7 @@ export async function getAllVisibleGames(): Promise<GameSummary[]> {
   for (const t of allTrails) {
     const cfg = configByRef.get(t.ref);
     if (!cfg || cfg.status === 'inactive') continue;
-    summaries.push(summariseTrail(t, cfg.status));
+    summaries.push(summariseTrail(t, cfg.status, cfg.eventbriteTemplateId));
   }
   return summaries;
 }

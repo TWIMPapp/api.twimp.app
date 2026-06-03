@@ -30,6 +30,8 @@ import {
   listEventAttendees,
   setEventOverview,
   uploadImageFromUrl,
+  copyEvent,
+  setEventDates,
   gameRefFromTags,
   TWIMP_TAG_PREFIX,
 } from './eventbrite';
@@ -601,6 +603,54 @@ Creates a venue from the game's start lat/lng (reverse-geocoded for a readable a
           overviewFailures.forEach(f => { text += `  - ${f.date}: ${f.error}\n`; });
         }
         if (created.length) text += `\nReview in the Eventbrite UI, then publish_eventbrite_event for each.\n`;
+        return { content: [{ type: 'text', text }] };
+      } catch (e) {
+        return { content: [{ type: 'text', text: `Error: ${e instanceof Error ? e.message : String(e)}` }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
+    'copy_eventbrite_event_from_template',
+    `Mint a per-date Eventbrite event for a TWIMP game by COPYING the game's configured template event (game_config.eventbrite_template_id), then setting the new event's date to the supplied YYYY-MM-DD.
+
+PREFERRED over create_eventbrite_events_for_game when a template exists — the template carries the cover image, description/overview, venue, ticket classes, refund policy, and structured-content modules that the create-from-scratch tool can't reliably set via the API. The copy starts as a draft on the template's original dates; we then PATCH it to the requested date (default 10:00–22:00 Europe/London).
+
+Fails fast if the game has no eventbrite_template_id configured. Does NOT publish — returns the draft id for review, then call publish_eventbrite_event when ready.`,
+    {
+      game_ref: z.string().describe('TWIMP game ref'),
+      date: z.string().describe('Target date YYYY-MM-DD (interpreted in Europe/London)'),
+      start_hour: z.number().min(0).max(23).default(DEFAULT_START_HOUR).describe('Local start hour (default 10)'),
+      end_hour: z.number().min(0).max(23).default(DEFAULT_END_HOUR).describe('Local end hour (default 22)'),
+      timezone: z.string().default(DEFAULT_TZ).describe('IANA timezone (default Europe/London)'),
+    },
+    async ({ game_ref, date, start_hour, end_hour, timezone }) => {
+      try {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+          return { content: [{ type: 'text', text: `date must be YYYY-MM-DD, got '${date}'.` }], isError: true };
+        }
+        const game = await getGameByRef(game_ref);
+        if (!game) {
+          return { content: [{ type: 'text', text: `Game ref '${game_ref}' not found.` }], isError: true };
+        }
+        if (!game.eventbrite_template_id) {
+          return { content: [{ type: 'text', text: `Game '${game_ref}' has no eventbrite_template_id configured. Set game_config.eventbrite_template_id to a template event id first, or use create_eventbrite_events_for_game.` }], isError: true };
+        }
+
+        const templateId = game.eventbrite_template_id;
+        const copied = await copyEvent(templateId);
+        const startLocal = `${date}T${String(start_hour).padStart(2, '0')}:00:00`;
+        const endLocal = `${date}T${String(end_hour).padStart(2, '0')}:00:00`;
+        await setEventDates(copied.id, startLocal, endLocal, timezone);
+
+        const text =
+          `Copied template ${templateId} → new draft event for '${game_ref}'.\n\n` +
+          `- New event id: ${copied.id}\n` +
+          `- Date: ${date} (${timezone})\n` +
+          `- Time: ${String(start_hour).padStart(2, '0')}:00–${String(end_hour).padStart(2, '0')}:00\n` +
+          `- Status: draft\n` +
+          `- URL: ${copied.url}\n\n` +
+          `Review in the Eventbrite UI, then publish_eventbrite_event ${copied.id} when ready.`;
         return { content: [{ type: 'text', text }] };
       } catch (e) {
         return { content: [{ type: 'text', text: `Error: ${e instanceof Error ? e.message : String(e)}` }], isError: true };
