@@ -310,23 +310,27 @@ export async function copyEvent(templateEventId: string): Promise<EventbriteEven
   });
 }
 
-// Update an event's start/end. Both inputs are local wall-clock ISO strings
-// (no Z, no offset) interpreted in `timezone`; we send the timezone alongside
-// the UTC conversion so Eventbrite stores both.
-export async function setEventDates(
+// Update an event's start/end (and optionally its name) in a single PATCH.
+// Time inputs are local wall-clock ISO strings (no Z, no offset) interpreted
+// in `timezone`; we send the timezone alongside the UTC conversion so
+// Eventbrite stores both. Name is sent as html and Eventbrite derives `text`
+// from it. Combining into one call avoids a second round-trip for copies
+// that need both fields rewritten.
+export async function setEventDatesAndName(
   eventId: string,
   startLocal: string,
   endLocal: string,
   timezone = 'Europe/London',
+  name?: string,
 ): Promise<void> {
+  const event: Record<string, unknown> = {
+    start: { timezone, utc: toUtc(startLocal, timezone) },
+    end:   { timezone, utc: toUtc(endLocal,   timezone) },
+  };
+  if (name) event.name = { html: name };
   await eb(`/events/${eventId}/`, {
     method: 'POST',
-    body: JSON.stringify({
-      event: {
-        start: { timezone, utc: toUtc(startLocal, timezone) },
-        end:   { timezone, utc: toUtc(endLocal,   timezone) },
-      },
-    }),
+    body: JSON.stringify({ event }),
   });
 }
 

@@ -31,7 +31,7 @@ import {
   setEventOverview,
   uploadImageFromUrl,
   copyEvent,
-  setEventDates,
+  setEventDatesAndName,
   gameRefFromTags,
   TWIMP_TAG_PREFIX,
 } from './eventbrite';
@@ -623,8 +623,9 @@ Fails fast if the game has no eventbrite_template_id configured. Does NOT publis
       start_hour: z.number().min(0).max(23).default(DEFAULT_START_HOUR).describe('Local start hour (default 10)'),
       end_hour: z.number().min(0).max(23).default(DEFAULT_END_HOUR).describe('Local end hour (default 22)'),
       timezone: z.string().default(DEFAULT_TZ).describe('IANA timezone (default Europe/London)'),
+      name: z.string().optional().describe("Event title (defaults to the game's name)"),
     },
-    async ({ game_ref, date, start_hour, end_hour, timezone }) => {
+    async ({ game_ref, date, start_hour, end_hour, timezone, name }) => {
       try {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
           return { content: [{ type: 'text', text: `date must be YYYY-MM-DD, got '${date}'.` }], isError: true };
@@ -641,11 +642,13 @@ Fails fast if the game has no eventbrite_template_id configured. Does NOT publis
         const copied = await copyEvent(templateId);
         const startLocal = `${date}T${String(start_hour).padStart(2, '0')}:00:00`;
         const endLocal = `${date}T${String(end_hour).padStart(2, '0')}:00:00`;
-        await setEventDates(copied.id, startLocal, endLocal, timezone);
+        const finalName = name || game.name;
+        await setEventDatesAndName(copied.id, startLocal, endLocal, timezone, finalName);
 
         const text =
           `Copied template ${templateId} → new draft event for '${game_ref}'.\n\n` +
           `- New event id: ${copied.id}\n` +
+          `- Name: ${finalName}\n` +
           `- Date: ${date} (${timezone})\n` +
           `- Time: ${String(start_hour).padStart(2, '0')}:00–${String(end_hour).padStart(2, '0')}:00\n` +
           `- Status: draft\n` +
