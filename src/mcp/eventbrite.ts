@@ -279,6 +279,51 @@ export async function createTicketClass(eventId: string, opts: {
   });
 }
 
+// List ticket classes on an event. Used after /copy/ to re-window each one,
+// since the copy inherits the template's sales_start/sales_end verbatim.
+export async function listEventTicketClasses(eventId: string): Promise<Array<{
+  id: string;
+  name: string;
+  sales_start?: string | null;
+  sales_end?: string | null;
+}>> {
+  const r: any = await eb(`/events/${eventId}/ticket_classes/`);
+  return r.ticket_classes || [];
+}
+
+// Reset a single ticket class's sales window. Only sales_end is updated —
+// leaving sales_start untouched means sales open immediately (or whenever
+// the template had them open from, which is fine if it was in the past).
+export async function setTicketClassSalesEnd(
+  eventId: string,
+  ticketClassId: string,
+  salesEndUtc: string,
+): Promise<void> {
+  await eb(`/events/${eventId}/ticket_classes/${ticketClassId}/`, {
+    method: 'POST',
+    body: JSON.stringify({ ticket_class: { sales_end: salesEndUtc } }),
+  });
+}
+
+// Compose: list all ticket classes on `eventId`, set each one's sales_end
+// to the supplied UTC timestamp. Returns the count updated.
+export async function resetAllTicketSalesEnd(
+  eventId: string,
+  salesEndUtc: string,
+): Promise<number> {
+  const ticketClasses = await listEventTicketClasses(eventId);
+  for (const tc of ticketClasses) {
+    await setTicketClassSalesEnd(eventId, tc.id, salesEndUtc);
+  }
+  return ticketClasses.length;
+}
+
+// Exported for callers that need the same local→utc conversion the event
+// PATCH does (e.g. when computing a sales_end UTC from a local event-start).
+export function localToUtc(localIso: string, timezone: string): string {
+  return toUtc(localIso, timezone);
+}
+
 // ---------- Attendees ----------
 
 export async function listEventAttendees(eventId: string): Promise<Array<{

@@ -32,6 +32,8 @@ import {
   uploadImageFromUrl,
   copyEvent,
   setEventDatesAndName,
+  resetAllTicketSalesEnd,
+  localToUtc,
   gameRefFromTags,
   TWIMP_TAG_PREFIX,
 } from './eventbrite';
@@ -645,6 +647,17 @@ Fails fast if the game has no eventbrite_template_id configured. Does NOT publis
         const finalName = name || game.name;
         await setEventDatesAndName(copied.id, startLocal, endLocal, timezone, finalName);
 
+        // Template ticket classes were copied verbatim — including the
+        // template's sales_end (now in the past). Reset each ticket class's
+        // sales_end to the new event's start, so sales close at event start.
+        let ticketsUpdated = 0;
+        let ticketResetError: string | undefined;
+        try {
+          ticketsUpdated = await resetAllTicketSalesEnd(copied.id, localToUtc(startLocal, timezone));
+        } catch (err: any) {
+          ticketResetError = err.message;
+        }
+
         const text =
           `Copied template ${templateId} → new draft event for '${game_ref}'.\n\n` +
           `- New event id: ${copied.id}\n` +
@@ -652,9 +665,32 @@ Fails fast if the game has no eventbrite_template_id configured. Does NOT publis
           `- Date: ${date} (${timezone})\n` +
           `- Time: ${String(start_hour).padStart(2, '0')}:00–${String(end_hour).padStart(2, '0')}:00\n` +
           `- Status: draft\n` +
+          `- Tickets re-windowed: ${ticketResetError ? `FAILED — ${ticketResetError}` : `${ticketsUpdated} ticket class(es), sales close at event start`}\n` +
           `- URL: ${copied.url}\n\n` +
           `Review in the Eventbrite UI, then publish_eventbrite_event ${copied.id} when ready.`;
         return { content: [{ type: 'text', text }] };
+      } catch (e) {
+        return { content: [{ type: 'text', text: `Error: ${e instanceof Error ? e.message : String(e)}` }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
+    'reset_eventbrite_event_sales_window',
+    `Reset every ticket class on an Eventbrite event to close sales at the event start. Fixes the "sales ended" problem on copies of a template whose ticket classes have a stale sales_end inherited from the source.
+
+Use this for events that were already published before copy_eventbrite_event_from_template learned to re-window ticket classes automatically.`,
+    { event_id: z.string() },
+    async ({ event_id }) => {
+      try {
+        // Read the event back so we know its (now-correct) start time.
+        const events = await listOrgEvents({});
+        const found = events.find(e => e.id === event_id);
+        if (!found) {
+          return { content: [{ type: 'text', text: `Event ${event_id} not found under the TWIMP org (or it's outside the listing window).` }], isError: true };
+        }
+        const updated = await resetAllTicketSalesEnd(event_id, found.start.utc);
+        return { content: [{ type: 'text', text: `Re-windowed ${updated} ticket class(es) on ${event_id}; sales now close at ${found.start.local} ${found.start.timezone}.` }] };
       } catch (e) {
         return { content: [{ type: 'text', text: `Error: ${e instanceof Error ? e.message : String(e)}` }], isError: true };
       }
