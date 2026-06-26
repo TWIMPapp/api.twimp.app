@@ -57,14 +57,14 @@ export const AnniesMurderBournemouth: Trail = {
                 {
                     "id": "101",
                     "type": "information",
-                    "content": `Peter Sampson Interview\n\n1. Please state your name for the record.\nPeter James Sampson\n\n2. Do you have any relationship to the deceased Annie Sullivan?\nRelationship? No, but I knew her.  She works for my wife and I during the week.\n\n3. What sort of work does she do?\nAngela and I work quite long hours, she does shifts at the Nuffield Health Hospital, often late ones so we need help around the house and with the kids.\nShe's supposed to come round before I go to work, so about 08:45am, she then does a couple hours of cleaning and then comes back at around 7pm to put the kids to bed.\nOh god, the kids are going to be so upset.\n\n4. You said "supposed to"?\nWell, she's been a bit unreliable recently, turning up later than expected, keeps saying she's ill... she's probably just out late or hung over or something.\nLike this morning for example, there's a plug socket in the kitchen that's been sparking and I wanted to let her know when she arrived, not to use it.\nI waited until about 10 minutes to 9, any longer and I would have made myself late for work!\n\n5. So you believe Annie was on her way to your house when you hit her with your car at 08:54am?\nUmm... yes, I suppose she was.  But there was a man!\n\n6. A man? OK we'll come back to him. You said you were running late for work?\nYou're trying to suggest I was driving like a lunatic or something, aren't you!? I'm a very safe driver!\n\n7. And yet, you knocked down a woman in your car in broad daylight?\nWell yes but I'm pretty sure that man had something to do with it.  I think he must have pushed her into the road because she just appeared out of nowhere.\n\n8. OK, so you saw this man push Annie into the road?\nYes!  Well, sort of, it all happened so fast and I got a bit of glare from the sun in my eyes as I approached the crossroads so I couldn't really see him properly.\n\n9. Can you describe this man?  Could you work with a sketch artist?\nUmm..  yeah he was a bit taller than Annie, had a beard.  Not sure about his face though, like I said, I couldn't see him properly.\n\n10. OK, no problem, do you remember what he was wearing perhaps?\nJeans maybe? Look I'm sorry, I really don't know.  I was only thinking about Annie at the time.\n\n11. OK, do you know where he went after the accident?\nHe ran off behind me while I was trying to help Annie.  This is just awful!\n\nThat's all for now. Thank you for your time.`,
+                    "content": `Peter Sampson Interview\n\n1. Please state your name for the record.\n\nPeter James Sampson\n\n2. Do you have any relationship to the deceased Annie Sullivan?\n\nRelationship? No, but I knew her.  She works for my wife and I during the week.\n\n3. What sort of work does she do?\n\nAngela and I work quite long hours, she does shifts at the Nuffield Health Hospital, often late ones so we need help around the house and with the kids.\n\nShe's supposed to come round before I go to work, so about 08:45am, she then does a couple hours of cleaning and then comes back at around 7pm to put the kids to bed.\n\nOh god, the kids are going to be so upset.\n\n4. You said "supposed to"?\n\nWell, she's been a bit unreliable recently, turning up later than expected, keeps saying she's ill... she's probably just out late or hung over or something.\n\nLike this morning for example, there's a plug socket in the kitchen that's been sparking and I wanted to let her know when she arrived, not to use it.\n\nI waited until about 10 minutes to 9, any longer and I would have made myself late for work!\n\n5. So you believe Annie was on her way to your house when you hit her with your car at 08:54am?\n\nUmm... yes, I suppose she was.  But there was a man!\n\n6. A man? OK we'll come back to him. You said you were running late for work?\n\nYou're trying to suggest I was driving like a lunatic or something, aren't you!? I'm a very safe driver!\n\n7. And yet, you knocked down a woman in your car in broad daylight?\n\nWell yes but I'm pretty sure that man had something to do with it.  I think he must have pushed her into the road because she just appeared out of nowhere.\n\n8. OK, so you saw this man push Annie into the road?\n\nYes!  Well, sort of, it all happened so fast and I got a bit of glare from the sun in my eyes as I approached the crossroads so I couldn't really see him properly.\n\n9. Can you describe this man?  Could you work with a sketch artist?\n\nUmm..  yeah he was a bit taller than Annie, had a beard.  Not sure about his face though, like I said, I couldn't see him properly.\n\n10. OK, no problem, do you remember what he was wearing perhaps?\n\nJeans maybe? Look I'm sorry, I really don't know.  I was only thinking about Annie at the time.\n\n11. OK, do you know where he went after the accident?\n\nHe ran off behind me while I was trying to help Annie.  This is just awful!\n\nThat's all for now. Thank you for your time.`,
                     "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/police.png",
                     "required": false
                 },
                 {
                     "id": "102",
                     "type": "information",
-                    "content": `This is what we know about Peter Sampson.\n\nName: Peter Sampson\nGender: Male\nAge: 33\nHeight: 181cm\nWeight: 82kg\n\nOccupation 1: Senior Treasury Analyst\nPlace of Work: 10 Old Christchurch Road, Bournemouth\nEmployer: Nationwide Building Society\n\nSpouse: Mrs Angela Sampson, 31`,
+                    "content": `This is what we know about Peter Sampson.\n\nName: Peter Sampson\n\nGender: Male\n\nAge: 33\n\nHeight: 181cm\n\nWeight: 82kg\n\nOccupation 1: Senior Treasury Analyst\n\nPlace of Work: 10 Old Christchurch Road, Bournemouth\n\nEmployer: Nationwide Building Society\n\nSpouse: Mrs Angela Sampson, 31`,
                     "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/peter.png",
                     "required": false
                 },
@@ -78,7 +78,7 @@ export const AnniesMurderBournemouth: Trail = {
                 {
                     "id": "104",
                     "type": "information",
-                    "content": `Over to you, we need to solve the case and select the correct verdict.\n\nIdeally we would have a coroner's report but they're backed up and we could be waiting a while.  In the meantime, let's focus on what we have.\n\nWas this just an accident?\nDoes Peter Sampson's story check out?\nWho is this bearded stranger?\n\nI want to do a bit of a background check on Annie, head to her address, Fairthorn Court, 27 Badorgan Road and let's see what we can find out.`,
+                    "content": `Over to you, we need to solve the case and select the correct verdict.\n\nIdeally we would have a coroner's report but they're backed up and we could be waiting a while.  In the meantime, let's focus on what we have.\n\nWas this just an accident?\n\nDoes Peter Sampson's story check out?\n\nWho is this bearded stranger?\n\nI want to do a bit of a background check on Annie, head to her address, Fairthorn Court, 27 Badorgan Road and let's see what we can find out.`,
                     "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/police.png",
                     "required": false
                 },
@@ -103,14 +103,14 @@ export const AnniesMurderBournemouth: Trail = {
                 {
                     "id": "200",
                     "type": "information",
-                    "content": `Let's start with the basic profile we've put together.\n\nAnnie Sullivan\nGender: Female\nAge: 27\nHeight: 167cm\nWeight: 67kg\nAddress: Fairthorn Court, 27 Badorgan Road\n\nOccupation 1: Cafe Waitress\nPlace of Work: Meyrick Park Cafe, Central Drive, BH2 6LH\nEmployer: Nigel Hampton\n\nOccupation 2: Au Pair / Cleaner\nPlace of Work: 32 Dean Park Road,\nEmployer: Mr and Mrs Sampson\n\nItems recovered at the scene:\nWallet containing:\nCards: Natwest Bank Debit Card, Tesco Clubcard, PureGym Member Pass, Bournemouth Library Card\nNotes: £10\nCoins: £1 x 2, 50p x 1, 10p x 1, 1p x 1\n\nTesco bag containing one pack of ginger biscuits and a bottle of water.  Receipt matches items in bag, dated Tuesday 08:41`,
+                    "content": `Let's start with the basic profile we've put together.\n\nAnnie Sullivan\n\nGender: Female\n\nAge: 27\n\nHeight: 167cm\n\nWeight: 67kg\n\nAddress: Fairthorn Court, 27 Badorgan Road\n\nOccupation 1: Cafe Waitress\n\nPlace of Work: Meyrick Park Cafe, Central Drive, BH2 6LH\n\nEmployer: Nigel Hampton\n\nOccupation 2: Au Pair / Cleaner\n\nPlace of Work: 32 Dean Park Road,\n\nEmployer: Mr and Mrs Sampson\n\nItems recovered at the scene:\n\nWallet containing:\n\nCards: Natwest Bank Debit Card, Tesco Clubcard, PureGym Member Pass, Bournemouth Library Card\n\nNotes: £10\n\nCoins: £1 x 2, 50p x 1, 10p x 1, 1p x 1\n\nTesco bag containing one pack of ginger biscuits and a bottle of water.  Receipt matches items in bag, dated Tuesday 08:41`,
                     "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/annie.png",
                     "required": false
                 },
                 {
                     "id": "201",
                     "type": "information",
-                    "content": `This is Nicky, Annie's neighbour, let's see what she has to say.\n\n1. Please state your name for the record.\nNicky Foster\n\n2. Do you have any relationship to the deceased Annie Sullivan?\nOh my gosh!  Deceased.  Err... yeah we were friends.\n\n3. Would you say you were close?\nWouldn't say we were besties but yeah, we would hang out.  Annie isn't really one for gossip though.\n\n4. How do you know each other?\nWell we live here in the same block of flats and we both worked at the Cafe for a few months before I left.\nAnnie is a bit of a bookworm but she used to come out quite a lot for drinks, not so much recently.\n\n5. So her behaviour recently has changed?  Do you know who she's been spending her time with?\nUmm... no not really, just don't think she's been out much.  She goes to the gym most mornings and I know she's been working more recently.  A bit too much in my opinion, she seemed tired when I saw her at the weekend.\n\n6. Working at the cafe?\nWell yes, she mentioned that she really needed to build up some savings so she's taken on an extra shift on Saturday mornings.\nBut she's been working later for that family too, trouble trying to get the kids to bed, in fairness I never wanted to go to bed when I was little either.\n\n7. A witness reported seeing her with a man, do you know of any men in her life?\nHmm... no, not since Sean.  Like I said, doesn't really talk about boys much.\nThere are these group of creepy guys that come in once a month, one asked her out months ago, she told him after that offer she was thinking of dating girls for a while!\nHahaha, it was so unlike her but I was so proud.  Nigel would have been livid!\nGosh, I still can't believe she's dead!\n\n8. Nigel?\nNigel Hampton, the owner of Meyrick Park cafe, he must be desperate for lunch staff now.\n\n9. I see.  And you mentioned someone called Sean, could you tell me more about him?\nOh, he's alright I guess, bit of your show-off type.  Always working out or doing something with cars with his mates.  He is kind of charming, works at PureGym but he kept playing games, not replying for days, stuff like that.  Think she just got fed up with it and so she dumped him a few months back.\n\n10. And do you know if she has heard from him since?\nShe hasn't mentioned him but him and his mates are usually playing football down Meyrick Park so no doubt they've bumped into each other.  You don't think he's got something to do with this do you?\n\n11. Final question.  Before going to work, Annie seems to have taken a detour to buy some ginger nuts and some water.  Is that normal?\nGinger nuts!?  That is a bit odd, she's normally a bit of a health freak.  Sorry, I don't know.`,
+                    "content": `This is Nicky, Annie's neighbour, let's see what she has to say.\n\n1. Please state your name for the record.\n\nNicky Foster\n\n2. Do you have any relationship to the deceased Annie Sullivan?\n\nOh my gosh!  Deceased.  Err... yeah we were friends.\n\n3. Would you say you were close?\n\nWouldn't say we were besties but yeah, we would hang out.  Annie isn't really one for gossip though.\n\n4. How do you know each other?\n\nWell we live here in the same block of flats and we both worked at the Cafe for a few months before I left.\n\nAnnie is a bit of a bookworm but she used to come out quite a lot for drinks, not so much recently.\n\n5. So her behaviour recently has changed?  Do you know who she's been spending her time with?\n\nUmm... no not really, just don't think she's been out much.  She goes to the gym most mornings and I know she's been working more recently.  A bit too much in my opinion, she seemed tired when I saw her at the weekend.\n\n6. Working at the cafe?\n\nWell yes, she mentioned that she really needed to build up some savings so she's taken on an extra shift on Saturday mornings.\n\nBut she's been working later for that family too, trouble trying to get the kids to bed, in fairness I never wanted to go to bed when I was little either.\n\n7. A witness reported seeing her with a man, do you know of any men in her life?\n\nHmm... no, not since Sean.  Like I said, doesn't really talk about boys much.\n\nThere are these group of creepy guys that come in once a month, one asked her out months ago, she told him after that offer she was thinking of dating girls for a while!\n\nHahaha, it was so unlike her but I was so proud.  Nigel would have been livid!\n\nGosh, I still can't believe she's dead!\n\n8. Nigel?\n\nNigel Hampton, the owner of Meyrick Park cafe, he must be desperate for lunch staff now.\n\n9. I see.  And you mentioned someone called Sean, could you tell me more about him?\n\nOh, he's alright I guess, bit of your show-off type.  Always working out or doing something with cars with his mates.  He is kind of charming, works at PureGym but he kept playing games, not replying for days, stuff like that.  Think she just got fed up with it and so she dumped him a few months back.\n\n10. And do you know if she has heard from him since?\n\nShe hasn't mentioned him but him and his mates are usually playing football down Meyrick Park so no doubt they've bumped into each other.  You don't think he's got something to do with this do you?\n\n11. Final question.  Before going to work, Annie seems to have taken a detour to buy some ginger nuts and some water.  Is that normal?\n\nGinger nuts!?  That is a bit odd, she's normally a bit of a health freak.  Sorry, I don't know.`,
                     "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/nicky.png",
                     "required": false
                 },
@@ -142,7 +142,7 @@ export const AnniesMurderBournemouth: Trail = {
                 {
                     "id": "300",
                     "type": "information",
-                    "content": `Cafe Owner Interview\n\n1. Please state your name for the record.\nNigel Warren Churchill\n\n2. Do you have any relationship to the deceased Annie Sullivan?\nYes, she's one of my lunch staff.\n\n3. When was the last time you saw Annie?\nMonday, her shift starts at 12 but she's always here 10 minutes early.  Wish I could say the same for my other staff\n\n4. How did Annie get on with the staff and the customers here?\nFine, possibly a bit quiet for some of our more elderly regulars who come in for a chat, but she's polite, quite a smart cookie that one.\n\n5. Did she have any problems with anyone here?  Was she perhaps receiving any unwanted attention?\nOnly old Harold but he gives everyone unwanted attention.  He's harmless though.  He's 85 and I've usually made his coffee in the time it takes him just to sit down\n\n6. Nigel, I have to ask.  A man fitting your description was seen at the scene of the accident.  Can you tell me where you were on Tuesday morning at exactly 08:54am?\nOh wow.  Yes, I was here... opening up.  I do the stock count in the morning so I would have been in the back.\n\n7. Can anyone verify that?\nUmm... well no!  But Maggie gets in just before 9am, she can tell you.`,
+                    "content": `Cafe Owner Interview\n\n1. Please state your name for the record.\n\nNigel Warren Churchill\n\n2. Do you have any relationship to the deceased Annie Sullivan?\n\nYes, she's one of my lunch staff.\n\n3. When was the last time you saw Annie?\n\nMonday, her shift starts at 12 but she's always here 10 minutes early.  Wish I could say the same for my other staff\n\n4. How did Annie get on with the staff and the customers here?\n\nFine, possibly a bit quiet for some of our more elderly regulars who come in for a chat, but she's polite, quite a smart cookie that one.\n\n5. Did she have any problems with anyone here?  Was she perhaps receiving any unwanted attention?\n\nOnly old Harold but he gives everyone unwanted attention.  He's harmless though.  He's 85 and I've usually made his coffee in the time it takes him just to sit down\n\n6. Nigel, I have to ask.  A man fitting your description was seen at the scene of the accident.  Can you tell me where you were on Tuesday morning at exactly 08:54am?\n\nOh wow.  Yes, I was here... opening up.  I do the stock count in the morning so I would have been in the back.\n\n7. Can anyone verify that?\n\nUmm... well no!  But Maggie gets in just before 9am, she can tell you.`,
                     "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/nigel.png",
                     "required": false
                 },
@@ -156,19 +156,21 @@ export const AnniesMurderBournemouth: Trail = {
                 {
                     "id": "302",
                     "type": "information",
-                    "content": `Let's speak to someone who saw Annie more regularly.  Sean at PureGym would be one option — and don't forget she had a Library card in her wallet too.  See what you can dig up.`,
+                    "content": `Hmmm... I think we're going to need to find about more about Annie's recent behavour.  Sean at PureGym would be one option — and don't forget she had a Library card in her wallet too.  See what you can dig up.`,
                     "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/police.png",
                     "required": false
                 },
                 {
-                    // PureGym + Library are hidden siblings — the player has to
-                    // deduce where to go from the clues (PureGym member pass at
-                    // the scene, Library card, Nicky's "gym most mornings").
-                    // Empty markers leave the map blank; awty activates each on
-                    // arrival.
+                    // PureGym + Library are hidden siblings unlocked here. Task
+                    // 302 names both outright, so we mark both rather than make
+                    // the player deduce it — blank markers just made navigation
+                    // a guessing game. awty still activates each on arrival.
                     "type": "map",
                     "content": `Ready to go?`,
-                    "markers": [],
+                    "markers": [
+                        "05c60b97-187f-418b-8ee1-1276fd380782",
+                        "91faa350-d62e-4c39-911c-ecd850c6f004"
+                    ],
                     "required": false
                 }
             ]
@@ -188,7 +190,7 @@ export const AnniesMurderBournemouth: Trail = {
                 {
                     "id": "400",
                     "type": "information",
-                    "content": `Sean Interview\n\n1. Please state your name for the record.\nSean, Sean Crawford\n\n2. Do you have any relationship to the deceased Annie Sullivan?\nNot any more, I dumped her months back.\n\n3. When was the last time you saw Annie?\nI dunno, a few weeks ago maybe.\n\n4. Are you aware that Annie was involved in a fatal accident?\nNah, I wasn't. Is she alright?\n\n5. No sir, it was a fatal accident, that means Annie has passed away.\nOh.  Um... crap... that's messed up.\n\n6. You said you haven't seen her for weeks, has she not been attending the gym?\nNot as much as she used to but I think she was in one morning last week just before my shift.  I only know cause Jo said she was feeling sick and went home, she probably just avoiding me.\n\n7. According to another testimony, it was in fact Annie that ended your relationship, not you?\nOh.  Well nah you see, I kinda just let her think it was her idea.  I was going to do it.  She never wanted to go out anywhere, was more interested in her books.\n\n8. On the morning of the accident, she was seen with a bearded man.  Any idea who that might be?\nNot really.  I think her Dad has a beard, never met him though, he lives in Southampton I think.`,
+                    "content": `Sean Interview\n\n1. Please state your name for the record.\n\nSean, Sean Crawford\n\n2. Do you have any relationship to the deceased Annie Sullivan?\n\nNot any more, I dumped her months back.\n\n3. When was the last time you saw Annie?\n\nI dunno, a few weeks ago maybe.\n\n4. Are you aware that Annie was involved in a fatal accident?\n\nNah, I wasn't. Is she alright?\n\n5. No sir, it was a fatal accident, that means Annie has passed away.\n\nOh.  Um... crap... that's messed up.\n\n6. You said you haven't seen her for weeks, has she not been attending the gym?\n\nNot as much as she used to but I think she was in one morning last week just before my shift.  I only know cause Jo said she was feeling sick and went home, she probably just avoiding me.\n\n7. According to another testimony, it was in fact Annie that ended your relationship, not you?\n\nOh.  Well nah you see, I kinda just let her think it was her idea.  I was going to do it.  She never wanted to go out anywhere, was more interested in her books.\n\n8. On the morning of the accident, she was seen with a bearded man.  Any idea who that might be?\n\nNot really.  I think her Dad has a beard, never met him though, he lives in Southampton I think.`,
                     "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/sean.png",
                     "required": false
                 },
@@ -202,7 +204,9 @@ export const AnniesMurderBournemouth: Trail = {
                 {
                     "type": "map",
                     "content": `Ready to go?`,
-                    "markers": [],
+                    "markers": [
+                        "91faa350-d62e-4c39-911c-ecd850c6f004"
+                    ],
                     "required": false
                 }
             ]
@@ -222,8 +226,8 @@ export const AnniesMurderBournemouth: Trail = {
                 {
                     "id": "500",
                     "type": "information",
-                    "content": `Librarian Interview\n\n1. Please state your name for the record.\nSylvia Fording\n\n2. Good afternoon, Ms. Fording, I am investigating the recent traffic incident that led to the death of one of your library patrons, Annie Sullivan. Are you aware of the situation?\nOh no, that's terrible news. I had no idea. I hope she didn't suffer too much.\n\n3. Ms. Fording. can you tell me how well you knew Ms. Sullivan?\nWell, she was a regular at the library, but I wouldn't say we were close. I'm the head librarian, so I don't always have time to chat with everyone who comes in, but I do like to check-in with people when I can.\n\n4. I understand. Did you notice anything unusual about Ms. Sullivan's behavior or demeanor in the recent days or weeks?\nNot that I can recall. She always seemed like a nice, normal young woman. I do remember what books she checked out, though. Sometimes what people read can give you insight into their lives, you know?\n\n5. Yes, that can be helpful. Can you tell me what books Miss Sullivan checked out?\nWell, she was interested in a lot of different things. She checked out a few novels, some biographies, and some cookbooks. But I do remember one book in particular that she seemed very interested in. It was about the medicinal benefits of ginger if I recall correctly.\n\n6. Ginger? Can you tell me more about that book?\nI'm sorry, she didn't actually check the book out and I don't remember the title or author.  But I remember her being quite surprised at how ginger can be used to treat all sorts of ailments, from nausea to arthritis to migraines. I remember thinking it was an unusual choice for someone her age, but everyone has their own interests, I suppose.\n\n7. Thank you for that information, Ms. Fording. You've been very helpful. If you think of anything else that might be useful to our investigation, please don't hesitate to contact me.\nOf course, I'll keep my eyes and ears open. And please let me know if there's anything more I can do to help.`,
-                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/library.png",
+                    "content": `Librarian Interview\n\n1. Please state your name for the record.\n\nSylvia Fording\n\n2. Good afternoon, Ms. Fording, I am investigating the recent traffic incident that led to the death of one of your library patrons, Annie Sullivan. Are you aware of the situation?\n\nOh no, that's terrible news. I had no idea. I hope she didn't suffer too much.\n\n3. Ms. Fording. can you tell me how well you knew Ms. Sullivan?\n\nWell, she was a regular at the library, but I wouldn't say we were close. I'm the head librarian, so I don't always have time to chat with everyone who comes in, but I do like to check-in with people when I can.\n\n4. I understand. Did you notice anything unusual about Ms. Sullivan's behavior or demeanor in the recent days or weeks?\n\nNot that I can recall. She always seemed like a nice, normal young woman. I do remember what books she checked out, though. Sometimes what people read can give you insight into their lives, you know?\n\n5. Yes, that can be helpful. Can you tell me what books Miss Sullivan checked out?\n\nWell, she was interested in a lot of different things. She checked out a few novels, some biographies, and some cookbooks. But I do remember one book in particular that she seemed very interested in. It was about the medicinal benefits of ginger if I recall correctly.\n\n6. Ginger? Can you tell me more about that book?\n\nI'm sorry, she didn't actually check the book out and I don't remember the title or author.  But I remember her being quite surprised at how ginger can be used to treat all sorts of ailments, from nausea to arthritis to migraines. I remember thinking it was an unusual choice for someone her age, but everyone has their own interests, I suppose.\n\n7. Thank you for that information, Ms. Fording. You've been very helpful. If you think of anything else that might be useful to our investigation, please don't hesitate to contact me.\n\nOf course, I'll keep my eyes and ears open. And please let me know if there's anything more I can do to help.`,
+                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/library.jpg",
                     "required": false
                 },
                 {
@@ -257,26 +261,28 @@ export const AnniesMurderBournemouth: Trail = {
                     "id": "600",
                     "type": "information",
                     "content": `You take a seat and spread your notes across the table.  Time to make sense of what you've gathered.\n\nTip: tap the journal icon at the top of the screen to swipe back through every clue you've collected.`,
+                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/case_files.png",
                     "required": false
                 },
                 {
                     "id": "601",
                     "type": "question_single",
                     "content": `Who is the murderer?`,
+                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/case_files.png",
                     "options": [
                         {
                             "index": 0,
+                            "content": "Sean",
+                            "response": { "title": "Incorrect", "sentiment": "negative" }
+                        },
+                        {
+                            "index": 1,
                             "content": "Peter Sampson",
                             "response": { "title": "Correct!", "sentiment": "positive" }
                         },
                         {
-                            "index": 1,
-                            "content": "Nigel",
-                            "response": { "title": "Incorrect", "sentiment": "negative" }
-                        },
-                        {
                             "index": 2,
-                            "content": "Sean",
+                            "content": "Nigel",
                             "response": { "title": "Incorrect", "sentiment": "negative" }
                         },
                         {
@@ -291,6 +297,7 @@ export const AnniesMurderBournemouth: Trail = {
                     "id": "602",
                     "type": "question_single",
                     "content": `In Peter's interview, what question number received a response that proves that they were lying?`,
+                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/case_files.png",
                     "options": [
                         {
                             "index": 0,
@@ -314,12 +321,14 @@ export const AnniesMurderBournemouth: Trail = {
                     "id": "603",
                     "type": "information",
                     "content": `Peter's claim that the sun shone in his eyes just doesn't add up.  He was heading south down Dean Park Road and turning right towards Wimborne Road — so the sun, low in the eastern sky at that time of morning, would have been behind him and to his left.  No way it was in his eyes.\n\nLet's see if you've figured out the motive, it's something about Annie.`,
+                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/case_files.png",
                     "required": false
                 },
                 {
                     "id": "604",
                     "type": "question_single",
                     "content": `Something about Annie, an 8 letter word beginning with P explains the motive`,
+                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/case_files.png",
                     "options": [
                         {
                             "index": 0,
@@ -337,6 +346,7 @@ export const AnniesMurderBournemouth: Trail = {
                 {
                     "id": "605",
                     "type": "finish",
+                    "image_url": "https://trail-images.s3.eu-west-2.amazonaws.com/annies-murder/bournemouth/case_files.png",
                     "content": `Congratulations!  A terrible waste indeed and thanks to you, Peter will go to jail.  He didn't just kill a lovely hard working woman, but his own unborn child.  Annie had always had a soft spot for Peter, he was well dressed and charming.  With all the late nights at the house with Angela at work, one night, Peter made a move on Annie and she didn't turn him down.\n\nTwo months later, Annie had been at the house and had stayed a little too long, Angela was due home any minute so she hurriedly picked up her bag and rushed home.  As she ran out the door, a letter fell out of her bag but she didn't notice.  Peter recognised the Nuffield Health branding from his wife's job and picked it up.  When he saw the word "ultrasound" written on the letter, Peter freaked out, he didn't know what to do.\n\nAnnie was really starting to struggle with morning sickness and had been researching ginger to try and get on top of it.  It was so bad that morning though that she went to Tesco to get some ginger biscuits in the hope that would do something but just being around food made her feel worse.\n\nOn the morning of the incident, Peter waited around to confront her but when she was late, he couldn't wait any longer.  And as he drove to work, he just kept imagining Annie bumping into his wife, that she would find out, the kids would find out, he'd be a scandal at work and everything would fall apart.  All of a sudden, the walls felt like they were closing in fast.  And then as he approached the pedestrian crossing, he saw Annie step out to cross the road and in a split second, instead of hitting the brakes, he intentionally hit the accelerator.`,
                     "required": false
                 }
