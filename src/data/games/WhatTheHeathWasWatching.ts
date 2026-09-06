@@ -72,7 +72,7 @@ export const WhatTheHeathWasWatching: Trail = {
                 {
                     id: '2',
                     type: 'information',
-                    content: `Hey Storyteller!\n\nA few things while the younger ones are listening to Pat:\n\n• Keep little ones close near gorse — it scratches.\n• If you spot Pip, soft voices only. Chasing will make him bolt again.\n• Dogs on leads are welcome; give other walkers space on narrow bits.\n\nAbout 30–40 minutes of walking plus stops. Next pin is the field entrance, south into the open grass.`,
+                    content: `Hey Storyteller!\n\nWhile the younger ones are with Pat:\n\n• Keep little ones close near gorse — it scratches.\n• Dogs on leads are welcome; give other walkers space on narrow bits.\n\nAbout 30–40 minutes of walking plus stops. Next pin is the field entrance, south into the open grass.`,
                     image_url: `${IMG}/pat.png`,
                     required: false,
                 },
