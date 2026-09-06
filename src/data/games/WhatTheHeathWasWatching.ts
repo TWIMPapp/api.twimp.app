@@ -105,7 +105,7 @@ export const WhatTheHeathWasWatching: Trail = {
                 {
                     id: '101',
                     type: 'information',
-                    content: `A voice note from Pat pings on the app.\n\n"If you have reached the open field, you are on the right track. Pip always tears across this bit when we start a walk. Check the middle and the edges. Call his name once or twice, then listen. If he answers, tell me at the next gate — I left a note there."\n\nWhile you walk, younger players can hunt for three different greens before the next pin: grass, leaf, and something pricklier at the edges. It keeps eyes on the ground, which is where a small dog is easiest to miss.`,
+                    content: `A voice note from Pat:\n\n"If you have reached the open field, you are on the right track. Pip always tears across this bit when we start a walk. Check the middle and the edges. Call his name once or twice, then listen. If he answers, tell me at the next gate — I left a note there."\n\nWhile you walk, hunt for three different greens before the next pin: grass, leaf, and something pricklier at the edges. It keeps eyes on the ground, which is where a small dog is easiest to miss.`,
                     image_url: `${IMG}/pat.png`,
                     required: false,
                 },
