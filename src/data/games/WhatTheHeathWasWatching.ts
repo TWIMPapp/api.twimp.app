@@ -10,7 +10,7 @@ import { Trail } from '../../types/index';
  *          look-finds on real place (scar, heather, latches, forks);
  *          choice sets state (SCAR vs HEATHER) and changes later copy;
  *          GPS path-fork waits until Ross spots a real fork on foot.
- * Status:  pending playtest — keep ref for URL stability
+ * Status:  active playtest — keep ref for URL stability
  * Images:  stubbed S3 — replace; paw-print / collar are PHOTO stubs
  */
 

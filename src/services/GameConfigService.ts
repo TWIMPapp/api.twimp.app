@@ -22,7 +22,7 @@ const CACHE_TTL_MS = 60 * 1000; // 1 minute cache
 const FALLBACK_CONFIG: GameConfig[] = [
     { ref: 'easter-event', gameType: 'universal', status: 'featured', eventbriteTemplateId: null },
     { ref: 'the-eggstraordinary-case-of-the-missing-eggs-frome', gameType: 'trail', status: 'pending', eventbriteTemplateId: null },
-    { ref: 'what-the-heath-was-watching', gameType: 'trail', status: 'pending', eventbriteTemplateId: null },
+    { ref: 'what-the-heath-was-watching', gameType: 'trail', status: 'active', eventbriteTemplateId: null },
 ];
 
 function mergeWithFallback(rows: GameConfig[]): GameConfig[] {
