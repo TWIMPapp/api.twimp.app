@@ -148,7 +148,7 @@ export const WhatTheHeathWasWatching: Trail = {
                 {
                     id: '200',
                     type: 'information',
-                    content: `Gorse crowds the latch. Yellow flowers if the season's kind; prickles either way.\n\nTied to the gatepost with a bit of twine is a scrap of paper in Pat's handwriting — left for any helper on this loop:\n\nPIP — dawn bolt. Not on road. Check high point. Collar tag loose last week — may have come off.\nIf you find the tag, keep it. If you find Pip, soft voice.\n— B\n\nYoung ears: look at the real latch. Which way does it open? Soft hands. No yanking. (We're not asking you to invent damage — just notice how it works.)`,
+                    content: `Gorse crowds the latch. Yellow flowers if the season's kind; prickles either way.\n\nTied to the gatepost with a bit of twine is a scrap of paper in Pat's handwriting — left for any helper on this loop:\n\nPIP — dawn bolt. Not on road. Check high point. Collar tag loose last week — may have come off.\nIf you find the tag, keep it. If you find Pip, soft voice.\n— P\n\nYoung ears: look at the real latch. Which way does it open? Soft hands. No yanking. (We're not asking you to invent damage — just notice how it works.)`,
                     image_url: `${IMG}/pat.png`, // STUB
                     required: false,
                 },
