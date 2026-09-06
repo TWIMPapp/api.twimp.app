@@ -1,13 +1,17 @@
 import { Trail } from '../../types/index';
 
 /**
- * What the Heath Was Watching
+ * What the Heath Was Watching — rebuild: Pip's Bolt
  * --------------------------------------------------------------------
  * Audience: family / dog-walk (Ross daily Upton Heath loop)
- * Status:   pending playtest — registered in Trails[]; game_config.status=pending
- * Voice:    rewritten toward Jasmarina / Annie craft (scene + dialogue + quest)
- * Images:   stubbed S3 paths — replace before polish pass.
- * MacGuffin: inventory token "The Heath Watch" (small brass charm from Briar's gate)
+ * Spine:   lost-dog adventure (NOT the abandoned Heath Watch fetch-quest)
+ * Craft:   Jasmarina scenes + immersion rules — no fake broken props;
+ *          temporary evidence via in-app photo / "this morning";
+ *          look-finds on real place (scar, heather, latches, forks);
+ *          choice sets state (SCAR vs HEATHER) and changes later copy;
+ *          GPS path-fork waits until Ross spots a real fork on foot.
+ * Status:  pending playtest — keep ref for URL stability
+ * Images:  stubbed S3 — replace; paw-print / collar are PHOTO stubs
  */
 
 const IMG = 'https://trail-images.s3.eu-west-2.amazonaws.com/what-the-heath-was-watching';
@@ -23,31 +27,31 @@ const LOC = {
 
 export const WhatTheHeathWasWatching: Trail = {
     ref: 'what-the-heath-was-watching',
-    name: 'What the Heath Was Watching',
+    name: "Pip's Bolt",
     type: 'WALK',
     content_pack: false,
     ownerId: null,
     ageSuitability: 'Family',
     attributes: ['DOG_ACCESSIBLE'],
     region: 'Dorset',
-    tags: ['draft', 'dog-walk', 'upton-heath', 'family'],
+    tags: ['draft', 'dog-walk', 'upton-heath', 'family', 'adventure'],
     price: 0,
     isFree: true,
     tester: true,
     isValidating: true,
     image_url: `${IMG}/cover.png`, // STUB
-    description: `TWIMP is an outdoor storytelling app — walk to pins on a map and the next chapter plays when you arrive.\n\nOn Upton Heath, a scruffy trail-dog called Pip needs your help. Briar's Heath Watch has gone missing from the gate, and without it the evening walkers will be locked out of their usual loop. Follow Pip across the field, through the gorse, up to the viewpoint, and bring the Watch home.\n\nRoughly 30–40 minutes. Dogs welcome. Play any time.`,
-    start_node_caption: 'Find the red pin at the Springdale Road car park — Pip is waiting.',
+    description: `TWIMP is an outdoor storytelling app — walk to pins on a map and the next chapter plays when you arrive.\n\nAt the Springdale Road car park on Upton Heath, Briar's trail-dog Pip has bolted into the gorse. Help search the loop: open field, gates, viewpoint, and home again. There will be clues, a choice, and a twist — and nothing that asks you to pretend a healthy latch is broken.\n\nRoughly 30–40 minutes. Dogs welcome.`,
+    start_node_caption: 'Find the red pin at the Springdale Road car park — Briar is waiting.',
     items: [
         {
-            key: 'heath_watch',
-            name: 'The Heath Watch',
-            image_url: `${IMG}/heath_watch.png`, // STUB — small brass charm
-            thumb_url: `${IMG}/heath_watch_thumb.png`, // STUB
+            key: 'collar_tag',
+            name: "Pip's Collar Tag",
+            image_url: `${IMG}/collar_tag.png`, // STUB
+            thumb_url: `${IMG}/collar_tag_thumb.png`, // STUB
         },
     ],
     steps: [
-        // 1. Car Park — cold open + quest
+        // 1. Car park — cold open + quest
         {
             index: 0,
             locationId: LOC.carPark,
@@ -57,26 +61,27 @@ export const WhatTheHeathWasWatching: Trail = {
             can_revisit: false,
             trackingEnabled: true,
             on_search: { proximity_radius: 40 },
+            on_arrival: ['setState -value SEARCH'],
             tasks: [
                 {
                     id: '0',
                     type: 'information',
-                    content: `A scruffy little dog skids across the car park gravel and stops right in front of you, panting hard. His ears are too big for his head, one of them folded the wrong way, and there's a smear of mud on his white chest like he's already been exploring.\n\nHe looks up, tilts his head, and somehow — through the app — you hear him clear as anything.\n\n"Finally! I've been waiting for someone who looks like they actually listen."\n\nHe plants his paws. "The name's Pip. Trail-dog. Officially unofficial helper of Upton Heath. And we've got a problem."`,
-                    image_url: `${IMG}/pip.png`, // STUB
+                    content: `A weathered figure in a moss-green coat is pacing the Springdale Road car park, soft lead dangling empty from one hand. Their cap is crooked. Their face is the particular shade of calm people use when they are absolutely not calm.\n\nThis is Briar.\n\n"You're walkers," Briar says, spotting you. Not a question. "Good. I need walkers."\n\nBriar holds up the empty lead. The clip still swings.\n\n"Pip. My trail-dog. Scruffy. Ears too big. White chest usually muddy by now. He bolted at first light — straight off the gravel toward the open grass. Fox scent, maybe. Or deer. Or pure Pip stubbornness."`,
+                    image_url: `${IMG}/briar.png`, // STUB
                     required: false,
                 },
                 {
                     id: '1',
                     type: 'information',
-                    content: `"Briar looks after the gates on this loop," Pip continues, glancing toward the path that leads south into the open grass. "Every morning Briar hangs the Heath Watch on the first latch — a little brass charm, warm from people's hands, shiny from years of dogs brushing past it. Walkers touch it for luck. Kids make a wish on it. Briar says it helps the heath remember who came through kindly."\n\nPip's tail droops.\n\n"This morning it was gone. Hook empty. Briar is… not happy. And Briar not happy means the last gate stays awkward until someone brings the Watch home."\n\nHe leans in, conspiratorial. "I caught a glint of something pale up near the high viewpoint yesterday — west side, where the ground looks scraped and empty. I think that's where it went. Will you help me get it back?"`,
-                    image_url: `${IMG}/pip.png`, // STUB
+                    content: `"I've checked the road," Briar continues. "He's not there. Which means he's on the heath loop — field, gates, high point, back. Same path half the dogs in Corfe Mullen know by heart."\n\nBriar's voice drops.\n\n"I need someone to walk it properly. Look. Listen. Don't rush. I'll take the far edges and meet you at the last gate before the cars. If you find him, soft voices. He's brave until he isn't."\n\nBriar digs in a pocket and shows you a phone photo: a clear paw print in soft mud, taken this morning where the gravel meets the grass.\n\n"That's him leaving. Heading south into the field. Will you help?"`,
+                    image_url: `${IMG}/paw_print.png`, // STUB — in-app photo evidence
                     required: false,
                 },
                 {
                     id: '2',
                     type: 'information',
-                    content: `Hey Storyteller!\n\nThis is a family loop from the Springdale Road / Upton Heath car park: open field → gate onto the heath path → viewpoint → return along the heath → final gate → cars. Roughly half an hour of walking, plus stops for the story.\n\nAt each pin you may get more than one screen:\n• first screens — the story everyone can enjoy\n• later screens — a little more detail for older kids and adults\nRead what fits your group. Skip freely.\n\nBetween pins, talk about what you think happened to the Heath Watch. That's part of the fun.\n\nCharacters on the app (not "imagine a rabbit"):\n• Pip — scruffy trail-dog, your guide and friend\n• Briar — looks after the gorse gates; prickly but soft underneath\n• Merryn — quiet walker who knows the viewpoint\n\nNext screen: map. Head to the field entrance — Pip's already sniffing that way.`,
-                    image_url: `${IMG}/pip.png`, // STUB
+                    content: `Hey Storyteller!\n\nThis is a family adventure loop on Upton Heath (~30–40 min walking plus story stops). Dogs welcome.\n\nYou're helping Briar find Pip. At each pin the story continues. Some screens are for everyone; later ones add a bit more for older ears — read what fits.\n\nBetween pins, guess: why did Pip bolt? Where would *your* dog hide?\n\nImmersion note for you: look-finds point at real things (gates, scar, heather). Temporary clues (prints, tags) show as photos in the app — we won't ask anyone to pretend a fine latch is broken. If you spot a real detail on your walk, tell Nadia/Craig and we'll weave it in.\n\nNext: map. Field entrance. South into the open grass.`,
+                    image_url: `${IMG}/briar.png`, // STUB
                     required: false,
                 },
                 {
@@ -88,7 +93,7 @@ export const WhatTheHeathWasWatching: Trail = {
             ],
         },
 
-        // 2. Field entrance
+        // 2. Field entrance — clues + walking challenge
         {
             index: 1,
             locationId: LOC.fieldEntrance,
@@ -102,22 +107,22 @@ export const WhatTheHeathWasWatching: Trail = {
                 {
                     id: '100',
                     type: 'information',
-                    content: `The path opens into a wide stretch of grass. The sky feels suddenly bigger here, as if someone rolled the ceiling back.\n\nPip trots ahead, then spins round to face you, ears bouncing.\n\n"See? This is where people stop rushing. Or they don't — and then Briar complains about muddy boots and yanked latches later."\n\nHe sniffs the edge of the grass. "If someone carried the Heath Watch this way, they'd have come through this open bit first. Brass catches the light. Keep your eyes soft. Not staring — noticing."`,
-                    image_url: `${IMG}/pip.png`, // STUB
+                    content: `The path spills into open grass. The sky feels suddenly huge.\n\nYou half-expect Pip to hurtle back already. He doesn't.\n\nBriar's photo matches the edge of the gravel behind you — but out here the ground hardens and prints vanish. A bolted dog could have run anywhere the grass allows.\n\nOn the app, Briar's voice-note crackles in:\n\n"If you're at the open field — good. Pip loves this bit. He runs like the day's too small. Check the edges as well as the middle. Dogs that are playing stay visible. Dogs that are worried hug the prickly stuff."`,
+                    image_url: `${IMG}/briar.png`, // STUB
                     required: false,
                 },
                 {
                     id: '101',
                     type: 'information',
-                    content: `Pip sits (briefly — he isn't good at sitting).\n\n"While we walk to the next gate, I've got a job for the young ones. Find three different greens before we get there. Grass green. Leaf green. And a pricklier green — that one's usually gorse or something that wants a hug but shouldn't get one."\n\nHe grins a dog grin. "Adults can help. Or pretend they're only counting for the kids. I won't tell."`,
-                    image_url: `${IMG}/pip.png`, // STUB
+                    content: `Young ears — job while you walk to the next gate:\n\nFind three different greens before you arrive. Grass green. Leaf green. Pricklier green (gorse counts; look, don't hug).\n\nAnd listen: any bark that isn't yours? Any rustle that stops when you stop?\n\nOlder ears: Beacon Road sits behind you like a corridor of hurry. Pip didn't bolt toward the road. He bolted into space. That already tells you something about what he was chasing — or what he thought he was saving.`,
+                    image_url: `${IMG}/pip.png`, // STUB — reminder of who you're seeking
                     required: false,
                 },
                 {
                     id: '102',
                     type: 'information',
-                    content: `As you set off across the field, Pip falls in beside you.\n\n"Funny thing about Beacon Road back there," he says more quietly. "People arrive from it still walking like they're late for something. The heath notices. Briar notices. I notice because my paws get stepped on."\n\nHe glances up. "If anyone in your group is still in road-mode — too fast, not looking — that's a clue about the kind of morning that loses a charm from a gate hook."\n\nUp ahead: a gate onto the heath path. Pip's ears lift. "Briar's territory. Best behaviour. Soft hands on the latch."`,
-                    image_url: `${IMG}/pip.png`, // STUB
+                    content: `Ahead: a gate onto the heath path. Gorse will start claiming the edges.\n\nBriar again (voice-note): "Soft hands on the latch when you get there. And think — if you were Pip, and something small and scared was out on the heath, would you take the open pale ground… or the deep heather?"\n\nThat question matters. You'll answer it at the gate.`,
+                    image_url: `${IMG}/briar.png`, // STUB
                     required: false,
                 },
                 {
@@ -129,7 +134,7 @@ export const WhatTheHeathWasWatching: Trail = {
             ],
         },
 
-        // 3. Field gate — Briar
+        // 3. Field gate — Briar fragment + CHOICE
         {
             index: 2,
             locationId: LOC.fieldGate,
@@ -143,21 +148,48 @@ export const WhatTheHeathWasWatching: Trail = {
                 {
                     id: '200',
                     type: 'information',
-                    content: `Gorse crowds the latch like it grew there on purpose — yellow flowers if you're lucky, prickles either way.\n\nOn the empty hook beside the gate hangs… nothing. Just a pale ring of cleaner wood where something used to sit.\n\nA voice arrives before a face does — dry as the spines, warm underneath.\n\n"So. Pip found helpers."\n\nBriar steps into view on the path side of the gate: a weathered figure in a moss-green coat, hair tucked under a soft cap, fingers stained the colour of gorse bark. Their eyes flick from you to the empty hook and back.\n\n"Heath Watch. Gone since first light. I don't lose things. Someone borrowed it without asking."`,
+                    content: `Gorse crowds the latch. Yellow flowers if the season's kind; prickles either way.\n\nTied to the gatepost with a bit of twine is a scrap of paper in Briar's handwriting — left for any helper on this loop:\n\nPIP — dawn bolt. Not on road. Check high point. Collar tag loose last week — may have come off.\nIf you find the tag, keep it. If you find Pip, soft voice.\n— B\n\nYoung ears: look at the real latch. Which way does it open? Soft hands. No yanking. (We're not asking you to invent damage — just notice how it works.)`,
                     image_url: `${IMG}/briar.png`, // STUB
                     required: false,
                 },
                 {
                     id: '201',
                     type: 'information',
-                    content: `Pip clears his throat. "We're going to the viewpoint. I saw a glint—"\n\n"I know what you think you saw," Briar cuts in, not unkindly. Then, to you: "Listen carefully. The Watch likes high places and pale ground. If a walker dropped it, or set it down 'just for a second', it'll be near where the heath opens and the old workings show — west of the path at the top. Merryn's usually up there. Merryn sees everything and says half of it."\n\nBriar rests a hand on the latch.\n\n"Before you go through: soft hands. This gate remembers yankers. Stand on the field side, then the path side. Same latch. Feels different, doesn't it? That's not magic. That's manners worn into metal."\n\nYoung ears: touch the latch gently. Look for yellow on the gorse. Count the prickles if you dare (from a safe distance!).`,
+                    content: `Beyond the gate the heath proper begins. To your left and right, living purple-green. Farther on, at the high point, you'll see a pale scar in the ground to the west — old workings, bare beside the heather.\n\nBriar's riddle from the voice-note lands properly now.\n\nIf Pip was *playing*, he'd take open ground — the scar side — where he can see forever.\nIf Pip was *protecting* something scared, he'd take the deep heather — cover, quiet, prickles to keep big feet away.`,
                     image_url: `${IMG}/briar.png`, // STUB
                     required: false,
                 },
-                {
+                                {
                     id: '202',
+                    type: 'question_single',
+                    content: `What do you think Pip was doing when he bolted?`,
+                    image_url: `${IMG}/pip.png`, // STUB
+                    options: [
+                        {
+                            index: 0,
+                            content: 'Playing / chasing — he’ll be on the open pale scar',
+                            response: {
+                                title: 'Noted!',
+                                subtitle: 'Open ground theory. Hold it for the viewpoint.',
+                                sentiment: 'positive',
+                            },
+                        },
+                        {
+                            index: 1,
+                            content: 'Protecting something — he’ll be deep in the heather',
+                            response: {
+                                title: 'Noted!',
+                                subtitle: 'Cover theory. Hold it for the viewpoint.',
+                                sentiment: 'positive',
+                            },
+                        },
+                    ],
+                    required: true,
+                },
+                {
+                    id: '203',
                     type: 'information',
-                    content: `Briar opens the gate just enough.\n\n"Bring my Watch home and I'll stop scowling at the evening dog-walkers. Fail, and I'll still let you back — I'm not a monster — but I'll sigh loudly. Pip hates the sighing."\n\nPip nods solemnly. "It's a very heavy sigh."\n\nBriar almost smiles. "Go on then. Viewpoint. Look west for the pale scar in the ground. Look for Merryn. And if you argue about what happened on the way up… good. Means you're paying attention."\n\nAdult layer, if you want it: gorse holds the edge of the heath — tough, nitrogen-fixing, fire-adapted. Briar's "manners in metal" is just a way of saying places remember how we treat them.`,
+                    content: `Good. Hold that theory.\n\nNext pin is the viewpoint — the high place Briar mentioned. Look west for the pale scar. Look at the living heath. See which story the land tells you.\n\nIf your group disagrees, argue on the way up. That's allowed. Encouraged, even.`,
                     image_url: `${IMG}/briar.png`, // STUB
                     required: false,
                 },
@@ -170,7 +202,8 @@ export const WhatTheHeathWasWatching: Trail = {
             ],
         },
 
-        // 4. Viewpoint — Merryn + MacGuffin
+        // 4. Viewpoint — Merryn + tag + twist seed (state-aware copy via two info paths is hard without duplicate steps;
+        //    we write one scene that validates BOTH theories then twists)
         {
             index: 3,
             locationId: LOC.viewpoint,
@@ -184,22 +217,22 @@ export const WhatTheHeathWasWatching: Trail = {
                 {
                     id: '300',
                     type: 'information',
-                    content: `The path opens. The air thins into distance. Behind you the heath is purple-green and living; to the west the ground pales into a scraped scar — old workings, empty of heather, like a page with the writing rubbed out.\n\nSomeone is already here.\n\nMerryn sits on a low rise with a thermos and a notebook, coat the colour of winter sky. They don't jump when Pip barrels over. They just mark a page and look up.\n\n"Pip. And company. I wondered when Briar would send a search party."`,
+                    content: `The path opens. Distance arrives all at once.\n\nWest: pale scraped ground — the scar, empty of heather, like a page with the writing rubbed out.\nEast and around: living heath, purple-green, prickly, full of hiding places.\nOn a clear day the far line can show coastline and hills. Today, take what the air gives you.\n\nSomeone is already here with a thermos.\n\nMerryn. Coat the colour of winter sky. Notebook open. Not surprised to see you.`,
                     image_url: `${IMG}/merryn.png`, // STUB
                     required: false,
                 },
                 {
                     id: '301',
                     type: 'information',
-                    content: `"We're looking for the Heath Watch," you explain.\n\nMerryn nods toward the pale ground to the west. "A runner came through at dawn. Dropped something shiny near the edge of the scar, swore, kept going. I picked it up so it wouldn't get trodden in. Brass. Warm. Hook-shaped wear on one side."\n\nFrom a coat pocket, Merryn draws a small brass charm on a short leather thong — polished bright where fingers have worried it for years.\n\n"I was going to walk it down to Briar after my notes. But since you're here…"\n\nMerryn holds it out.\n\n**The Heath Watch** settles into your pack (check inventory). It isn't magic. It is loved. That's close enough.\n\nYoung ears: point west. Find the pale scar. Find something far away that isn't a tree — coastline or hills if the air is kind today.`,
-                    image_url: `${IMG}/heath_watch.png`, // STUB
-                    on_arrival: ['addItem -item heath_watch'],
+                    content: `"Briar's helpers," Merryn says. "Good. Pip came through at dawn. I watched him."\n\nMerryn points — first to the pale scar, then to a darker seam of heather.\n\n"He ran the open ground like he was chasing. Then he doubled back into the heather like he was hiding something. So if your group picked *playing* or *protecting*… you were both half right. Pip was doing both."\n\nFrom the heather edge, Merryn holds up a small metal disc on a broken ring.\n\n"His collar tag. Caught on gorse. He didn't stop for it."\n\n**Pip's Collar Tag** goes into your inventory. Proof. Direction. Worry.`,
+                    image_url: `${IMG}/collar_tag.png`, // STUB
+                    on_arrival: ['addItem -item collar_tag'],
                     required: false,
                 },
                 {
                     id: '302',
                     type: 'information',
-                    content: `Merryn closes the notebook.\n\n"People ask what the heath is watching from up here. It isn't watching the path. It's watching whether anyone looks past the path — at the scar, at the living heather, at the far line of coast and hills when the haze lets them through."\n\nPip sits. Actually sits. Rare.\n\n"So we weren't hunting a mystery villain," Pip says. "Just a dropped charm and a kind stranger with a thermos."\n\nMerryn smiles. "Villains are rarer than dropped things. Take it home to Briar. Soft hands on the last latch."\n\nAdult aside: the pale scar is place-memory — worked ground beside living heath. If the coast and Purbeck hills show today, treat them as a gift of clear air, not a promise. Speculate on the walk down: who needed the Watch more — Briar, or the people who touch it every morning?`,
+                    content: `Merryn's voice softens.\n\n"Here's the part Briar doesn't know yet. Pip wasn't alone when he left the scar. Something small was with him — low to the ground, pale, moving wrong for a fox. A pup, I think. Or a dog so young it still forgets its feet."\n\nMerryn caps the thermos.\n\n"They headed back along the return path toward the last gate. Pip was herding, not fleeing. If I'm right, he hasn't been lost for a single minute. He's been busy."\n\nYoung ears: look at the real scar. Look at the real heather. Can you see why a dog might use both?\n\nAdult aside: the scar is worked ground beside living heath — place-memory. Soft coast/hills if the air allows. No need to invent wreckage; the split is already the drama.`,
                     image_url: `${IMG}/merryn.png`, // STUB
                     required: false,
                 },
@@ -212,7 +245,7 @@ export const WhatTheHeathWasWatching: Trail = {
             ],
         },
 
-        // 5. Heath path end — return drip
+        // 5. Heath path end — tension before reveal
         {
             index: 4,
             locationId: LOC.heathPathEnd,
@@ -226,22 +259,22 @@ export const WhatTheHeathWasWatching: Trail = {
                 {
                     id: '400',
                     type: 'information',
-                    content: `The path narrows again between heather and gorse. Pip trots a happy figure-eight, glancing back to check the Heath Watch is still "with" you.\n\n"Return leg!" he announces. "Same ground, different eyes. That's the fun bit."\n\nHe stops beside a clump of heather. "Young ears — find one thing you didn't notice on the way out. A colour. A sound. A silence. Just one. I'll wait. I'm excellent at waiting. (This is a lie.)"`,
+                    content: `The path narrows between heather and gorse. This is return-leg country — same loop, tighter shoulders.\n\nYou listen harder than you did on the way out.\n\nA rustle. Then nothing. Then — maybe — a tiny high sound that could be wind through spines… or a pup that doesn't know how to bark properly yet.`,
                     image_url: `${IMG}/pip.png`, // STUB
                     required: false,
                 },
                 {
                     id: '401',
                     type: 'information',
-                    content: `As you walk, Pip talks half to himself.\n\n"Story so far, in case anyone's collecting it: Briar hangs the Watch. Someone runs at dawn. Charm slips near the scar. Merryn pockets it so it doesn't get crushed. We fetch it. Briar stops sighing. Dogs get their evening loop without a lecture."\n\nHe looks up at you. "Not every adventure needs a villain. Sometimes it needs a finder."\n\nIf you're carrying the Heath Watch, keep it safe for the last gate. Briar will want to see it on the hook where it belongs.`,
+                    content: `Young ears: soft voices now. If Pip is herding something scared, shouting turns helpers into threats.\n\nLook-find (real): pick one hiding place a small dog could use — a gorse gap, a heather hollow, a shadow by the path edge. Point at it. Don't charge it.\n\nOlder ears: if Merryn is right, the story flipped. You weren't chasing a runaway. You were walking into the middle of a rescue already in progress.`,
                     image_url: `${IMG}/pip.png`, // STUB
                     required: false,
                 },
                 {
                     id: '402',
                     type: 'information',
-                    content: `Adult aside, if you want it: daily loops like this are ordinary magic. A brass charm on a gate is only a story because someone bothers to care when it's missing — and because you're standing on the exact path where it travels every morning.\n\nOne gate left. Pip's ears are already pointing toward the sound of distant cars.\n\n"Briar gets the last word," Pip warns. "Briar always wants the last word."`,
-                    image_url: `${IMG}/pip.png`, // STUB
+                    content: `Briar's last gate is ahead — gravel-hint of cars beyond.\n\nYou've got Pip's tag. You've got Merryn's sighting. You've got a theory that might make Briar's empty lead feel very different in about three minutes.\n\nWalk in quiet. Let the heath keep its secret until the latch.`,
+                    image_url: `${IMG}/briar.png`, // STUB
                     required: false,
                 },
                 {
@@ -253,7 +286,7 @@ export const WhatTheHeathWasWatching: Trail = {
             ],
         },
 
-        // 6. Final gate — payoff
+        // 6. Final gate — twist payoff
         {
             index: 5,
             locationId: LOC.finalGate,
@@ -267,21 +300,21 @@ export const WhatTheHeathWasWatching: Trail = {
                 {
                     id: '500',
                     type: 'information',
-                    content: `The latch appears again. Beyond it, the hint of gravel and car doors — the ordinary world waiting.\n\nBriar is already there, arms folded, trying not to look hopeful.\n\nPip skids to a halt. "We found it! Well — Merryn found it. We fetched it. Team effort. Mostly me."\n\nYou hold out the Heath Watch. Briar takes it with both hands, turns it once in the light, and hangs it gently on the hook beside the gate. The brass settles with a tiny, satisfied click.\n\nBriar's shoulders drop.\n\n"You brought the walk back quieter than you took it," Briar says. "That's enough. For today."`,
-                    image_url: `${IMG}/briar.png`, // STUB
+                    content: `Briar is at the latch, empty lead still in hand — and frozen.\n\nBecause sitting neatly on the path side of the gate is Pip: muddy white chest, ridiculous ears, eyes bright with the particular smugness of a dog who has been right all morning.\n\nPressed against Pip's side, trembling but upright, is a scrawny pup with a scrap of blue ribbon tangled round one paw. No collar. Too young for this heath alone.\n\nPip stands up, trots to you, and bumps your knee as if to say: *took you long enough.*`,
+                    image_url: `${IMG}/pip.png`, // STUB
                     required: false,
                 },
                 {
                     id: '501',
                     type: 'information',
-                    content: `Pip bumps your knee, tail a blur.\n\n"See? Not spooky. Just… looking after a place properly."\n\nBriar opens the gate for you. Soft hands. No yanking.\n\n"Evening walkers will thank you, even if they never know why the latch felt friendly again. Touch the Watch once if you like — kids especially. Then home. Water for dogs. Biscuits for Pip optional but strongly recommended."\n\nPip strikes a heroic pose that lasts approximately one second.`,
-                    image_url: `${IMG}/pip.png`, // STUB
+                    content: `You hold out the collar tag. Briar takes it, kneels, and refastens it with hands that aren't quite steady.\n\n"You weren't lost," Briar tells Pip. Soft. Rough. "You were working."\n\nPip's tail answers for him.\n\nBriar looks at you. "Merryn radioed. Said you had the tag. Said the land told the story if anyone bothered to look — open ground to spot the pup, heather to hide it, loop home to the gate. You bothered."\n\nYoung ears: soft hello to the pup. No sudden hands. Pip is in charge until Briar says otherwise.\n\nAdults: if you guessed *protecting* at the gate, enjoy being right-ish. If you guessed *playing*, enjoy being right about the scar dash. Pip used both. Good dogs often do.`,
+                    image_url: `${IMG}/briar.png`, // STUB
                     required: false,
                 },
                 {
                     id: '502',
                     type: 'finish',
-                    content: `That's the loop.\n\nThe Heath Watch is home. Briar is (mostly) smiling. Pip will absolutely claim this was his idea from the start.\n\nWhat the heath was watching: whether anyone would look past the path — and whether someone would bring a small brass kindness back where it belongs.\n\nCars ahead. Soft thank-you to Briar optional (recommended).\n\nCome back another day — the latch will remember the hand.\n\n— Pip, Briar & Merryn`,
+                    content: `That's the loop.\n\nPip wasn't missing. Pip was mid-rescue — a bolted dawn dash across the scar, a hide in the heather, a herding job all the way home. You brought the tag. Briar brought the lead. The pup brought the reminder that empty heath isn't empty if you're listening.\n\nCars ahead. Water for dogs. Soft thank-you to Briar. Biscuits for Pip non-negotiable.\n\nCome back another day — and if you spot a real detail we should weave in (a truly broken latch, a particular gorse tunnel, a desire-line fork), tell Nadia. We'll write it in the right way round: place first, story second.\n\n— Pip, Briar & Merryn`,
                     image_url: `${IMG}/cover.png`, // STUB
                     required: false,
                 },
