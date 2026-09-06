@@ -16,6 +16,22 @@ let configCache: GameConfig[] | null = null;
 let cacheTime: number = 0;
 const CACHE_TTL_MS = 60 * 1000; // 1 minute cache
 
+// Hardcoded playtest / fallback rows. Merged after DB (DB wins on same ref).
+// Used when Supabase is down/empty so a pending trail can still appear for
+// direct-URL playtesting.
+const FALLBACK_CONFIG: GameConfig[] = [
+    { ref: 'easter-event', gameType: 'universal', status: 'featured', eventbriteTemplateId: null },
+    { ref: 'the-eggstraordinary-case-of-the-missing-eggs-frome', gameType: 'trail', status: 'pending', eventbriteTemplateId: null },
+    { ref: 'what-the-heath-was-watching', gameType: 'trail', status: 'pending', eventbriteTemplateId: null },
+];
+
+function mergeWithFallback(rows: GameConfig[]): GameConfig[] {
+    const byRef = new Map<string, GameConfig>();
+    for (const row of FALLBACK_CONFIG) byRef.set(row.ref, row);
+    for (const row of rows) byRef.set(row.ref, row); // DB wins
+    return Array.from(byRef.values());
+}
+
 export class GameConfigService {
     static async getAll(): Promise<GameConfig[]> {
         // Check cache first
@@ -24,11 +40,9 @@ export class GameConfigService {
         }
 
         if (!isSupabaseConfigured()) {
-            // Fallback defaults when Supabase not configured
-            return [
-                { ref: 'easter-event', gameType: 'universal', status: 'featured', eventbriteTemplateId: null },
-                { ref: 'the-eggstraordinary-case-of-the-missing-eggs-frome', gameType: 'trail', status: 'pending', eventbriteTemplateId: null }
-            ];
+            configCache = FALLBACK_CONFIG;
+            cacheTime = Date.now();
+            return configCache;
         }
 
         try {
@@ -38,21 +52,26 @@ export class GameConfigService {
 
             if (error) {
                 console.error('Supabase getGameConfig error:', error);
-                return configCache || [];
+                configCache = mergeWithFallback(configCache || []);
+                cacheTime = Date.now();
+                return configCache;
             }
 
-            configCache = (data || []).map((d: any) => ({
+            const mapped = (data || []).map((d: any) => ({
                 ref: d.ref,
                 gameType: d.game_type,
                 status: d.status as GameStatus,
                 eventbriteTemplateId: d.eventbrite_template_id ?? null,
             }));
+            configCache = mergeWithFallback(mapped);
             cacheTime = Date.now();
 
             return configCache;
         } catch (e) {
             console.error('Failed to get game config from Supabase:', e);
-            return configCache || [];
+            configCache = mergeWithFallback(configCache || []);
+            cacheTime = Date.now();
+            return configCache;
         }
     }
 
