@@ -3,8 +3,8 @@ import { Trail } from '../../types/index';
 /**
  * Pip's Bolt (ref: what-the-heath-was-watching)
  * Family dog-walk adventure on Upton Heath.
- * Player craft: Jasmarina-style scenes; no meta/craft talk in player copy;
- * don't telegraph the twist; British names (Pat, Helen, Pip).
+ * Art lives under game.twimp.app/public/trails/what-the-heath-was-watching/
+ * Storyteller tasks first + shared storybook image; every task has image_url.
  */
 
 const IMG = 'https://game.twimp.app/trails/what-the-heath-was-watching';
@@ -58,33 +58,33 @@ export const WhatTheHeathWasWatching: Trail = {
                 {
                     id: '0',
                     type: 'information',
-                    content: `A woman in a moss-green coat is pacing the Springdale Road car park with an empty dog lead in her hand. The clip swings as she turns. Her cap is crooked and she looks like she has already walked the same stretch of gravel more than once.\n\nShe spots you and comes straight over.\n\n"You're going on the heath? Good. I need help." She holds up the lead. "This is supposed to have Pip on the end of it. Scruffy little thing, ears too big for his head, white chest that is always muddy. He slipped his collar at first light and ran south into the grass. I've checked the road. He isn't there."`,
-                    image_url: `${IMG}/pat.png`,
+                    content: `Hey Storyteller!\n\nWhile the younger ones meet Pat:\n\n• Keep little ones close near gorse — it scratches.\n• Dogs on leads are welcome; give other walkers space on narrow bits.\n\nAbout 30–40 minutes of walking plus stops. Next pin is the field entrance, south into the open grass.`,
+                    image_url: `${IMG}/storyteller_storybook.png`,
                     required: false,
                 },
                 {
                     id: '1',
+                    type: 'information',
+                    content: `A woman in a moss-green coat is pacing the Springdale Road car park with an empty dog lead in her hand. The clip swings as she turns. Her cap is crooked and she looks like she has already walked the same stretch of gravel more than once.\n\nShe spots you and comes straight over.\n\n"You're going on the heath? Good. I need help." She holds up the lead. "This is supposed to have Pip on the end of it. Scruffy little thing, ears too big for his head, white chest that is always muddy. He slipped his collar at first light and ran south into the grass. I've checked the road. He isn't there."`,
+                    image_url: `${IMG}/pat_carpark.png`,
+                    required: false,
+                },
+                {
+                    id: '2',
                     type: 'information',
                     content: `"I'm Pat," she says. "Pip knows this loop better than I do — across the field, through the gate, up to the high point, and back. If he is still out there, that is where he will be."\n\nShe shows you a photo on her phone: a paw print in soft mud where the gravel meets the grass, taken that morning.\n\n"That is him leaving. I am going to sweep the edges. If you walk the main path and keep your eyes open, we might find him before it gets late. If you do see him, call softly. Don't chase. He will only run farther."\n\nShe waits for your answer like it matters.\n\n"Will you help?"`,
                     image_url: `${IMG}/paw_print.png`,
                     required: false,
                 },
                 {
-                    id: '2',
-                    type: 'information',
-                    content: `Hey Storyteller!\n\nWhile the younger ones are with Pat:\n\n• Keep little ones close near gorse — it scratches.\n• Dogs on leads are welcome; give other walkers space on narrow bits.\n\nAbout 30–40 minutes of walking plus stops. Next pin is the field entrance, south into the open grass.`,
-                    image_url: `${IMG}/pat.png`,
-                    required: false,
-                },
-                {
                     type: 'map',
                     content: 'Ready to go?',
+                    image_url: `${IMG}/map_next.png`,
                     markers: [LOC.fieldEntrance],
                     required: false,
                 },
             ],
         },
-
         {
             index: 1,
             locationId: LOC.fieldEntrance,
@@ -99,32 +99,32 @@ export const WhatTheHeathWasWatching: Trail = {
                     id: '100',
                     type: 'information',
                     content: `The path opens into a wide stretch of grass and the car park feels suddenly far behind you. You look for a scruffy white chest moving through the field. There is nothing obvious — just wind in the grass and a few distant walkers on other paths.\n\nPat's photo matched the mud at the edge of the gravel. Out here the ground is firmer and prints don't last. Pip could have crossed this field in under a minute if he was really running.`,
-                    image_url: `${IMG}/pat.png`,
+                    image_url: `${IMG}/field_open.png`,
                     required: false,
                 },
                 {
                     id: '101',
                     type: 'information',
-                    content: `A voice note from Pat:\n\n"If you have reached the open field, you are on the right track. Pip always tears across this bit when we start a walk. Check the middle and the edges. Call his name once or twice, then listen. If he answers, tell me at the next gate — I left a note there."\n\nWhile you walk, hunt for three different greens before the next pin: grass, leaf, and something pricklier at the edges. It keeps eyes on the ground, which is where a small dog is easiest to miss.`,
-                    image_url: `${IMG}/pat.png`,
+                    content: `Pat's words from the car park are still clear enough: Pip always tears across this open stretch at the start of a walk. Check the middle and the edges. Call his name once or twice, then listen.\n\nWhile you walk, hunt for three different greens before the next pin: grass, leaf, and something pricklier at the edges. It keeps eyes on the ground, which is where a small dog is easiest to miss.`,
+                    image_url: `${IMG}/field_search.png`,
                     required: false,
                 },
                 {
                     id: '102',
                     type: 'information',
                     content: `Ahead, the field narrows toward a gate onto the heath path. Gorse begins to show along the sides.\n\nYou keep walking, calling now and then, hoping for a bark that isn't one of your own.`,
-                    image_url: `${IMG}/pip.png`,
+                    image_url: `${IMG}/field_to_gate.png`,
                     required: false,
                 },
                 {
                     type: 'map',
                     content: 'Ready to go?',
+                    image_url: `${IMG}/map_next.png`,
                     markers: [LOC.fieldGate],
                     required: false,
                 },
             ],
         },
-
         {
             index: 2,
             locationId: LOC.fieldGate,
@@ -138,33 +138,33 @@ export const WhatTheHeathWasWatching: Trail = {
                 {
                     id: '200',
                     type: 'information',
-                    content: `Gorse presses in around the gate. Tied to the post with a scrap of twine is a folded note in Pat's handwriting.\n\nPIP — slipped collar at dawn. Not on the road. Heading for the high point if he sticks to our usual loop. His tag has been loose for a week — if you find it, keep it. If you find him, soft voice and message me.\n— Pat\n\nYou look at the latch the way any walker does before going through: which way it opens, whether it sticks, whether someone has left it kind for the next person. Then you go on.`,
-                    image_url: `${IMG}/pat.png`,
+                    content: `Gorse presses in around the gate. You look at the latch the way any walker does before going through: which way it opens, whether it sticks, whether someone has left it kind for the next person.\n\nNo Pip on this side. No bark waiting for you. Only the path onto the heath and the high point Pat pointed you toward.\n\nYou go on.`,
+                    image_url: `${IMG}/gate_latch.png`,
                     required: false,
                 },
                 {
                     id: '201',
                     type: 'information',
-                    content: `Beyond the gate the heath opens properly — lower plants, wider sky, the path stretching toward the high point Pat mentioned.\n\nThere is still no Pip. No bark. Only the scrape of your own feet and the odd bird lifting out of the heather.\n\nYounger players can look for yellow on the gorse as you go. Older ones can watch the path edges for movement. Either way, eyes up. A small dog can vanish into this stuff in seconds.`,
-                    image_url: `${IMG}/pat.png`,
+                    content: `Beyond the gate the heath opens properly — lower plants, wider sky, the path stretching toward the high point Pat mentioned.\n\nThere is still no Pip. No bark. Only the scrape of your own feet and the odd bird lifting out of the heather.\n\nLook for yellow on the gorse as you go, and watch the path edges for movement. Eyes up. A small dog can vanish into this stuff in seconds.`,
+                    image_url: `${IMG}/heath_path.png`,
                     required: false,
                 },
                 {
                     id: '202',
                     type: 'information',
                     content: `The next pin is the viewpoint at the top. If Pip stuck to their usual walk, that is where the path opens out and you can see a long way. Pat will be covering the sides; your job is the spine of the route.\n\nYou push on, the empty lead in Pat's photo still clear in your mind.`,
-                    image_url: `${IMG}/pip.png`,
+                    image_url: `${IMG}/toward_viewpoint.png`,
                     required: false,
                 },
                 {
                     type: 'map',
                     content: 'Ready to go?',
+                    image_url: `${IMG}/map_next.png`,
                     markers: [LOC.viewpoint],
                     required: false,
                 },
             ],
         },
-
         {
             index: 3,
             locationId: LOC.viewpoint,
@@ -178,8 +178,8 @@ export const WhatTheHeathWasWatching: Trail = {
                 {
                     id: '300',
                     type: 'information',
-                    content: `The path rises and opens. To the west the ground turns pale and bare beside the living heather — an old scar in the heath. On a clear day you can see a long way past it; today you take whatever view the air allows.\n\nA woman is sitting on a low rise with a thermos and a notebook. She looks up as you arrive, as if she has been expecting someone on this path sooner or later.`,
-                    image_url: `${IMG}/helen.png`,
+                    content: `The path rises and opens. To the west the ground turns pale and bare beside the living heather — an old scar in the heath. On a clear day you can see a long way past it; today you take whatever view the air allows.\n\nA woman is sitting on a low rise with a thermos and a notebook. She looks up as you arrive — another walker, not surprised to see people on this path.`,
+                    image_url: `${IMG}/helen_viewpoint.png`,
                     required: false,
                 },
                 {
@@ -193,19 +193,19 @@ export const WhatTheHeathWasWatching: Trail = {
                 {
                     id: '302',
                     type: 'information',
-                    content: `Helen screws the lid back on her thermos.\n\n"He was heading down the return path toward the last gate when I lost sight of him. Still moving, still not coming when called. If you keep going that way, you may catch him before Pat does."\n\nShe hesitates, then adds, "He kept looking back over his shoulder. I thought he was worried about being followed. Maybe he was."\n\nYounger players can point out the pale ground to the west and the darker heather around it. Then it is time to move. Pip still isn't here.`,
-                    image_url: `${IMG}/helen.png`,
+                    content: `Helen screws the lid back on her thermos.\n\n"He was heading down the return path toward the last gate when I lost sight of him. Still moving, still not coming when called. If you keep going that way, you may catch him before Pat does."\n\nShe hesitates, then adds, "He kept looking back over his shoulder. I thought he was worried about being followed. Maybe he was."\n\nPoint out the pale ground to the west and the darker heather around it. Then it is time to move. Pip still isn't here.`,
+                    image_url: `${IMG}/scar_heather.png`,
                     required: false,
                 },
                 {
                     type: 'map',
                     content: 'Ready to go?',
+                    image_url: `${IMG}/map_next.png`,
                     markers: [LOC.heathPathEnd],
                     required: false,
                 },
             ],
         },
-
         {
             index: 4,
             locationId: LOC.heathPathEnd,
@@ -220,32 +220,32 @@ export const WhatTheHeathWasWatching: Trail = {
                     id: '400',
                     type: 'information',
                     content: `The path narrows between heather and gorse on the way back. You are carrying Pip's tag now, which somehow makes the silence feel louder.\n\nYou try his name again, softer than before. For a moment you think you hear something ahead — a short sound, too high for Pat, too brief to be sure. Then only the wind.`,
-                    image_url: `${IMG}/pip.png`,
+                    image_url: `${IMG}/return_path.png`,
                     required: false,
                 },
                 {
                     id: '401',
                     type: 'information',
-                    content: `You slow down without meaning to. If Pip is close, crashing about in the gorse will only push him on.\n\nYounger players can pick one spot beside the path where a small dog might press in and wait — a gap, a hollow, a shadow — and watch it while you pass. No rushing. No shouting.`,
-                    image_url: `${IMG}/pip.png`,
+                    content: `You slow down without meaning to. If Pip is close, crashing about in the gorse will only push him on.\n\nPick one spot beside the path where a small dog might press in and wait — a gap, a hollow, a shadow — and watch it while you pass. No rushing. No shouting.`,
+                    image_url: `${IMG}/quiet_listen.png`,
                     required: false,
                 },
                 {
                     id: '402',
                     type: 'information',
                     content: `The last gate before the car park is ahead. That is where Pat said she would meet you. Whether Pip is with her already, or still somewhere on this stretch, you will know soon.\n\nYou walk on with the tag in your inventory and Helen's words still in your head: he kept looking back.`,
-                    image_url: `${IMG}/pat.png`,
+                    image_url: `${IMG}/toward_final_gate.png`,
                     required: false,
                 },
                 {
                     type: 'map',
                     content: 'Ready to go?',
+                    image_url: `${IMG}/map_next.png`,
                     markers: [LOC.finalGate],
                     required: false,
                 },
             ],
         },
-
         {
             index: 5,
             locationId: LOC.finalGate,
@@ -260,68 +260,32 @@ export const WhatTheHeathWasWatching: Trail = {
                     id: '500',
                     type: 'information',
                     content: `Pat is at the latch with the empty lead — and she has stopped dead.\n\nOn the path side of the gate sits Pip, muddy white chest and all, looking immensely pleased with himself. Pressed against his side is a skinny pup with a scrap of blue ribbon tangled round one paw. No collar. Too young to be out here alone.\n\nPip stands, trots over, and bumps your knee as if you are late for something obvious.`,
-                    image_url: `${IMG}/pip.png`,
+                    image_url: `${IMG}/pip_and_pup.png`,
                     required: false,
                 },
                 {
                     id: '501',
                     type: 'information',
-                    content: `You hold out the collar tag. Pat kneels, clips it back into place, and rests her forehead against Pip's for a second before she trusts her voice.\n\n"You weren't lost," she tells him. "You were working."\n\nShe looks at the pup, then at you.\n\n"Helen messaged. Said he kept looking back. I thought he was scared. He was checking on this one." She scratches Pip's ridiculous ear. "Dawn dash across the open ground to find it, heather to keep it safe, all the way home to the gate. And us searching for a runaway."\n\nSoft hellos for the pup. No sudden hands. Pip seems to think he is in charge, and just now nobody argues.`,
-                    image_url: `${IMG}/pat.png`,
+                    content: `You hold out the collar tag. Pat kneels, clips it back into place, and rests her forehead against Pip's for a second before she trusts her voice.\n\n"You weren't lost," she tells him. "You were working."\n\nShe looks at the pup, then at you.\n\n"I ran into Helen on the way round. She said he kept looking back. I thought he was scared. He was checking on this one." She scratches Pip's ridiculous ear. "Dawn dash across the open ground to find it, heather to keep it safe, all the way home to the gate. And us searching for a runaway."\n\nSoft hellos for the pup. No sudden hands. Pip seems to think he is in charge, and just now nobody argues.`,
+                    image_url: `${IMG}/pat_reunion.png`,
                     required: false,
                 },
                 {
                     id: '502',
                     type: 'finish',
                     content: `That is the loop.\n\nPip was never missing for long. He was mid-rescue — a bolted run at dawn, a hide in the heather, and a careful job of bringing a lost pup home. You found the tag. Pat found her dog. The pup found people who will sort out the ribbon and the rest.\n\nCars are ahead. Water for any dogs with you. Biscuits for Pip are not optional.\n\nCome back another day. The heath will still be here — and so, with any luck, will Pip.`,
-                    image_url: `${IMG}/cover.png`,
+                    image_url: `${IMG}/finish_cover.png`,
                     required: false,
                 },
             ],
         },
     ],
     locations: [
-        {
-            index: 0,
-            id: LOC.carPark,
-            lat: 50.762012947626665,
-            lng: -2.0202031483379357,
-            name: 'Car Park',
-        },
-        {
-            index: 1,
-            id: LOC.fieldEntrance,
-            lat: 50.76091533282281,
-            lng: -2.023903538661342,
-            name: 'Field Entrance',
-        },
-        {
-            index: 2,
-            id: LOC.fieldGate,
-            lat: 50.75890153169216,
-            lng: -2.0291648364341,
-            name: 'Field Gate onto Path',
-        },
-        {
-            index: 3,
-            id: LOC.viewpoint,
-            lat: 50.75665047258589,
-            lng: -2.0238960223839038,
-            name: 'Viewpoint',
-        },
-        {
-            index: 4,
-            id: LOC.heathPathEnd,
-            lat: 50.757752670965544,
-            lng: -2.0237197804462004,
-            name: 'Heath Path End (Return)',
-        },
-        {
-            index: 5,
-            id: LOC.finalGate,
-            lat: 50.76096551558284,
-            lng: -2.020612977450314,
-            name: 'Final Gate before Car Park',
-        },
+        { index: 0, id: LOC.carPark, lat: 50.762012947626665, lng: -2.0202031483379357, name: 'Car Park' },
+        { index: 1, id: LOC.fieldEntrance, lat: 50.76091533282281, lng: -2.023903538661342, name: 'Field Entrance' },
+        { index: 2, id: LOC.fieldGate, lat: 50.75890153169216, lng: -2.0291648364341, name: 'Field Gate onto Path' },
+        { index: 3, id: LOC.viewpoint, lat: 50.75665047258589, lng: -2.0238960223839038, name: 'Viewpoint' },
+        { index: 4, id: LOC.heathPathEnd, lat: 50.757752670965544, lng: -2.0237197804462004, name: 'Heath Path End (Return)' },
+        { index: 5, id: LOC.finalGate, lat: 50.76096551558284, lng: -2.020612977450314, name: 'Final Gate before Car Park' },
     ],
 };
