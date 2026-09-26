@@ -12,6 +12,7 @@
     { "source": "/awty", "destination": "/api/awty" },
     { "source": "/next", "destination": "/api/next" },
     { "source": "/journal", "destination": "/api/journal" },
+    { "source": "/items", "destination": "/api/items" },
     { "source": "/list", "destination": "/api/list" },
     { "source": "/trails/list", "destination": "/api/list" },
     { "source": "/easter_event/:path*", "destination": "/api/easter_event/:path*" },
