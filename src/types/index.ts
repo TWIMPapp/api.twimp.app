@@ -16,6 +16,8 @@ export interface Location {
 
 export interface TrailTask {
     type: string;
+    // Player-facing markdown. May include play-day date tokens such as
+    // {{P-2|dddd d MMM}}. See docs/trail-authoring.md.
     content?: string;
     hint?: string;
     answer?: string[];

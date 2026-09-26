@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { handleOptions, cors } from './_utils';
 import { SessionService } from '../src/services/SessionService';
 import { TrailService } from '../src/services/TrailService';
+import { resolvePlayerVisible } from '../src/utils/dateTokens';
 
 // Player's evidence log. Returns the ordered list of `information` tasks the
 // player has actually seen — every info task in every step they've activated,
@@ -51,7 +52,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const t = step.tasks[i];
             if (!t || t.type !== 'information') continue;
             const { on_arrival, on_search, on_answer, ...clean } = t;
-            tasks.push(clean);
+            tasks.push(resolvePlayerVisible(clean, session.playStart));
         }
     }
 

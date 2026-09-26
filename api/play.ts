@@ -5,6 +5,7 @@ import { DinoHuntService } from '../src/services/DinoHuntService';
 import { CustomTrailService } from '../src/services/CustomTrailService';
 import { TrailService } from '../src/services/TrailService';
 import { SessionService } from '../src/services/SessionService';
+import { resolvePlayerVisible } from '../src/utils/dateTokens';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (handleOptions(req, res)) return;
@@ -60,7 +61,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const step = (trail as any).steps[stepIndex];
         const task = step ? step.tasks[taskIndex] : null;
         if (task) {
-            return res.json({ body: { ok: true, task } });
+            return res.json({ body: { ok: true, task: resolvePlayerVisible(task, session.playStart) } });
         }
     }
 
@@ -72,7 +73,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // comes from trail.start_node_caption (no engine-side fallback string).
     const firstStep = (trail as any).steps?.[0];
     const startLoc = firstStep?.location;
-    const mapTask = {
+    const mapTask = resolvePlayerVisible({
         id: -1,
         type: 'map',
         content: trail.start_node_caption || '',
@@ -85,7 +86,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             colour: 'red',
             status: 'active',
         }] : [],
-    };
+    }, session.playStart);
 
     res.json({ body: { ok: true, task: mapTask } });
 }

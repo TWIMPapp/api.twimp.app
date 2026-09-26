@@ -2,6 +2,7 @@ import { GeoService } from './GeoService';
 import { SessionService } from './SessionService';
 import { TrailService } from './TrailService';
 import { GameSession } from './SessionService';
+import { resolveDateTokens, resolvePlayerVisible } from '../utils/dateTokens';
 
 export class GameEngineService {
     static async handleAWTY(userId: string, trailRef: string, lat: number, lng: number, accuracy: number = 10, currentTaskId?: number) {
@@ -129,7 +130,12 @@ export class GameEngineService {
             const task = this.cleanupTaskForFrontend(step.tasks[0], session.state);
 
             await SessionService.saveSession(session);
-            return { ok: true, step_type: step.type, task, outcome: { items: [...items, ...taskItems, ...stepArrivalItems] } };
+            // Resolve on the response copy. `task` is already a shallow clone from
+            // cleanup; items are new objects. The cached trail is not written.
+            return resolvePlayerVisible(
+                { ok: true, step_type: step.type, task, outcome: { items: [...items, ...taskItems, ...stepArrivalItems] } },
+                session.playStart,
+            );
         }
     }
 
@@ -178,13 +184,22 @@ export class GameEngineService {
                 // or several equivalent ones (string[]), e.g. ["1956", "56"].
                 const ans = answer.trim().toLowerCase();
                 const match = task.options.find((o: any) =>
-                    (Array.isArray(o.content) ? o.content : [o.content]).some((c: any) => String(c).toLowerCase() === ans)
+                    (Array.isArray(o.content) ? o.content : [o.content]).some((c: any) => {
+                        const raw = String(c ?? '');
+                        // The client submits the text the player saw. Date tokens
+                        // are resolved for that comparison only — `o` stays the
+                        // cached trail option.
+                        const shown = raw.includes('{{') ? resolveDateTokens(raw, session.playStart) : raw;
+                        return shown.toLowerCase() === ans;
+                    })
                 );
                 if (match) {
                     if (match.response?.sentiment === "positive") {
                         taskIndex++;
                     }
-                    outcome = match.response;
+                    // Copy before attaching granted items. `match.response` is a
+                    // reference into the cached trail.
+                    outcome = match.response ? { ...match.response } : undefined;
                     if (outcome?.action) {
                         const r = this.applyActions(session, outcome.action, trail);
                         if (r.items.length) outcome.items = [...(outcome.items || []), ...r.items];
@@ -216,7 +231,7 @@ export class GameEngineService {
             await SessionService.saveSession(session);
         }
 
-        return { ok, task, outcome };
+        return resolvePlayerVisible({ ok, task, outcome }, session.playStart);
     }
 
     static async handleRestart(userId: string, trailRef: string) {
