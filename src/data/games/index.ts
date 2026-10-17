@@ -10,7 +10,6 @@ import { BryngarwWoodlandSummer } from './BryngarwWoodlandSummer';
 import { EggstraordinaryCardiff } from './EggstraordinaryCardiff';
 import { EggstraordinaryFrome } from './EggstraordinaryFrome';
 import { EasterEvent } from './EasterEvent';
-import { WhatTheHeathWasWatching } from './WhatTheHeathWasWatching';
 
 // Helper to get all trails (including EVENT type games)
 export const Trails = [
@@ -25,8 +24,7 @@ export const Trails = [
     BryngarwWoodlandSummer,
     EggstraordinaryCardiff,
     EggstraordinaryFrome,
-    EasterEvent,
-    WhatTheHeathWasWatching
+    EasterEvent
 ];
 
 export const getStoredTrails = () => Trails;
