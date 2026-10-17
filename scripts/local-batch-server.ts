@@ -29,7 +29,7 @@ http.createServer((req, res) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Access-Control-Allow-Headers', '*');
       if (req.method === 'OPTIONS') return res.end();
-      if (url.pathname === '/list') return r.json({ featured: [], all: [{ ref: trail.ref, name: trail.name, hasSession: true }] });
+      if (url.pathname === '/list') return r.json({ featured: [], playAgain: [], nearYou: [], all: [{ ref: trail.ref, name: trail.name, description: trail.description, image_url: trail.image_url, tags: trail.tags, hasSession: true }] });
       res.statusCode = 404; return res.end('{}');
     }
     try { await h(q, r); } catch (e: any) { console.error(e); res.statusCode = 500; res.end(JSON.stringify({ err: e.message })); }
