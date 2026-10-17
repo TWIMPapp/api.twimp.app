@@ -14,7 +14,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(405).json({ ok: false, message: 'Method not allowed' });
     }
 
-    const { game_ref, trail_ref, user_id, action, answer, puzzle_id, lat, lng } = req.body;
+    const { game_ref, trail_ref, user_id, action, answer, puzzle_id, lat, lng, batch, sync_position } = req.body;
     const ref = game_ref || trail_ref; // Support both for backwards compatibility
 
     if (!ref || !user_id) {
@@ -140,6 +140,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const result = await GameEngineService.handleRestart(user_id, ref);
         return res.json({ body: result });
     }
-    const result = await GameEngineService.handleNext(user_id, ref, answer);
+    const result = await GameEngineService.handleNext(user_id, ref, answer, {
+        batch: batch === true || batch === 'true',
+        syncPosition: sync_position !== undefined && sync_position !== null ? Number(sync_position) : undefined,
+    });
     res.json({ body: result });
 }

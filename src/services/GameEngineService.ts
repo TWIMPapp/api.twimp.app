@@ -5,7 +5,7 @@ import { GameSession } from './SessionService';
 import { resolveDateTokens, resolvePlayerVisible } from '../utils/dateTokens';
 
 export class GameEngineService {
-    static async handleAWTY(userId: string, trailRef: string, lat: number, lng: number, accuracy: number = 10, currentTaskId?: number) {
+    static async handleAWTY(userId: string, trailRef: string, lat: number, lng: number, accuracy: number = 10, currentTaskId?: number, batch: boolean = false) {
         const session = await SessionService.getSession(userId, trailRef);
         const trail = await TrailService.getResolvedTrailAsync(trailRef) || TrailService.getResolvedTrail(trailRef);
 
@@ -128,22 +128,30 @@ export class GameEngineService {
             const stepArrivalItems = resolvedActions ? this.applyActions(session, resolvedActions, trail).items : [];
 
             const task = this.cleanupTaskForFrontend(step.tasks[0], session.state);
+            const batchFields = batch ? this.buildBatch(session, trail, stepIndex, 0) : {};
 
             await SessionService.saveSession(session);
             // Resolve on the response copy. `task` is already a shallow clone from
             // cleanup; items are new objects. The cached trail is not written.
             return resolvePlayerVisible(
-                { ok: true, step_type: step.type, task, outcome: { items: [...items, ...taskItems, ...stepArrivalItems] } },
+                { ok: true, step_type: step.type, task, outcome: { items: [...items, ...taskItems, ...stepArrivalItems] }, ...batchFields },
                 session.playStart,
             );
         }
     }
 
-    static async handleNext(userId: string, trailRef: string, answer?: string) {
+    static async handleNext(userId: string, trailRef: string, answer?: string, opts: { batch?: boolean; syncPosition?: number } = {}) {
         const session = await SessionService.getSession(userId, trailRef);
         const trail = await TrailService.getResolvedTrailAsync(trailRef) || TrailService.getResolvedTrail(trailRef);
 
         if (!trail) return { ok: false, message: "Trail not found" };
+
+        // Background cross-check from a batch client (see buildBatch). Read-only:
+        // no advance, no side effects — returns the card at `syncPosition`
+        // exactly as it was cleaned when the batch was sent.
+        if (typeof opts.syncPosition === 'number' && !Number.isNaN(opts.syncPosition)) {
+            return this.handleSync(session, trail, opts.syncPosition);
+        }
 
         if (session.task === 0) {
             session.playStart = Date.now();
@@ -228,7 +236,9 @@ export class GameEngineService {
 
             task = this.cleanupTaskForFrontend(task, session.state);
             session.task = stepIndex * 100 + taskIndex;
+            const batchFields = opts.batch ? this.buildBatch(session, trail, stepIndex, taskIndex) : {};
             await SessionService.saveSession(session);
+            return resolvePlayerVisible({ ok, task, outcome, ...batchFields }, session.playStart);
         }
 
         return resolvePlayerVisible({ ok, task, outcome }, session.playStart);
@@ -332,6 +342,75 @@ export class GameEngineService {
             clean.markers = clean.markers[sessionState] || [];
         }
         return clean;
+    }
+
+    // ===== Batch next =====
+    //
+    // With `batch: true` the response carries, alongside the unchanged `task`:
+    //   position: number        — session position of `task` (step*100 + index)
+    //   upcoming: UpcomingTask[] — the cards after `task` in the same step, up to
+    //                              and including the next blocking card (anything
+    //                              that is not an `information` card: questions,
+    //                              map, finish, other interactive types) or the
+    //                              end of the step. Empty when `task` is blocking.
+    // Each upcoming entry is the cleaned card plus:
+    //   position, server_call_required (source card had on_arrival), items
+    //   (items its on_arrival granted).
+    //
+    // Session advance: on_arrival for every card in the batch is applied now
+    // (accepted trade-off), and session.task is moved to the LAST card in the
+    // batch. That way a later answer / swipe-past-end /next acts on the right
+    // card, and on_arrival is never applied twice. The state each card was
+    // cleaned with is remembered (session.input[BATCH_KEY]) so a client's
+    // background `sync_position` call can return a byte-identical card for
+    // cross-checking without touching the session.
+    static readonly BATCH_KEY = '__batch';
+
+    private static isBlocking(task: any): boolean {
+        return !task || task.type !== 'information';
+    }
+
+    private static buildBatch(session: GameSession, trail: any, stepIndex: number, taskIndex: number) {
+        const step = trail.steps[stepIndex];
+        const position = stepIndex * 100 + taskIndex;
+        const states: Record<string, string> = { [position]: session.state || '' };
+        const upcoming: any[] = [];
+
+        if (!this.isBlocking(step.tasks[taskIndex])) {
+            for (let i = taskIndex + 1; i < step.tasks.length; i++) {
+                const src = step.tasks[i];
+                const actions = this.resolveConditionalActions(src.on_arrival, session.state);
+                const items = actions ? this.applyActions(session, actions, trail).items : [];
+                const pos = stepIndex * 100 + i;
+                states[pos] = session.state || '';
+                upcoming.push({
+                    ...this.cleanupTaskForFrontend(src, session.state),
+                    position: pos,
+                    server_call_required: !!src.on_arrival,
+                    items,
+                });
+                session.task = pos;
+                if (this.isBlocking(src)) break;
+            }
+        }
+
+        session.input = session.input || {};
+        session.input[this.BATCH_KEY] = JSON.stringify({ from: position, to: session.task, states });
+        return { position, upcoming };
+    }
+
+    private static handleSync(session: GameSession, trail: any, position: number) {
+        let batch: any = null;
+        try { batch = JSON.parse(session.input?.[this.BATCH_KEY] || 'null'); } catch { batch = null; }
+        const inBatch = batch && batch.states && Object.prototype.hasOwnProperty.call(batch.states, String(position))
+            && position >= batch.from && position <= batch.to && batch.to === session.task;
+        if (!inBatch) {
+            return { ok: false, synced: false, reason: 'Position not in current batch', position: session.task };
+        }
+        const src = trail.steps[Math.floor(position / 100)]?.tasks[position % 100];
+        if (!src) return { ok: false, synced: false, reason: 'Invalid position', position: session.task };
+        const task = this.cleanupTaskForFrontend(src, batch.states[String(position)]);
+        return resolvePlayerVisible({ ok: true, synced: true, position, task }, session.playStart);
     }
 
     // step.on_arrival / task.on_arrival can be:

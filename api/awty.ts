@@ -13,7 +13,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(405).json({ ok: false, message: 'Method not allowed' });
     }
 
-    const { game_ref, trail_ref, user_id, lat, lng, accuracy, task_id } = req.body;
+    const { game_ref, trail_ref, user_id, lat, lng, accuracy, task_id, batch } = req.body;
     const ref = game_ref || trail_ref; // Support both for backwards compatibility
 
     if (!ref || !user_id) {
@@ -47,7 +47,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         parseFloat(lat),
         parseFloat(lng),
         parseFloat(accuracy),
-        task_id
+        task_id,
+        batch === true || batch === 'true'
     );
     res.json({ body: result });
 }
