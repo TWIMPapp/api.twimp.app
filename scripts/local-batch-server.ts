@@ -6,13 +6,15 @@ import { TrailService } from '../src/services/TrailService';
 import next from '../api/next';
 import play from '../api/play';
 import awty from '../api/awty';
+import journal from '../api/journal';
+import items from '../api/items';
 
 // BATCH_TRAIL_FILE: one or more trail JSON paths, comma-separated.
 const trails: any[] = process.env.BATCH_TRAIL_FILE!.split(',').filter(Boolean)
   .map(f => JSON.parse(fs.readFileSync(f.trim(), 'utf8')));
 (TrailService as any).getTrailByRefAsync = async (ref: string) => trails.find(t => t.ref === ref);
 
-const routes: Record<string, any> = { '/next': next, '/play': play, '/awty': awty };
+const routes: Record<string, any> = { '/next': next, '/play': play, '/awty': awty, '/journal': journal, '/items': items };
 http.createServer((req, res) => {
   let raw = '';
   req.on('data', c => (raw += c));
