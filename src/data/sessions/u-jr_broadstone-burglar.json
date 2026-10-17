@@ -1,0 +1,14 @@
+{
+  "userId": "u-jr",
+  "trail": "broadstone-burglar",
+  "task": 3,
+  "retries": 0,
+  "playStart": 1792235019475,
+  "path": "0",
+  "state": "BRIEFED",
+  "items": [],
+  "input": {
+    "__batch": "{\"from\":1,\"to\":3,\"states\":{\"1\":\"BRIEFED\",\"2\":\"BRIEFED\",\"3\":\"BRIEFED\"}}"
+  },
+  "lastAWTY": 1792235008191
+}

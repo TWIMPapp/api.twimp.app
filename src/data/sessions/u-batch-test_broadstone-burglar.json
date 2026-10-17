@@ -1,0 +1,14 @@
+{
+  "userId": "u-batch-test",
+  "trail": "broadstone-burglar",
+  "task": 806,
+  "retries": 0,
+  "playStart": 1792228732986,
+  "path": "0",
+  "state": "SHOP_PJ",
+  "items": [],
+  "input": {
+    "__batch": "{\"from\":801,\"to\":806,\"states\":{\"801\":\"SHOP_PJ\",\"802\":\"SHOP_PJ\",\"803\":\"SHOP_PJ\",\"804\":\"SHOP_PJ\",\"805\":\"SHOP_PJ\",\"806\":\"SHOP_PJ\"}}"
+  },
+  "lastAWTY": 1792228732989
+}

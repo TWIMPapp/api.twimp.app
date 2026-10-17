@@ -1,0 +1,14 @@
+{
+  "userId": "ngrok-mw",
+  "trail": "monsters-wimborne-test-2000",
+  "task": 305,
+  "retries": 0,
+  "playStart": 1792232549426,
+  "path": "2|3",
+  "state": "FINISHED",
+  "items": [],
+  "input": {
+    "__batch": "{\"from\":300,\"to\":305,\"states\":{\"300\":\"FINISHED\",\"301\":\"FINISHED\",\"302\":\"FINISHED\",\"303\":\"FINISHED\",\"304\":\"FINISHED\",\"305\":\"FINISHED\"}}"
+  },
+  "lastAWTY": 1792232558988
+}

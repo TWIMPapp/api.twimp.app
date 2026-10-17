@@ -1,0 +1,13 @@
+{
+  "userId": "u-e2e",
+  "trail": "broadstone-burglar",
+  "task": 812,
+  "retries": 0,
+  "playStart": 1792229036108,
+  "path": "",
+  "state": "PD1_DONE",
+  "items": [],
+  "input": {
+    "__batch": "{\"from\":807,\"to\":812,\"states\":{\"807\":\"DEREK_DONE\",\"808\":\"DEREK_DONE\",\"809\":\"DEREK_DONE\",\"810\":\"DEREK_DONE\",\"811\":\"PD1_DONE\",\"812\":\"PD1_DONE\"}}"
+  }
+}

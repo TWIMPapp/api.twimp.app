@@ -386,6 +386,7 @@ export class GameEngineService {
                 upcoming.push({
                     ...this.cleanupTaskForFrontend(src, session.state),
                     position: pos,
+                    step_name: step.name,
                     server_call_required: !!src.on_arrival,
                     items,
                 });
@@ -396,7 +397,7 @@ export class GameEngineService {
 
         session.input = session.input || {};
         session.input[this.BATCH_KEY] = JSON.stringify({ from: position, to: session.task, states });
-        return { position, upcoming };
+        return { position, step_name: step.name, upcoming };
     }
 
     private static handleSync(session: GameSession, trail: any, position: number) {
@@ -410,7 +411,7 @@ export class GameEngineService {
         const src = trail.steps[Math.floor(position / 100)]?.tasks[position % 100];
         if (!src) return { ok: false, synced: false, reason: 'Invalid position', position: session.task };
         const task = this.cleanupTaskForFrontend(src, batch.states[String(position)]);
-        return resolvePlayerVisible({ ok: true, synced: true, position, task }, session.playStart);
+        return resolvePlayerVisible({ ok: true, synced: true, position, step_name: trail.steps[Math.floor(position / 100)]?.name, task }, session.playStart);
     }
 
     // step.on_arrival / task.on_arrival can be:

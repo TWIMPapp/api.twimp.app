@@ -1,0 +1,13 @@
+{
+  "userId": "u-tin",
+  "trail": "broadstone-burglar",
+  "task": 207,
+  "retries": 0,
+  "playStart": 1792236546945,
+  "path": "0|1|2",
+  "state": "JO_DONE",
+  "items": [],
+  "input": {
+    "__batch": "{\"from\":201,\"to\":207,\"states\":{\"201\":\"\",\"202\":\"\",\"203\":\"\",\"204\":\"\",\"205\":\"\",\"206\":\"JO_DONE\",\"207\":\"JO_DONE\"}}"
+  }
+}

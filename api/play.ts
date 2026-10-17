@@ -61,7 +61,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const step = (trail as any).steps[stepIndex];
         const task = step ? step.tasks[taskIndex] : null;
         if (task) {
-            return res.json({ body: { ok: true, task: resolvePlayerVisible(task, session.playStart) } });
+            return res.json({ body: { ok: true, task: resolvePlayerVisible(task, session.playStart), position: session.task, step_name: step?.name } });
         }
     }
 

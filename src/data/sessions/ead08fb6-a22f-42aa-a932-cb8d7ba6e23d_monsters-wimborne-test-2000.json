@@ -1,0 +1,14 @@
+{
+  "userId": "ead08fb6-a22f-42aa-a932-cb8d7ba6e23d",
+  "trail": "monsters-wimborne-test-2000",
+  "task": 3,
+  "retries": 0,
+  "playStart": 1792236316663,
+  "path": "0",
+  "state": "SEARCH",
+  "items": [],
+  "input": {
+    "__batch": "{\"from\":0,\"to\":3,\"states\":{\"0\":\"SEARCH\",\"1\":\"SEARCH\",\"2\":\"SEARCH\",\"3\":\"SEARCH\"}}"
+  },
+  "lastAWTY": 1792236321607
+}

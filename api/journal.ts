@@ -52,7 +52,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const t = step.tasks[i];
             if (!t || t.type !== 'information') continue;
             const { on_arrival, on_search, on_answer, ...clean } = t;
-            tasks.push(resolvePlayerVisible(clean, session.playStart));
+            // position / step_name: extra fields so clients can group by stop.
+            tasks.push(resolvePlayerVisible({ ...clean, position: idx * 100 + i, step_name: step.name }, session.playStart));
         }
     }
 
