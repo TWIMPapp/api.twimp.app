@@ -3,6 +3,7 @@ import { Trail } from '../../types/index';
 // Source: twimp_adalo/trails/json/jasmarina_bournemouth.js
 export const JasmarinaBournemouth: Trail = {
     "ref": "jasmarina-bournemouth",
+    "items_enabled": true,
     "name": "Jasmarina",
     "type": "WALK",
     "description": `TWIMP is an outdoor storytelling app — walk to pins on a map and the next chapter plays when you arrive. No headphones, no tour guide.\n\nThis one, Jasmarina, is a Choose Your Own Adventure set in Bournemouth's Lower Gardens. A pirate captain has stolen a kind fisherwoman's lucky charm and it's up to you to get it back. Who you trust along the way shapes the story — multiple routes, multiple endings.\n\nRoughly 45–60 minutes. Pushchair and dog friendly. Play any time, as many times as you like.`,
