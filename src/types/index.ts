@@ -96,6 +96,6 @@ export interface Trail {
     tester?: boolean;
     isValidating?: boolean;
     start_node_caption?: string;
-    // Items tab on/off for the player. Absent = true (back-compat). See docs/trail-authoring.md.
+    // Items tab on/off for the player. Absent = false (tab hidden). See docs/trail-authoring.md.
     items_enabled?: boolean;
 }

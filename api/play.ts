@@ -61,7 +61,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const step = (trail as any).steps[stepIndex];
         const task = step ? step.tasks[taskIndex] : null;
         if (task) {
-            return res.json({ body: { ok: true, task: resolvePlayerVisible(task, session.playStart), position: session.task, step_name: step?.name, items_enabled: (trail as any).items_enabled !== false } });
+            return res.json({ body: { ok: true, task: resolvePlayerVisible(task, session.playStart), position: session.task, step_name: step?.name, items_enabled: (trail as any).items_enabled === true } });
         }
     }
 
@@ -88,5 +88,5 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }] : [],
     }, session.playStart);
 
-    res.json({ body: { ok: true, task: mapTask, items_enabled: (trail as any).items_enabled !== false } });
+    res.json({ body: { ok: true, task: mapTask, items_enabled: (trail as any).items_enabled === true } });
 }

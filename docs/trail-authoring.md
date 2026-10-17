@@ -65,9 +65,9 @@ The burglary was reported {{P-2|rel}} ({{P-2|dddd d MMM}}).
 Top-level boolean on the trail JSON. It controls whether the player's game page shows the **Items** tab.
 
 ```json
-{ "ref": "my-trail", "items_enabled": false, ... }
+{ "ref": "my-trail", "items_enabled": true, ... }
 ```
 
-- Absent or `true` means the tab is shown. The default is `true` so every existing trail keeps the tab it has today, without a data migration. A rule based on whether the trail uses items (`items[]` / `addItem` / `items_added`) was considered. It was rejected because it would silently remove the tab from any live trail where items are granted indirectly.
-- `false` hides the Items tab. The Journal and the exit (Leave game) tab are unaffected. Items can still be granted server-side; they just aren't shown.
-- It is exposed to the client as `items_enabled` (always a boolean) on each game in `/list`, on `/play` responses, and on batch `/next` responses (alongside `position` / `upcoming`) including `sync_position`.
+- Only `true` shows the tab. Absent, `false`, or anything else hides it. **Any trail that grants items (`items[]` catalogue with `addItem`, `items_added`, item-gated logic) must set `items_enabled: true`, or its players won't see their items.**
+- The Journal and the exit (Leave game) tab are unaffected. Items can still be granted server-side whatever the flag says; the flag only controls what is shown.
+- It is exposed to the client as `items_enabled` (always a boolean) on each game in `/list`, on `/play` responses, and on batch `/next` responses (alongside `position` / `upcoming`) including `sync_position`. A client that has never received the flag for a trail hides the tab.

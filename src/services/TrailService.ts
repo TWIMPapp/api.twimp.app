@@ -203,7 +203,7 @@ export class TrailService {
                 type: t.type,
                 gradient: t.gradient,
                 content_pack: t.content_pack,
-                items_enabled: (t as any).items_enabled !== false,
+                items_enabled: (t as any).items_enabled === true,
                 status: config?.status ?? 'active'
             };
         });
