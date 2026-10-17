@@ -7,9 +7,10 @@ import next from '../api/next';
 import play from '../api/play';
 import awty from '../api/awty';
 
-const file = process.env.BATCH_TRAIL_FILE!;
-const trail = JSON.parse(fs.readFileSync(file, 'utf8'));
-(TrailService as any).getTrailByRefAsync = async (ref: string) => (ref === trail.ref ? trail : undefined);
+// BATCH_TRAIL_FILE: one or more trail JSON paths, comma-separated.
+const trails: any[] = process.env.BATCH_TRAIL_FILE!.split(',').filter(Boolean)
+  .map(f => JSON.parse(fs.readFileSync(f.trim(), 'utf8')));
+(TrailService as any).getTrailByRefAsync = async (ref: string) => trails.find(t => t.ref === ref);
 
 const routes: Record<string, any> = { '/next': next, '/play': play, '/awty': awty };
 http.createServer((req, res) => {
@@ -29,7 +30,7 @@ http.createServer((req, res) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Access-Control-Allow-Headers', '*');
       if (req.method === 'OPTIONS') return res.end();
-      if (url.pathname === '/list') return r.json({ featured: [], playAgain: [], nearYou: [], all: [{ ref: trail.ref, name: trail.name, description: trail.description, image_url: trail.image_url, tags: trail.tags, hasSession: true }] });
+      if (url.pathname === '/list') return r.json({ featured: [], playAgain: [], nearYou: [], all: trails.map(t => ({ ref: t.ref, name: t.name, description: t.description, image_url: t.image_url, tags: t.tags, hasSession: true })) });
       res.statusCode = 404; return res.end('{}');
     }
     try { await h(q, r); } catch (e: any) { console.error(e); res.statusCode = 500; res.end(JSON.stringify({ err: e.message })); }
