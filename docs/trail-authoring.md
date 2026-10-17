@@ -59,3 +59,15 @@ The burglary was reported {{P-2|rel}} ({{P-2|dddd d MMM}}).
 | {{P-1|ddd d MMM}} | Van returned after midnight |
 | {{P|ddd d MMM}} | You open the logbook |
 ```
+
+## Items tab: `items_enabled`
+
+Top-level boolean on the trail JSON. It controls whether the player's game page shows the **Items** tab.
+
+```json
+{ "ref": "my-trail", "items_enabled": false, ... }
+```
+
+- Absent or `true` means the tab is shown. The default is `true` so every existing trail keeps the tab it has today, without a data migration. A rule based on whether the trail uses items (`items[]` / `addItem` / `items_added`) was considered. It was rejected because it would silently remove the tab from any live trail where items are granted indirectly.
+- `false` hides the Items tab. The Journal and the exit (Leave game) tab are unaffected. Items can still be granted server-side; they just aren't shown.
+- It is exposed to the client as `items_enabled` (always a boolean) on each game in `/list`, on `/play` responses, and on batch `/next` responses (alongside `position` / `upcoming`) including `sync_position`.

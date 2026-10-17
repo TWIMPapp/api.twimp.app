@@ -32,7 +32,7 @@ http.createServer((req, res) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Access-Control-Allow-Headers', '*');
       if (req.method === 'OPTIONS') return res.end();
-      if (url.pathname === '/list') return r.json({ featured: [], playAgain: [], nearYou: [], all: trails.map(t => ({ ref: t.ref, name: t.name, description: t.description, image_url: t.image_url, tags: t.tags, hasSession: true })) });
+      if (url.pathname === '/list') return r.json({ featured: [], playAgain: [], nearYou: [], all: trails.map(t => ({ ref: t.ref, name: t.name, description: t.description, image_url: t.image_url, tags: t.tags, hasSession: true, items_enabled: t.items_enabled !== false })) });
       res.statusCode = 404; return res.end('{}');
     }
     try { await h(q, r); } catch (e: any) { console.error(e); res.statusCode = 500; res.end(JSON.stringify({ err: e.message })); }

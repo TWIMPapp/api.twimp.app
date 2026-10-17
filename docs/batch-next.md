@@ -7,6 +7,8 @@
   blocking card (any non-`information` type) or the end of the step. Empty if `task` is blocking.
   Each entry = card + `position`, `server_call_required` (source had `on_arrival`), `items`
   (items granted by its `on_arrival`).
+- `items_enabled` — trail's Items-tab flag (boolean, `true` when the trail omits it; see
+  `trail-authoring.md`). Also on `/play` responses and each `/list` game.
 
 `task`, `outcome`, `ok` are unchanged. Empty answer → `ok:false`; unmatched answer → no task/upcoming;
 matched negative option → same question back, `upcoming: []`.
