@@ -59,6 +59,9 @@ export interface Step {
     // reachable. ANDed across the array, and ANDed with `state` / requiredSteps
     // if also set. Unset = no item prerequisite.
     requiredItems?: string[];
+    // on_search.proximity_radius: object size in metres (default 1).
+    // on_search.inverted: true → fires when the player is OUTSIDE
+    // proximity_radius + GPS buffer (e.g. a "left the game area" step).
     on_search?: any;
     // Three forms:
     //   - { items_added, items_removed }      → legacy items, handled by updateItems

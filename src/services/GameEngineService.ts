@@ -3,6 +3,7 @@ import { SessionService } from './SessionService';
 import { TrailService } from './TrailService';
 import { GameSession } from './SessionService';
 import { resolveDateTokens, resolvePlayerVisible } from '../utils/dateTokens';
+import { isInvertedStep, isTriggered, pickActivatedStep } from '../utils/proximity';
 
 export class GameEngineService {
     static async handleAWTY(userId: string, trailRef: string, lat: number, lng: number, accuracy: number = 10, currentTaskId?: number, batch: boolean = false) {
@@ -55,10 +56,15 @@ export class GameEngineService {
             const accuracyBuffer = Math.min(40, Math.max(10, accuracy * 1.5));
             const catchmentRadius = proximityRadius + accuracyBuffer;
 
+            // Inverted steps (on_search.inverted: true) fire when the fix is
+            // OUTSIDE the catchment. The buffer still widens the circle, so it
+            // makes an inverted step harder to fire (GPS jitter can't trip it).
+            const inverted = isInvertedStep(step);
             const results = {
                 index,
                 distanceInMetres,
-                inRange: distanceInMetres < catchmentRadius,
+                inverted,
+                inRange: isTriggered(distanceInMetres, catchmentRadius, inverted),
                 // Port other conditions from legacy
                 notBeenHereBefore: !session.path.split("|").includes(index.toString()) || (step.on_search?.can_revisit === true),
                 isCurrentStep: index === currentStep,
@@ -85,10 +91,12 @@ export class GameEngineService {
             return { ...step, ...results, allowed };
         }).sort((a: any, b: any) => a.distanceInMetres - b.distanceInMetres);
 
-        const nearby = steps.filter((s: any) => s.allowed && s.inRange);
+        // Normal steps win; an inverted step fires only if no normal step matched.
+        const activated = pickActivatedStep(steps);
 
-        if (nearby.length === 0) {
-            const closest = steps.filter((s: any) => s.allowed)[0];
+        if (!activated) {
+            // Inverted (arena) steps are never a navigation target.
+            const closest = steps.filter((s: any) => s.allowed && !s.inverted)[0];
             let message = "Not close enough";
             let direction, distance;
 
@@ -106,7 +114,7 @@ export class GameEngineService {
             return { ok: true, message, distance, direction };
         } else {
             // Step activated
-            const step = nearby[0];
+            const step: any = activated;
             const stepIndex = step.index;
             const pathArr = session.path ? session.path.split("|") : [];
             pathArr.push(stepIndex.toString());

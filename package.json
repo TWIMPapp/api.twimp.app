@@ -5,7 +5,7 @@
     "dev:server": "vercel dev --listen 3001 --yes",
     "dev:all": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,green\" \"npm run dev:server\" \"npm run dev --prefix ../game.twimp.app\"",
     "build": "tsc",
-    "test": "node --experimental-strip-types --test src/utils/dateTokens.test.ts"
+    "test": "node --experimental-strip-types --test src/utils/dateTokens.test.ts src/utils/proximity.test.ts"
   },
   "keywords": [],
   "author": "",
