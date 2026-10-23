@@ -36,6 +36,10 @@ import {
   localToUtc,
   gameRefFromTags,
   gameRefForEvent,
+  getEventContent,
+  updateEventFields,
+  replaceEventOverview,
+  makeTicketsFree,
   TWIMP_TAG_PREFIX,
 } from './eventbrite';
 
@@ -730,6 +734,48 @@ Use this for events that were already published before copy_eventbrite_event_fro
       try {
         await unpublishEvent(event_id);
         return { content: [{ type: 'text', text: `Unpublished ${event_id}.` }] };
+      } catch (e) {
+        return { content: [{ type: 'text', text: `Error: ${e instanceof Error ? e.message : String(e)}` }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
+    'get_eventbrite_event_content',
+    'Read an Eventbrite event\'s full content (name, summary, description, overview modules, venue, logo, tickets, refund policy). Read-only.',
+    { event_id: z.string() },
+    async ({ event_id }) => {
+      try {
+        const c = await getEventContent(event_id);
+        return { content: [{ type: 'text', text: JSON.stringify(c, null, 2) }] };
+      } catch (e) {
+        return { content: [{ type: 'text', text: `Error: ${e instanceof Error ? e.message : String(e)}` }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
+    'update_eventbrite_event_content',
+    'Update an Eventbrite event\'s name, summary, venue, cover image (image_url uploaded), overview HTML (replaces the listing overview), and/or make all tickets free. Only provided fields change. Works on drafts and live events.',
+    {
+      event_id: z.string(),
+      name: z.string().optional(),
+      summary: z.string().max(140).optional(),
+      overview_html: z.string().optional(),
+      venue_id: z.string().optional(),
+      image_url: z.string().optional(),
+      make_free: z.boolean().optional(),
+    },
+    async ({ event_id, name, summary, overview_html, venue_id, image_url, make_free }) => {
+      try {
+        const done: string[] = [];
+        let logoId: string | undefined;
+        if (image_url) { logoId = await uploadImageFromUrl(image_url); done.push(`image ${logoId}`); }
+        await updateEventFields(event_id, { name, summary, venueId: venue_id, logoId });
+        if (name) done.push('name'); if (summary !== undefined) done.push('summary'); if (venue_id) done.push('venue');
+        if (overview_html) { const v = await replaceEventOverview(event_id, overview_html); done.push(`overview v${v}`); }
+        if (make_free) { const n = await makeTicketsFree(event_id); done.push(`${n} ticket class(es) made free`); }
+        return { content: [{ type: 'text', text: `Updated ${event_id}: ${done.join(', ') || 'nothing'}.` }] };
       } catch (e) {
         return { content: [{ type: 'text', text: `Error: ${e instanceof Error ? e.message : String(e)}` }], isError: true };
       }

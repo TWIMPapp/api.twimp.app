@@ -445,3 +445,59 @@ export function gameRefForEvent(
   const hit = games.find(g => (g.name || '').trim().toLowerCase() === n);
   return hit ? hit.ref : null;
 }
+
+// ---------- Content read/update (templates) ----------
+
+/** Full content of an event: name, summary, description, venue, logo, tickets, structured-content modules. */
+export async function getEventContent(eventId: string): Promise<any> {
+  const e = await eb<any>(`/events/${eventId}/?expand=venue,logo`);
+  const tc = await eb<any>(`/events/${eventId}/ticket_classes/`);
+  let sc: any = null;
+  try { sc = await eb<any>(`/events/${eventId}/structured_content/?purpose=listing`); } catch (err: any) { sc = { error: err.message }; }
+  return {
+    id: e.id, status: e.status, url: e.url, name: e.name?.text, summary: e.summary,
+    description_html: e.description?.html, start: e.start?.local, end: e.end?.local,
+    venue: e.venue ? { id: e.venue.id, name: e.venue.name, address: e.venue.address?.localized_address_display } : null,
+    logo: e.logo ? { id: e.logo.id, url: e.logo.original?.url || e.logo.url } : null,
+    refund_policy: e.refund_policy, capacity: e.capacity,
+    tickets: (tc.ticket_classes || []).map((t: any) => ({ id: t.id, name: t.name, free: t.free, cost: t.cost?.display, quantity_total: t.quantity_total, sales_end: t.sales_end })),
+    structured_content: sc ? { page_version_number: sc.page_version_number, modules: sc.modules, error: sc.error } : null,
+  };
+}
+
+/** Update name/summary/venue/logo on an event (only provided fields). */
+export async function updateEventFields(eventId: string, f: { name?: string; summary?: string; venueId?: string; logoId?: string }): Promise<void> {
+  const event: Record<string, unknown> = {};
+  if (f.name) event.name = { html: f.name };
+  if (f.summary !== undefined) event.summary = f.summary;
+  if (f.venueId) event.venue_id = f.venueId;
+  if (f.logoId) event.logo_id = f.logoId;
+  if (Object.keys(event).length) await eb(`/events/${eventId}/`, { method: 'POST', body: JSON.stringify({ event }) });
+}
+
+/** Replace the listing overview with a single HTML text module, at the next page version. */
+export async function replaceEventOverview(eventId: string, html: string): Promise<number> {
+  let next = 1;
+  try {
+    const sc = await eb<any>(`/events/${eventId}/structured_content/?purpose=listing`);
+    const v = Number(sc?.page_version_number);
+    if (v) next = v + 1;
+  } catch { /* none yet */ }
+  await eb(`/events/${eventId}/structured_content/${next}/`, {
+    method: 'POST',
+    body: JSON.stringify({ modules: [{ type: 'text', data: { body: { type: 'html', text: html } } }], publish: true, purpose: 'listing' }),
+  });
+  return next;
+}
+
+/** Make every ticket class on an event free. */
+export async function makeTicketsFree(eventId: string): Promise<number> {
+  const tc = await eb<any>(`/events/${eventId}/ticket_classes/`);
+  let n = 0;
+  for (const t of tc.ticket_classes || []) {
+    if (t.free) continue;
+    await eb(`/events/${eventId}/ticket_classes/${t.id}/`, { method: 'POST', body: JSON.stringify({ ticket_class: { free: true } }) });
+    n++;
+  }
+  return n;
+}
