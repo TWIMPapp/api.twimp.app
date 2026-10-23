@@ -28,6 +28,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
+  // Stateless JSON-response server: no SSE stream (GET) and no sessions to
+  // terminate (DELETE). Reply 405 immediately per the MCP Streamable HTTP
+  // spec instead of letting the transport hang until the 300s timeout.
+  if (req.method === 'GET' || req.method === 'DELETE') {
+    res.setHeader('Allow', 'POST, OPTIONS');
+    res.status(405).json({
+      jsonrpc: '2.0',
+      error: { code: -32000, message: 'Method not allowed.' },
+      id: null,
+    });
+    return;
+  }
+
   // Auth check before doing anything expensive
   const expected = process.env.MCP_TOKEN;
   if (!expected) {
@@ -52,7 +65,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   )) as any;
   /* eslint-enable @typescript-eslint/no-explicit-any */
 
-  const server = new McpServer({ name: 'twimp', version: '1.0.0' });
+  const server = new McpServer({ name: 'twimp', version: '1.1.0' });
   registerTools(server);
 
   const transport = new StreamableHTTPServerTransport({
