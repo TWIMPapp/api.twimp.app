@@ -35,6 +35,7 @@ import {
   resetAllTicketSalesEnd,
   localToUtc,
   gameRefFromTags,
+  gameRefForEvent,
   TWIMP_TAG_PREFIX,
 } from './eventbrite';
 
@@ -359,8 +360,10 @@ Constraints:
         if (events.length === 0) {
           return { content: [{ type: 'text', text: `No Eventbrite events in the next ${days_ahead} days.` }] };
         }
+        let games: Array<{ ref: string; name: string }> = [];
+        try { games = await getAllVisibleGames(); } catch { /* tags only */ }
         const lines = events.map(e => {
-          const ref = gameRefFromTags(e.tags);
+          const ref = gameRefForEvent(e, games);
           const startLocal = e.start.local.slice(0, 16).replace('T', ' ');
           return `- [${e.id}] ${e.name.text}\n  ${startLocal} ${e.start.timezone}  •  status: ${e.status}  •  game: ${ref || 'UNMANAGED (no twimp_game tag)'}`;
         });
@@ -397,7 +400,7 @@ ORPHANS: Eventbrite events whose TWIMP game is no longer playable (inactive/pend
         const orphans: Array<{ event: typeof events[0]; reason: string }> = [];
 
         for (const e of events) {
-          const ref = gameRefFromTags(e.tags);
+          const ref = gameRefForEvent(e, allVisible);
           const localDate = e.start.local.slice(0, 10);
           if (!ref) {
             unmanaged.push(e);
@@ -515,7 +518,7 @@ Creates a venue from the game's start lat/lng (reverse-geocoded for a readable a
         });
         const existingDates = new Set<string>();
         for (const e of existing) {
-          if (gameRefFromTags(e.tags) === game_ref) existingDates.add(e.start.local.slice(0, 10));
+          if (gameRefForEvent(e, [{ ref: game_ref, name: game.name }]) === game_ref) existingDates.add(e.start.local.slice(0, 10));
         }
 
         let venueId = venue_id;

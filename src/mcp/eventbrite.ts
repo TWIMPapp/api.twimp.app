@@ -147,8 +147,12 @@ export async function createEvent(opts: {
     body: JSON.stringify(body),
   });
   // Tags are set via a separate endpoint
+  // Non-fatal: Eventbrite currently rejects this call ("event.tags - Unknown
+  // parameter"). Game ownership falls back to name matching (gameRefForEvent).
   if (opts.tags && opts.tags.length) {
-    await setEventTags(created.id, opts.tags);
+    try { await setEventTags(created.id, opts.tags); } catch (err: any) {
+      console.warn(`setEventTags failed for ${created.id}: ${err?.message}`);
+    }
   }
   return created;
 }
@@ -427,4 +431,17 @@ export function gameRefFromTags(tags?: Array<{ tag: string }>): string | null {
     }
   }
   return null;
+}
+
+/** Game ref from the twimp_game tag, else by exact (case-insensitive) event name match to a game name. */
+export function gameRefForEvent(
+  e: { tags?: Array<{ tag: string }>; name?: { text?: string } },
+  games: Array<{ ref: string; name: string }>,
+): string | null {
+  const tagged = gameRefFromTags(e.tags);
+  if (tagged) return tagged;
+  const n = (e.name?.text || '').trim().toLowerCase();
+  if (!n) return null;
+  const hit = games.find(g => (g.name || '').trim().toLowerCase() === n);
+  return hit ? hit.ref : null;
 }
