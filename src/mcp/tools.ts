@@ -10,7 +10,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 
-import { geocode, reverseGeocode } from './geocode';
+import { geocode, reverseGeocode, reverseGeocodeAddress } from './geocode';
 import { getAllVisibleGames, getLiveGames, getGameByRef } from './games';
 import {
   createRandomTrail,
@@ -521,12 +521,19 @@ Creates a venue from the game's start lat/lng (reverse-geocoded for a readable a
         let venueId = venue_id;
         if (!venueId) {
           let addressLine = game.name;
-          try { addressLine = await reverseGeocode(game.lat!, game.lng!); } catch { /* fall back */ }
+          let city: string | undefined;
+          let postcode: string | undefined;
+          try {
+            const addr = await reverseGeocodeAddress(game.lat!, game.lng!);
+            addressLine = addr.displayName; city = addr.city; postcode = addr.postcode;
+          } catch { /* fall back */ }
           const venue = await createVenue({
             name: `${game.name} starting point`,
             lat: game.lat!,
             lng: game.lng!,
             addressLine,
+            city: city || game.name, // Eventbrite requires a city; never send empty
+            postcode,
             country: 'GB',
           });
           venueId = venue.id;

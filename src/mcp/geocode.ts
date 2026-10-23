@@ -59,3 +59,21 @@ export async function reverseGeocode(lat: number, lng: number): Promise<string> 
   const result = await response.json() as { display_name: string };
   return result.display_name;
 }
+
+/** Structured reverse geocode: display name plus town/city and postcode. */
+export async function reverseGeocodeAddress(lat: number, lng: number): Promise<{ displayName: string; city?: string; postcode?: string }> {
+  const url = new URL('https://nominatim.openstreetmap.org/reverse');
+  url.searchParams.set('lat', lat.toString());
+  url.searchParams.set('lon', lng.toString());
+  url.searchParams.set('format', 'json');
+  url.searchParams.set('addressdetails', '1');
+  const response = await fetch(url.toString(), { headers: { 'User-Agent': 'twimp-mcp-server/0.1.0' } });
+  if (!response.ok) throw new Error(`Reverse geocoding failed: ${response.statusText}`);
+  const r = await response.json() as { display_name: string; address?: Record<string, string> };
+  const a = r.address || {};
+  return {
+    displayName: r.display_name,
+    city: a.town || a.city || a.village || a.suburb || a.county || undefined,
+    postcode: a.postcode || undefined,
+  };
+}
