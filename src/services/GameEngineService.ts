@@ -51,7 +51,7 @@ export class GameEngineService {
             //   normal pin (prox=1),   acc=30 → 1  + 30 = 31m (max)
             //   building (prox=50),    acc=30 → 50 + 30 = 80m
             const proximityRadius = step.on_search?.proximity_radius ?? 1;
-            const accuracyBuffer = Math.max(5, accuracy);
+            const accuracyBuffer = Math.max(10, accuracy);
             const catchmentRadius = proximityRadius + accuracyBuffer;
 
             const results = {
