@@ -21,7 +21,7 @@ export class GameEngineService {
             }
         }
 
-        if (accuracy > 75) {
+        if (accuracy > 30) {
             return { ok: false, reason: "GPS accuracy too low" };
         }
 
@@ -42,17 +42,16 @@ export class GameEngineService {
         const steps = (trail as any).steps.map((step: any, index: number) => {
             const distanceInMetres = GeoService.getDistanceFromLatLonInMeters(lat, lng, step.location.lat, step.location.lng);
             // Catchment = object_size + accuracy_buffer
-            //   accuracy_buffer = 1.5 * accuracy, clamped to [10, 40]
+            //   accuracy_buffer = max(5, accuracy)  (fixes over 30m are rejected above)
             //   object_size     = on_search.proximity_radius ?? 1
             //
             // Examples:
-            //   normal pin (prox=1),   acc=1  → 1  + 10 = 11m
-            //   normal pin (prox=1),   acc=30 → 1  + 40 = 41m
-            //   building (prox=50),    acc=1  → 50 + 10 = 60m (perimeter of 50m-wide)
-            //   building (prox=50),    acc=30 → 50 + 40 = 90m
-            //   stadium (prox=200),    acc=5  → 200 + 10 = 210m
+            //   normal pin (prox=1),   acc=1  → 1  + 5  = 6m
+            //   normal pin (prox=1),   acc=10 → 1  + 10 = 11m
+            //   normal pin (prox=1),   acc=30 → 1  + 30 = 31m (max)
+            //   building (prox=50),    acc=30 → 50 + 30 = 80m
             const proximityRadius = step.on_search?.proximity_radius ?? 1;
-            const accuracyBuffer = Math.min(40, Math.max(10, accuracy * 1.5));
+            const accuracyBuffer = Math.max(5, accuracy);
             const catchmentRadius = proximityRadius + accuracyBuffer;
 
             const results = {
