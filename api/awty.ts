@@ -9,6 +9,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (handleOptions(req, res)) return;
     cors(res);
 
+    // TEMPORARY (2026-10-30): log every incoming AWTY packet for GPS debugging. Remove after testing.
+    console.log('[AWTY-REQ]', req.method, JSON.stringify(req.body));
+
     if (req.method !== 'POST') {
         return res.status(405).json({ ok: false, message: 'Method not allowed' });
     }
