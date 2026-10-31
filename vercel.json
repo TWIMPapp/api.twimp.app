@@ -21,7 +21,8 @@
     { "source": "/custom-trail/:id", "destination": "/api/custom-trail/[id]" },
     { "source": "/valentine/create", "destination": "/api/valentine/create" },
     { "source": "/valentine/send", "destination": "/api/valentine/send" },
-    { "source": "/mcp", "destination": "/api/mcp" }
+    { "source": "/mcp", "destination": "/api/mcp" },
+    { "source": "/claim-sessions", "destination": "/api/claim-sessions" }
   ],
   "headers": [
     {
