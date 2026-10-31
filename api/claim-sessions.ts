@@ -21,9 +21,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'Method not allowed' });
     if (!secretOk(req)) return res.status(401).json({ ok: false, error: 'Unauthorised' });
 
-    const { email, anon_id, dry_run } = req.body || {};
-    const result = await claimSessions(email, anon_id, { dryRun: dry_run === true });
+    const { email, anon_id, dry_run, marketing_consent_at } = req.body || {};
+    const result = await claimSessions(email, anon_id, {
+        dryRun: dry_run === true,
+        marketingConsentAt: typeof marketing_consent_at === 'string' ? marketing_consent_at : null,
+    });
     if (!result.ok) return res.status(result.status).json({ ok: false, error: result.error });
-    console.log('[claim-sessions]', JSON.stringify({ target: result.target_user_id, claimed: result.claimed, skipped: result.skipped_conflicts, dry_run: !!dry_run }));
+    console.log('[claim-sessions]', JSON.stringify({ target: result.target_user_id, claimed: result.claimed, replaced: result.replaced, consent: result.consent_recorded, skipped: result.skipped_conflicts, dry_run: !!dry_run }));
     return res.json(result);
 }

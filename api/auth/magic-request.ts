@@ -12,7 +12,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(405).json({ ok: false, message: 'Method not allowed' });
     }
 
-    const { email, claim_id } = req.body || {};
+    const { email, claim_id, marketing_consent_at } = req.body || {};
     if (!email || typeof email !== 'string' || !EMAIL_RE.test(email)) {
         return res.status(400).json({ ok: false, message: 'A valid email is required' });
     }
@@ -20,7 +20,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket?.remoteAddress;
     const userAgent = req.headers['user-agent'];
 
-    const result = await MagicLinkService.createAndSend(email, ip, userAgent as string | undefined, claim_id);
+    const result = await MagicLinkService.createAndSend(email, ip, userAgent as string | undefined, claim_id, marketing_consent_at);
     if (!result.ok) {
         return res.status(500).json({ ok: false, message: result.message || 'Failed to send sign-in email' });
     }
