@@ -21,7 +21,9 @@ export class MagicLinkService {
     static async createAndSend(
         email: string,
         ip?: string,
-        userAgent?: string
+        userAgent?: string,
+        claimId?: unknown,
+        marketingConsentAt?: unknown
     ): Promise<{ ok: boolean; message?: string }> {
         if (!supabaseAdmin) return { ok: false, message: 'Sign-in is not configured' };
 
@@ -41,7 +43,13 @@ export class MagicLinkService {
             return { ok: false, message: 'Could not create a sign-in link' };
         }
 
-        const url = `${GAME_URL}/auth/magic?token=${token}`;
+        // Carry the anonymous player id through the email so the link still works
+        // when it opens in a different browser (e.g. the mail app's webview).
+        const claim = typeof claimId === 'string' && /^[0-9a-f-]{36}$/i.test(claimId) ? `&claim=${claimId}` : '';
+        // Opt-in consent ticked in the sign-in pop-up, carried the same way.
+        const mc = typeof marketingConsentAt === 'string' && !isNaN(Date.parse(marketingConsentAt))
+            ? `&mc=${encodeURIComponent(new Date(marketingConsentAt).toISOString())}` : '';
+        const url = `${GAME_URL}/auth/magic?token=${token}${claim}${mc}`;
         return this.sendEmail(normalised, url);
     }
 
