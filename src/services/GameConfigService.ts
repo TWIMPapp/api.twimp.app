@@ -9,6 +9,8 @@ export interface GameConfig {
     // Eventbrite event id to copy from when minting a per-date event for this
     // game. Null if no template configured.
     eventbriteTemplateId: string | null;
+    // partners.id (migrations/005_partners.sql). Null/absent = no partner.
+    partnerId?: string | null;
 }
 
 // In-memory cache with TTL
@@ -61,6 +63,7 @@ export class GameConfigService {
                 gameType: d.game_type,
                 status: d.status as GameStatus,
                 eventbriteTemplateId: d.eventbrite_template_id ?? null,
+                partnerId: d.partner_id ?? null,
             }));
             configCache = mergeWithFallback(mapped);
             cacheTime = Date.now();

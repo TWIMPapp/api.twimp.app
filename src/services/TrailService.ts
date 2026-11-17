@@ -3,7 +3,9 @@ import { resolveTrail } from '../utils/resolveTrail';
 import { Trail } from '../types/index';
 import { GeoService } from './GeoService';
 import { SessionService } from './SessionService';
-import { GameConfigService } from './GameConfigService';
+import { GameConfigService, GameConfig } from './GameConfigService';
+import { PartnerService } from './PartnerService';
+import { Partner, partnerSummary, trailCredits } from './PartnerCore';
 import { supabase, isSupabaseConfigured } from '../config/supabase';
 
 // Cache for dynamic trails (TTL-based)
@@ -153,7 +155,8 @@ export class TrailService {
         const isCreatorScoped = creatorId !== undefined && creatorId !== 'twimp';
 
         let activeTrails: Trail[];
-        let configMap: Map<string, { ref: string; status: string }>;
+        let configMap: Map<string, GameConfig>;
+        let partnersById: Map<string, Partner> = new Map();
 
         if (isCreatorScoped) {
             activeTrails = await this.queryTrails({ creatorId: creatorId!, isActive: true });
@@ -162,7 +165,11 @@ export class TrailService {
             // Refresh dynamic trails (only needed for the curated path)
             await this.refreshDynamicTrails();
             const trails = this.getAllTrails();
-            const gameConfig = await GameConfigService.getAll();
+            const [gameConfig, partners] = await Promise.all([
+                GameConfigService.getAll(),
+                PartnerService.getById(),
+            ]);
+            partnersById = partners;
             configMap = new Map(gameConfig.map(c => [c.ref, c]));
             // Only include trails that exist in game_config (default is inactive/hidden)
             activeTrails = trails.filter(t => {
@@ -204,7 +211,11 @@ export class TrailService {
                 gradient: t.gradient,
                 content_pack: t.content_pack,
                 items_enabled: (t as any).items_enabled === true,
-                status: config?.status ?? 'active'
+                status: config?.status ?? 'active',
+                // Partner branding (partners table via game_config.partner_id) and
+                // trail_data.credits, for the home card and intro screen.
+                partner: partnerSummary(config?.partnerId, partnersById),
+                credits: trailCredits(t)
             };
         });
 

@@ -92,6 +92,8 @@ export interface Trail {
     region?: string;
     tags?: string[];
     partner?: string;
+    // Attribution text (route/text source, photo licences). Shown on the intro screen.
+    credits?: string;
     energy_expires?: number;
     tester?: boolean;
     isValidating?: boolean;
